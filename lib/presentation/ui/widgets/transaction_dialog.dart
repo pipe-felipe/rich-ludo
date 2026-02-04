@@ -41,13 +41,16 @@ class TransactionDialog extends StatelessWidget {
                     children: [
                       Align(
                         alignment: Alignment.center,
-                        child: _TransactionTypeSelector(
-                          selectedType: uiState.transactionType,
-                          onTypeSelected: viewModel.onTransactionTypeChange,
+                        child: Transform.translate(
+                          offset: Offset(-15, -4),
+                          child: _TransactionTypeSelector(
+                            selectedType: uiState.transactionType,
+                            onTypeSelected: viewModel.onTransactionTypeChange,
+                          ),
                         ),
                       ),
                       Positioned(
-                        top: -4,
+                        top: -1,
                         right: -15,
                         child: IconButton(
                           onPressed: () => Navigator.of(context).pop(),
