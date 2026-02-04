@@ -5,7 +5,6 @@ import '../../../domain/model/transaction_type.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../viewmodel/transaction_form_viewmodel.dart';
 
-/// Dialog para criar uma nova transação
 class TransactionDialog extends StatelessWidget {
   final int selectedMonth;
   final int selectedYear;
@@ -27,28 +26,40 @@ class TransactionDialog extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 0,
+              bottom: 16,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: _TransactionTypeSelector(
-                        selectedType: uiState.transactionType,
-                        onTypeSelected: viewModel.onTransactionTypeChange,
+                SizedBox(
+                  height: 56,
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: _TransactionTypeSelector(
+                          selectedType: uiState.transactionType,
+                          onTypeSelected: viewModel.onTransactionTypeChange,
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
+                      Positioned(
+                        top: -4,
+                        right: -15,
+                        child: IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 _CategoryAndQuantityInput(
                   uiState: uiState,
-                  onExpenseCategoryChange:
-                      viewModel.onExpenseCategoryChange,
+                  onExpenseCategoryChange: viewModel.onExpenseCategoryChange,
                   onIncomeCategoryChange: viewModel.onIncomeCategoryChange,
                   onQuantityChange: viewModel.onQuantityChange,
                 ),
