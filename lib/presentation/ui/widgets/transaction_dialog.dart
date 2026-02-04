@@ -22,6 +22,7 @@ class TransactionDialog extends StatelessWidget {
         final uiState = viewModel.uiState;
 
         return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 25),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
