@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="rich_ludo"
+        android:label="Rich Ludo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
