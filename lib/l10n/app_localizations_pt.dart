@@ -94,4 +94,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get tryAgain => 'Tentar novamente';
+
+  @override
+  String get exportSuccess => 'Backup exportado com sucesso!';
+
+  @override
+  String get exportError => 'Erro ao exportar backup';
 }

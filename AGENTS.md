@@ -31,6 +31,9 @@ lib/
 - **Datas**: `targetMonth` (1-12), `targetYear`, `createdAt` (ms epoch)
 - **Enums**: Usar para tipos finitos (`TransactionType`, `ExpenseCategory`)
 
+OBS: Do not, ever, create a code duplication
+Make sure that there is no string or other kinda of variables that is created more than one time
+
 ## Testing
 Estrutura espelhada em `test/`:
 ```

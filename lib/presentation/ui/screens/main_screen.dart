@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../l10n/app_localizations.dart';
+import '../../../utils/result.dart';
 import '../../viewmodel/main_screen_viewmodel.dart';
+import '../../viewmodel/transaction_form_viewmodel.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/error_state.dart';
+import '../widgets/floating_notification.dart';
 import '../widgets/main_bottom_bar.dart';
 import '../widgets/main_top_bar.dart';
 import '../widgets/transaction_dialog.dart';
@@ -43,6 +47,7 @@ class MainScreen extends StatelessWidget {
                   child: Center(
                     child: MainBottomBar(
                       onAddButtonClick: () => _showTransactionDialog(context, viewModel),
+                      onSaveClick: () => _exportDatabase(context, viewModel),
                     ),
                   ),
                 ),
@@ -58,14 +63,56 @@ class MainScreen extends StatelessWidget {
     BuildContext context,
     MainScreenViewModel viewModel,
   ) async {
+    // Obter o FormViewModel antes do dialog para garantir acesso ao provider
+    final formViewModel = context.read<TransactionFormViewModel>();
+    formViewModel.resetForm();
+    
     await showDialog(
       context: context,
-      builder: (context) => TransactionDialog(
-        selectedMonth: viewModel.currentMonth,
-        selectedYear: viewModel.currentYear,
+      builder: (dialogContext) => ChangeNotifierProvider.value(
+        value: formViewModel,
+        child: TransactionDialog(
+          selectedMonth: viewModel.currentMonth,
+          selectedYear: viewModel.currentYear,
+        ),
       ),
     );
     viewModel.load.execute();
+  }
+
+  Future<void> _exportDatabase(
+    BuildContext context,
+    MainScreenViewModel viewModel,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    await viewModel.exportDatabase.execute();
+    
+    final result = viewModel.exportDatabase.result;
+    if (result == null) return;
+
+    // Garantir que o contexto ainda é válido antes de mostrar notificação
+    if (!context.mounted) return;
+
+    switch (result) {
+      case Ok<String>():
+        showFloatingNotification(
+          context: context,
+          message: l10n.exportSuccess,
+          type: NotificationType.success,
+        );
+      case Error<String>(:final error):
+        // Não mostrar erro se o usuário apenas cancelou
+        final errorMsg = error.toString();
+        if (!errorMsg.contains('cancelada')) {
+          showFloatingNotification(
+            context: context,
+            message: '${l10n.exportError}: $errorMsg',
+            type: NotificationType.error,
+            duration: const Duration(seconds: 5),
+          );
+        }
+    }
   }
 }
 

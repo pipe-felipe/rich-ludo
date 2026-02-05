@@ -5,13 +5,13 @@ import '../theme/app_theme.dart';
 class MainBottomBar extends StatelessWidget {
   final VoidCallback onAddButtonClick;
   final VoidCallback? onChartClick;
-  final VoidCallback? onSettingsClick;
+  final VoidCallback onSaveClick;
 
   const MainBottomBar({
     super.key,
     required this.onAddButtonClick,
     this.onChartClick,
-    this.onSettingsClick,
+    required this.onSaveClick,
   });
 
   @override
@@ -42,7 +42,7 @@ class MainBottomBar extends StatelessWidget {
           ),
           _BottomBarItem(
             imagePath: 'assets/icons/save-icon.png',
-            onTap: onSettingsClick ?? () {},
+            onTap: onSaveClick,
             size: docIconSize,
           ),
           _BottomBarItem(

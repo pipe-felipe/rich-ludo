@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import '../../domain/model/transaction.dart';
 import '../../domain/model/transaction_type.dart';
 import '../../domain/usecase/delete_transaction_usecase.dart';
+import '../../domain/usecase/export_database_usecase.dart';
 import '../../domain/usecase/get_transactions_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
@@ -11,6 +12,7 @@ import '../../utils/result.dart';
 class MainScreenViewModel extends ChangeNotifier {
   final GetTransactionsUseCase _getTransactionsUseCase;
   final DeleteTransactionUseCase _deleteTransactionUseCase;
+  final ExportDatabaseUseCase _exportDatabaseUseCase;
 
   List<Transaction> _allItems = [];
   List<Transaction> _items = [];
@@ -27,16 +29,22 @@ class MainScreenViewModel extends ChangeNotifier {
   /// Command para deletar uma transação
   late final Command1<int, int> deleteTransaction;
 
+  /// Command para exportar o banco de dados
+  late final Command0<String> exportDatabase;
+
   MainScreenViewModel({
     required GetTransactionsUseCase getTransactionsUseCase,
     required DeleteTransactionUseCase deleteTransactionUseCase,
+    required ExportDatabaseUseCase exportDatabaseUseCase,
   })  : _getTransactionsUseCase = getTransactionsUseCase,
-        _deleteTransactionUseCase = deleteTransactionUseCase {
+        _deleteTransactionUseCase = deleteTransactionUseCase,
+        _exportDatabaseUseCase = exportDatabaseUseCase {
     _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     
     // Inicializa Commands
     load = Command0<List<Transaction>>(_loadTransactions);
     deleteTransaction = Command1<int, int>(_deleteItem);
+    exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
     
     // Carrega dados iniciais
     load.execute();
