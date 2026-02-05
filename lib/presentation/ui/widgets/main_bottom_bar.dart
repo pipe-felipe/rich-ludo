@@ -4,13 +4,13 @@ import '../theme/app_theme.dart';
 
 class MainBottomBar extends StatelessWidget {
   final VoidCallback onAddButtonClick;
-  final VoidCallback? onChartClick;
+  final VoidCallback onRecoveryClick;
   final VoidCallback onSaveClick;
 
   const MainBottomBar({
     super.key,
     required this.onAddButtonClick,
-    this.onChartClick,
+    required this.onRecoveryClick,
     required this.onSaveClick,
   });
 
@@ -37,7 +37,7 @@ class MainBottomBar extends StatelessWidget {
         children: [
           _BottomBarItem(
             imagePath: 'assets/icons/backup-icon.png',
-            onTap: onChartClick ?? () {},
+            onTap: onRecoveryClick,
             size: docIconSize,
           ),
           _BottomBarItem(

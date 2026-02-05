@@ -4,6 +4,7 @@ import '../../domain/model/transaction_type.dart';
 import '../../domain/usecase/delete_transaction_usecase.dart';
 import '../../domain/usecase/export_database_usecase.dart';
 import '../../domain/usecase/get_transactions_usecase.dart';
+import '../../domain/usecase/import_database_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
 
@@ -13,6 +14,7 @@ class MainScreenViewModel extends ChangeNotifier {
   final GetTransactionsUseCase _getTransactionsUseCase;
   final DeleteTransactionUseCase _deleteTransactionUseCase;
   final ExportDatabaseUseCase _exportDatabaseUseCase;
+  final ImportDatabaseUseCase _importDatabaseUseCase;
 
   List<Transaction> _allItems = [];
   List<Transaction> _items = [];
@@ -32,19 +34,25 @@ class MainScreenViewModel extends ChangeNotifier {
   /// Command para exportar o banco de dados
   late final Command0<String> exportDatabase;
 
+  /// Command para importar backup do banco de dados
+  late final Command0<void> importDatabase;
+
   MainScreenViewModel({
     required GetTransactionsUseCase getTransactionsUseCase,
     required DeleteTransactionUseCase deleteTransactionUseCase,
     required ExportDatabaseUseCase exportDatabaseUseCase,
+    required ImportDatabaseUseCase importDatabaseUseCase,
   })  : _getTransactionsUseCase = getTransactionsUseCase,
         _deleteTransactionUseCase = deleteTransactionUseCase,
-        _exportDatabaseUseCase = exportDatabaseUseCase {
+        _exportDatabaseUseCase = exportDatabaseUseCase,
+        _importDatabaseUseCase = importDatabaseUseCase {
     _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     
     // Inicializa Commands
     load = Command0<List<Transaction>>(_loadTransactions);
     deleteTransaction = Command1<int, int>(_deleteItem);
     exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
+    importDatabase = Command0<void>(_importDatabaseUseCase.call);
     
     // Carrega dados iniciais
     load.execute();

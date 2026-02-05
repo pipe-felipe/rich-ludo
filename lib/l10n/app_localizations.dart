@@ -283,6 +283,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Erro ao exportar backup'**
   String get exportError;
+
+  /// No description provided for @importSuccess.
+  ///
+  /// In pt, this message translates to:
+  /// **'Backup restaurado com sucesso!'**
+  String get importSuccess;
+
+  /// No description provided for @importError.
+  ///
+  /// In pt, this message translates to:
+  /// **'Erro ao restaurar backup'**
+  String get importError;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import '../../utils/result.dart';
 import '../local/database/database_helper.dart';
@@ -49,5 +50,37 @@ class ExportLocalService implements ExportService {
         e is Exception ? e : Exception('Erro ao exportar banco de dados: $e'),
       );
     }
+  }
+
+  @override
+  Future<Result<void>> importDatabase(Uint8List backupBytes) async {
+    try {
+      final dbPathResult = await getDatabasePath();
+      if (dbPathResult.isError) {
+        return Result.error(dbPathResult.asError.error);
+      }
+
+      final dbPath = dbPathResult.asOk.value;
+      final dbFile = File(dbPath);
+
+      // Escrever os bytes do backup no arquivo do banco
+      await dbFile.writeAsBytes(backupBytes, flush: true);
+
+      return Result.ok(null);
+    } catch (e) {
+      return Result.error(
+        e is Exception ? e : Exception('Erro ao importar banco de dados: $e'),
+      );
+    }
+  }
+
+  @override
+  Future<void> closeDatabase() async {
+    await _databaseHelper.close();
+  }
+
+  @override
+  Future<void> reopenDatabase() async {
+    await _databaseHelper.database;
   }
 }

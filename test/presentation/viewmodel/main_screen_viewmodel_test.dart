@@ -5,22 +5,26 @@ import 'package:rich_ludo/domain/model/transaction_type.dart';
 import 'package:rich_ludo/domain/usecase/delete_transaction_usecase.dart';
 import 'package:rich_ludo/domain/usecase/export_database_usecase.dart';
 import 'package:rich_ludo/domain/usecase/get_transactions_usecase.dart';
+import 'package:rich_ludo/domain/usecase/import_database_usecase.dart';
 import 'package:rich_ludo/presentation/viewmodel/main_screen_viewmodel.dart';
 import 'package:rich_ludo/utils/result.dart';
 
 class MockGetTransactionsUseCase extends Mock implements GetTransactionsUseCase {}
 class MockDeleteTransactionUseCase extends Mock implements DeleteTransactionUseCase {}
 class MockExportDatabaseUseCase extends Mock implements ExportDatabaseUseCase {}
+class MockImportDatabaseUseCase extends Mock implements ImportDatabaseUseCase {}
 
 void main() {
   late MockGetTransactionsUseCase mockGetTransactionsUseCase;
   late MockDeleteTransactionUseCase mockDeleteTransactionUseCase;
   late MockExportDatabaseUseCase mockExportDatabaseUseCase;
+  late MockImportDatabaseUseCase mockImportDatabaseUseCase;
 
   setUp(() {
     mockGetTransactionsUseCase = MockGetTransactionsUseCase();
     mockDeleteTransactionUseCase = MockDeleteTransactionUseCase();
     mockExportDatabaseUseCase = MockExportDatabaseUseCase();
+    mockImportDatabaseUseCase = MockImportDatabaseUseCase();
   });
 
   MainScreenViewModel createViewModel({
@@ -33,6 +37,7 @@ void main() {
       getTransactionsUseCase: mockGetTransactionsUseCase,
       deleteTransactionUseCase: mockDeleteTransactionUseCase,
       exportDatabaseUseCase: mockExportDatabaseUseCase,
+      importDatabaseUseCase: mockImportDatabaseUseCase,
     );
   }
 
@@ -95,6 +100,7 @@ void main() {
           getTransactionsUseCase: mockGetTransactionsUseCase,
           deleteTransactionUseCase: mockDeleteTransactionUseCase,
           exportDatabaseUseCase: mockExportDatabaseUseCase,
+          importDatabaseUseCase: mockImportDatabaseUseCase,
         );
         
         await viewModel.load.execute();

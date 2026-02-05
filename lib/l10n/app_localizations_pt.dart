@@ -100,4 +100,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get exportError => 'Erro ao exportar backup';
+
+  @override
+  String get importSuccess => 'Backup restaurado com sucesso!';
+
+  @override
+  String get importError => 'Erro ao restaurar backup';
 }

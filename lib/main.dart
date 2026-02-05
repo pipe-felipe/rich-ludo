@@ -13,6 +13,7 @@ import 'domain/repository/transaction_repository.dart';
 import 'domain/usecase/delete_transaction_usecase.dart';
 import 'domain/usecase/export_database_usecase.dart';
 import 'domain/usecase/get_transactions_usecase.dart';
+import 'domain/usecase/import_database_usecase.dart';
 import 'domain/usecase/make_transaction_usecase.dart';
 import 'presentation/ui/theme/app_theme.dart';
 import 'presentation/ui/screens/main_screen.dart';
@@ -69,6 +70,11 @@ class RichLudoApp extends StatelessWidget {
             context.read<ExportService>(),
           ),
         ),
+        Provider<ImportDatabaseUseCase>(
+          create: (context) => ImportDatabaseUseCase(
+            context.read<ExportService>(),
+          ),
+        ),
         
         // Camada de ViewModels
         ChangeNotifierProvider<MainScreenViewModel>(
@@ -76,6 +82,7 @@ class RichLudoApp extends StatelessWidget {
             getTransactionsUseCase: context.read<GetTransactionsUseCase>(),
             deleteTransactionUseCase: context.read<DeleteTransactionUseCase>(),
             exportDatabaseUseCase: context.read<ExportDatabaseUseCase>(),
+            importDatabaseUseCase: context.read<ImportDatabaseUseCase>(),
           ),
         ),
         ChangeNotifierProvider<TransactionFormViewModel>(

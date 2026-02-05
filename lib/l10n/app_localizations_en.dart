@@ -100,4 +100,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exportError => 'Error exporting backup';
+
+  @override
+  String get importSuccess => 'Backup restored successfully!';
+
+  @override
+  String get importError => 'Error restoring backup';
 }

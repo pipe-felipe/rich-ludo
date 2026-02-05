@@ -30,5 +30,7 @@
   "errorLoading": "Error loading data",
   "tryAgain": "Try again",
   "exportSuccess": "Backup exported successfully!",
-  "exportError": "Error exporting backup"
+  "exportError": "Error exporting backup",
+  "importSuccess": "Backup restored successfully!",
+  "importError": "Error restoring backup"
 }

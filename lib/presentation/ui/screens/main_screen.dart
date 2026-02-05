@@ -47,6 +47,7 @@ class MainScreen extends StatelessWidget {
                   child: Center(
                     child: MainBottomBar(
                       onAddButtonClick: () => _showTransactionDialog(context, viewModel),
+                      onRecoveryClick: () => _importDatabase(context, viewModel),
                       onSaveClick: () => _exportDatabase(context, viewModel),
                     ),
                   ),
@@ -108,6 +109,43 @@ class MainScreen extends StatelessWidget {
           showFloatingNotification(
             context: context,
             message: '${l10n.exportError}: $errorMsg',
+            type: NotificationType.error,
+            duration: const Duration(seconds: 5),
+          );
+        }
+    }
+  }
+
+  Future<void> _importDatabase(
+    BuildContext context,
+    MainScreenViewModel viewModel,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    
+    await viewModel.importDatabase.execute();
+    
+    final result = viewModel.importDatabase.result;
+    if (result == null) return;
+
+    // Garantir que o contexto ainda é válido antes de mostrar notificação
+    if (!context.mounted) return;
+
+    switch (result) {
+      case Ok<void>():
+        showFloatingNotification(
+          context: context,
+          message: l10n.importSuccess,
+          type: NotificationType.success,
+        );
+        // Recarregar dados após importar
+        viewModel.load.execute();
+      case Error<void>(:final error):
+        // Não mostrar erro se o usuário apenas cancelou
+        final errorMsg = error.toString();
+        if (!errorMsg.contains('cancelada')) {
+          showFloatingNotification(
+            context: context,
+            message: '${l10n.importError}: $errorMsg',
             type: NotificationType.error,
             duration: const Duration(seconds: 5),
           );
