@@ -1,6 +1,8 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import '../../../config/database_config.dart';
+
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
@@ -9,24 +11,29 @@ class DatabaseHelper {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDB('rich_ludo.db');
+    _database = await _initDB();
     return _database!;
   }
 
-  Future<Database> _initDB(String filePath) async {
+  /// Retorna o caminho completo do arquivo do banco de dados
+  Future<String> getDatabasePath() async {
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
+    return join(dbPath, DatabaseConfig.databaseName);
+  }
+
+  Future<Database> _initDB() async {
+    final path = await getDatabasePath();
 
     return await openDatabase(
       path,
-      version: 1,
+      version: DatabaseConfig.databaseVersion,
       onCreate: _createDB,
     );
   }
 
   Future<void> _createDB(Database db, int version) async {
     await db.execute('''
-      CREATE TABLE transactions (
+      CREATE TABLE ${DatabaseConfig.tableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         amountCents INTEGER NOT NULL,
         type TEXT NOT NULL,
@@ -42,7 +49,9 @@ class DatabaseHelper {
   }
 
   Future<void> close() async {
-    final db = await instance.database;
-    db.close();
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
   }
 }

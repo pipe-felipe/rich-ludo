@@ -3,20 +3,28 @@ import 'package:mocktail/mocktail.dart';
 import 'package:rich_ludo/domain/model/transaction.dart';
 import 'package:rich_ludo/domain/model/transaction_type.dart';
 import 'package:rich_ludo/domain/usecase/delete_transaction_usecase.dart';
+import 'package:rich_ludo/domain/usecase/export_database_usecase.dart';
 import 'package:rich_ludo/domain/usecase/get_transactions_usecase.dart';
+import 'package:rich_ludo/domain/usecase/import_database_usecase.dart';
 import 'package:rich_ludo/presentation/viewmodel/main_screen_viewmodel.dart';
 import 'package:rich_ludo/utils/result.dart';
 
 class MockGetTransactionsUseCase extends Mock implements GetTransactionsUseCase {}
 class MockDeleteTransactionUseCase extends Mock implements DeleteTransactionUseCase {}
+class MockExportDatabaseUseCase extends Mock implements ExportDatabaseUseCase {}
+class MockImportDatabaseUseCase extends Mock implements ImportDatabaseUseCase {}
 
 void main() {
   late MockGetTransactionsUseCase mockGetTransactionsUseCase;
   late MockDeleteTransactionUseCase mockDeleteTransactionUseCase;
+  late MockExportDatabaseUseCase mockExportDatabaseUseCase;
+  late MockImportDatabaseUseCase mockImportDatabaseUseCase;
 
   setUp(() {
     mockGetTransactionsUseCase = MockGetTransactionsUseCase();
     mockDeleteTransactionUseCase = MockDeleteTransactionUseCase();
+    mockExportDatabaseUseCase = MockExportDatabaseUseCase();
+    mockImportDatabaseUseCase = MockImportDatabaseUseCase();
   });
 
   MainScreenViewModel createViewModel({
@@ -28,6 +36,8 @@ void main() {
     return MainScreenViewModel(
       getTransactionsUseCase: mockGetTransactionsUseCase,
       deleteTransactionUseCase: mockDeleteTransactionUseCase,
+      exportDatabaseUseCase: mockExportDatabaseUseCase,
+      importDatabaseUseCase: mockImportDatabaseUseCase,
     );
   }
 
@@ -89,6 +99,8 @@ void main() {
         final viewModel = MainScreenViewModel(
           getTransactionsUseCase: mockGetTransactionsUseCase,
           deleteTransactionUseCase: mockDeleteTransactionUseCase,
+          exportDatabaseUseCase: mockExportDatabaseUseCase,
+          importDatabaseUseCase: mockImportDatabaseUseCase,
         );
         
         await viewModel.load.execute();
@@ -315,6 +327,72 @@ void main() {
         
         expect(viewModel.deleteTransaction.running, isFalse);
         expect(viewModel.deleteTransaction.completed, isTrue);
+        
+        viewModel.dispose();
+      });
+    });
+
+    group('Exportar banco de dados', () {
+      test('deve chamar use case de export via Command', () async {
+        when(() => mockExportDatabaseUseCase())
+            .thenAnswer((_) async => Result.ok('/path/to/backup.ludo'));
+        
+        final viewModel = createViewModel();
+        await viewModel.load.execute();
+        
+        await viewModel.exportDatabase.execute();
+        
+        verify(() => mockExportDatabaseUseCase()).called(1);
+        
+        viewModel.dispose();
+      });
+
+      test('exportDatabase Command deve ter estado running durante execução', () async {
+        when(() => mockExportDatabaseUseCase())
+            .thenAnswer((_) async => Result.ok('/path/to/backup.ludo'));
+        
+        final viewModel = createViewModel();
+        await viewModel.load.execute();
+        
+        final future = viewModel.exportDatabase.execute();
+        
+        expect(viewModel.exportDatabase.running, isTrue);
+        
+        await future;
+        
+        expect(viewModel.exportDatabase.running, isFalse);
+        expect(viewModel.exportDatabase.completed, isTrue);
+        
+        viewModel.dispose();
+      });
+
+      test('exportDatabase Command deve ter estado error quando falha', () async {
+        when(() => mockExportDatabaseUseCase())
+            .thenAnswer((_) async => Result.error(Exception('Erro ao exportar')));
+        
+        final viewModel = createViewModel();
+        await viewModel.load.execute();
+        
+        await viewModel.exportDatabase.execute();
+        
+        expect(viewModel.exportDatabase.error, isTrue);
+        
+        viewModel.dispose();
+      });
+
+      test('exportDatabase Command deve retornar caminho do arquivo exportado', () async {
+        const expectedPath = '/storage/emulated/0/Documents/backup.ludo';
+        
+        when(() => mockExportDatabaseUseCase())
+            .thenAnswer((_) async => Result.ok(expectedPath));
+        
+        final viewModel = createViewModel();
+        await viewModel.load.execute();
+        
+        await viewModel.exportDatabase.execute();
+        
+        expect(viewModel.exportDatabase.result?.isOk, isTrue);
+        expect(viewModel.exportDatabase.result?.asOk.value, equals(expectedPath));
         
         viewModel.dispose();
       });

@@ -28,5 +28,9 @@
   "labelInvalidNumber": "Invalid Number",
   "noTransaction": "No transactions to display",
   "errorLoading": "Error loading data",
-  "tryAgain": "Try again"
+  "tryAgain": "Try again",
+  "exportSuccess": "Backup exported successfully!",
+  "exportError": "Error exporting backup",
+  "importSuccess": "Backup restored successfully!",
+  "importError": "Error restoring backup"
 }

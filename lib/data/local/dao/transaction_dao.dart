@@ -1,7 +1,7 @@
 import 'dart:async';
 import '../database/database_helper.dart';
 import '../../../domain/model/transaction.dart';
-import '../../../domain/model/transaction_type.dart';
+import '../../../domain/model/transaction_mapper.dart';
 
 class TransactionDao {
   final DatabaseHelper _databaseHelper;
@@ -23,7 +23,7 @@ class TransactionDao {
       orderBy: 'createdAt DESC',
     );
 
-    final transactions = maps.map((map) => _mapToTransaction(map)).toList();
+    final transactions = maps.map((map) => TransactionMapper.fromMap(map)).toList();
     _transactionsController.add(transactions);
   }
 
@@ -54,7 +54,7 @@ class TransactionDao {
       orderBy: 'createdAt DESC',
     );
 
-    return maps.map((map) => _mapToTransaction(map)).toList();
+    return maps.map((map) => TransactionMapper.fromMap(map)).toList();
   }
 
   Future<Transaction?> getTransactionById(int id) async {
@@ -67,12 +67,12 @@ class TransactionDao {
     );
 
     if (maps.isEmpty) return null;
-    return _mapToTransaction(maps.first);
+    return TransactionMapper.fromMap(maps.first);
   }
 
   Future<int> addTransaction(Transaction transaction) async {
     final db = await _databaseHelper.database;
-    final id = await db.insert('transactions', _transactionToMap(transaction));
+    final id = await db.insert('transactions', TransactionMapper.toMap(transaction));
     _refreshTransactions();
     return id;
   }
@@ -83,7 +83,7 @@ class TransactionDao {
 
     await db.transaction((txn) async {
       for (final transaction in transactions) {
-        final id = await txn.insert('transactions', _transactionToMap(transaction));
+        final id = await txn.insert('transactions', TransactionMapper.toMap(transaction));
         ids.add(id);
       }
     });
@@ -108,35 +108,6 @@ class TransactionDao {
     final count = await db.delete('transactions');
     _refreshTransactions();
     return count;
-  }
-
-  Transaction _mapToTransaction(Map<String, dynamic> map) {
-    return Transaction(
-      id: map['id'] as int,
-      amountCents: map['amountCents'] as int,
-      type: map['type'] == 'income' ? TransactionType.income : TransactionType.expense,
-      category: map['category'] as String?,
-      description: map['description'] as String?,
-      humanDate: (map['humanDate'] as String?) ?? '',
-      isRecurring: (map['isRecurring'] as int) == 1,
-      createdAt: map['createdAt'] as int,
-      targetMonth: map['targetMonth'] as int,
-      targetYear: map['targetYear'] as int,
-    );
-  }
-
-  Map<String, dynamic> _transactionToMap(Transaction transaction) {
-    return {
-      'amountCents': transaction.amountCents,
-      'type': transaction.type == TransactionType.income ? 'income' : 'expense',
-      'category': transaction.category,
-      'description': transaction.description,
-      'humanDate': transaction.humanDate,
-      'isRecurring': transaction.isRecurring ? 1 : 0,
-      'createdAt': transaction.createdAt,
-      'targetMonth': transaction.targetMonth,
-      'targetYear': transaction.targetYear,
-    };
   }
 
   void dispose() {

@@ -2,15 +2,20 @@ import 'package:flutter/foundation.dart';
 import '../../domain/model/transaction.dart';
 import '../../domain/model/transaction_type.dart';
 import '../../domain/usecase/delete_transaction_usecase.dart';
+import '../../domain/usecase/export_database_usecase.dart';
 import '../../domain/usecase/get_transactions_usecase.dart';
+import '../../domain/usecase/import_database_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
+import '../ui/utils/money_formatter.dart';
 
 /// ViewModel da tela principal
 /// Seguindo: https://docs.flutter.dev/app-architecture/case-study/ui-layer#define-a-view-model
 class MainScreenViewModel extends ChangeNotifier {
   final GetTransactionsUseCase _getTransactionsUseCase;
   final DeleteTransactionUseCase _deleteTransactionUseCase;
+  final ExportDatabaseUseCase _exportDatabaseUseCase;
+  final ImportDatabaseUseCase _importDatabaseUseCase;
 
   List<Transaction> _allItems = [];
   List<Transaction> _items = [];
@@ -27,16 +32,28 @@ class MainScreenViewModel extends ChangeNotifier {
   /// Command para deletar uma transação
   late final Command1<int, int> deleteTransaction;
 
+  /// Command para exportar o banco de dados
+  late final Command0<String> exportDatabase;
+
+  /// Command para importar backup do banco de dados
+  late final Command0<void> importDatabase;
+
   MainScreenViewModel({
     required GetTransactionsUseCase getTransactionsUseCase,
     required DeleteTransactionUseCase deleteTransactionUseCase,
+    required ExportDatabaseUseCase exportDatabaseUseCase,
+    required ImportDatabaseUseCase importDatabaseUseCase,
   })  : _getTransactionsUseCase = getTransactionsUseCase,
-        _deleteTransactionUseCase = deleteTransactionUseCase {
+        _deleteTransactionUseCase = deleteTransactionUseCase,
+        _exportDatabaseUseCase = exportDatabaseUseCase,
+        _importDatabaseUseCase = importDatabaseUseCase {
     _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     
     // Inicializa Commands
     load = Command0<List<Transaction>>(_loadTransactions);
     deleteTransaction = Command1<int, int>(_deleteItem);
+    exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
+    importDatabase = Command0<void>(_importDatabaseUseCase.call);
     
     // Carrega dados iniciais
     load.execute();
@@ -93,8 +110,8 @@ class MainScreenViewModel extends ChangeNotifier {
 
     // Calcular totais do mês
     final totals = _computeTotals(_items);
-    _totalIncomeText = 'R\$ ${_formatTwoDecimals(totals.$1)}';
-    _totalExpenseText = 'R\$ ${_formatTwoDecimals(totals.$2)}';
+    _totalIncomeText = 'R\$ ${formatMoney((totals.$1 * 100).round())}';
+    _totalExpenseText = 'R\$ ${formatMoney((totals.$2 * 100).round())}';
 
     // Calcular economia acumulada
     final now = DateTime.now();
@@ -108,7 +125,8 @@ class MainScreenViewModel extends ChangeNotifier {
       now.month,
       now.year,
     );
-    _totalSavingText = 'R\$ ${_formatTwoDecimals(savingsTotals.$1 - savingsTotals.$2)}';
+    final savingsAmount = (savingsTotals.$1 - savingsTotals.$2) * 100;
+    _totalSavingText = 'R\$ ${formatMoney(savingsAmount.round())}';
 
     notifyListeners();
   }
@@ -150,16 +168,6 @@ class MainScreenViewModel extends ChangeNotifier {
     }
 
     return (incomeCents / 100.0, expenseCents / 100.0);
-  }
-
-  String _formatTwoDecimals(double value) {
-    final cents = (value * 100).round();
-    final negative = cents < 0;
-    final absCents = cents.abs();
-    final whole = absCents ~/ 100;
-    final fraction = (absCents % 100).toString().padLeft(2, '0');
-    final sign = negative ? '-' : '';
-    return '$sign$whole.$fraction';
   }
 
   String _formatMonthYear(int month, int year) {
