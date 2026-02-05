@@ -1,0 +1,137 @@
+name: Build and Release APK
+
+on:
+  push:
+    branches:
+      - main  # Dispara apenas em push/merge na main
+  workflow_dispatch:  # Permite execução manual
+    inputs:
+      version:
+        description: 'Versão da release (ex: v1.0.0) - deixe vazio para usar pubspec.yaml'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build APK (Release)
+        run: flutter build apk --release
+
+      - name: Extract version from pubspec.yaml
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | sed 's/+.*//')
+          echo "version=v${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Rename APK with version
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION=${{ github.event.inputs.version }}
+          fi
+          echo "RELEASE_VERSION=${VERSION}" >> $GITHUB_ENV
+          mv build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/rich_ludo-${VERSION}.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-release
+          path: build/app/outputs/flutter-apk/rich_ludo-*.apk
+
+      - name: Upload version info
+        run: echo "${{ env.RELEASE_VERSION }}" > version.txt
+
+      - name: Upload version artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: version-info
+          path: version.txt
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: apk-release
+          path: ./apk
+
+      - name: Download version info
+        uses: actions/download-artifact@v4
+        with:
+          name: version-info
+          path: ./
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(cat version.txt)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          # Check if tag already exists via GitHub API
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${VERSION}")
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Release ${VERSION} already exists, skipping..."
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Release ${VERSION} does not exist, will create..."
+          fi
+
+      - name: Create Release
+        if: steps.check_release.outputs.exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Rich Ludo ${{ steps.version.outputs.version }}
+            
+            ### Download
+            Baixe o APK abaixo e instale no seu dispositivo Android.
+            
+            ### Instalação
+            1. Baixe o arquivo `.apk`
+            2. No Android, habilite "Fontes desconhecidas" nas configurações
+            3. Abra o arquivo APK para instalar
+          files: ./apk/*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
