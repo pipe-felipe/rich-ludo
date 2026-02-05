@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../domain/model/transaction_type.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../viewmodel/transaction_form_viewmodel.dart';
+import '../utils/category_icon.dart';
+import '../utils/category_mapper.dart';
 
 class TransactionDialog extends StatelessWidget {
   final int selectedMonth;
@@ -236,11 +238,11 @@ class _CategoryDropdown extends StatelessWidget {
           return ExpenseCategory.values.map((category) {
             return Row(
               children: [
-                Icon(_getExpenseCategoryIcon(category), size: 18),
+                Icon(getCategoryIcon(category.name, isIncome: false), size: 18),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    _mapExpenseCategory(category, l10n),
+                    mapExpenseCategory(category, l10n),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -253,9 +255,9 @@ class _CategoryDropdown extends StatelessWidget {
             value: category,
             child: Row(
               children: [
-                Icon(_getExpenseCategoryIcon(category), size: 18),
+                Icon(getCategoryIcon(category.name, isIncome: false), size: 18),
                 const SizedBox(width: 6),
-                Text(_mapExpenseCategory(category, l10n)),
+                Text(mapExpenseCategory(category, l10n)),
               ],
             ),
           );
@@ -276,11 +278,11 @@ class _CategoryDropdown extends StatelessWidget {
           return IncomeCategory.values.map((category) {
             return Row(
               children: [
-                Icon(_getIncomeCategoryIcon(category), size: 18),
+                Icon(getCategoryIcon(category.name, isIncome: true), size: 18),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    _mapIncomeCategory(category, l10n),
+                    mapIncomeCategory(category, l10n),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -293,9 +295,9 @@ class _CategoryDropdown extends StatelessWidget {
             value: category,
             child: Row(
               children: [
-                Icon(_getIncomeCategoryIcon(category), size: 18),
+                Icon(getCategoryIcon(category.name, isIncome: true), size: 18),
                 const SizedBox(width: 6),
-                Text(_mapIncomeCategory(category, l10n)),
+                Text(mapIncomeCategory(category, l10n)),
               ],
             ),
           );
@@ -304,70 +306,6 @@ class _CategoryDropdown extends StatelessWidget {
           if (value != null) onIncomeCategoryChange(value);
         },
       );
-    }
-  }
-
-  String _mapExpenseCategory(ExpenseCategory category, AppLocalizations l10n) {
-    switch (category) {
-      case ExpenseCategory.transport:
-        return l10n.expenseCategoryTransport;
-      case ExpenseCategory.gift:
-        return l10n.expenseCategoryGift;
-      case ExpenseCategory.recurring:
-        return l10n.expenseCategoryRecurring;
-      case ExpenseCategory.food:
-        return l10n.expenseCategoryFood;
-      case ExpenseCategory.stuff:
-        return l10n.expenseCategoryStuff;
-      case ExpenseCategory.medicine:
-        return l10n.expenseCategoryMedicine;
-      case ExpenseCategory.clothes:
-        return l10n.expenseCategoryClothes;
-    }
-  }
-
-  IconData _getExpenseCategoryIcon(ExpenseCategory category) {
-    switch (category) {
-      case ExpenseCategory.transport:
-        return Icons.directions_car;
-      case ExpenseCategory.gift:
-        return Icons.card_giftcard;
-      case ExpenseCategory.recurring:
-        return Icons.repeat;
-      case ExpenseCategory.food:
-        return Icons.restaurant;
-      case ExpenseCategory.stuff:
-        return Icons.shopping_bag;
-      case ExpenseCategory.medicine:
-        return Icons.medical_services;
-      case ExpenseCategory.clothes:
-        return Icons.checkroom;
-    }
-  }
-
-  String _mapIncomeCategory(IncomeCategory category, AppLocalizations l10n) {
-    switch (category) {
-      case IncomeCategory.salary:
-        return l10n.incomeCategorySalary;
-      case IncomeCategory.gift:
-        return l10n.incomeCategoryGift;
-      case IncomeCategory.investment:
-        return l10n.incomeCategoryInvestment;
-      case IncomeCategory.other:
-        return l10n.incomeCategoryOther;
-    }
-  }
-
-  IconData _getIncomeCategoryIcon(IncomeCategory category) {
-    switch (category) {
-      case IncomeCategory.salary:
-        return Icons.payments;
-      case IncomeCategory.gift:
-        return Icons.card_giftcard;
-      case IncomeCategory.investment:
-        return Icons.trending_up;
-      case IncomeCategory.other:
-        return Icons.attach_money;
     }
   }
 }

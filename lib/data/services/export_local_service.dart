@@ -5,13 +5,11 @@ import '../../utils/result.dart';
 import '../local/database/database_helper.dart';
 import 'export_service.dart';
 
-/// Implementação local do ExportService
-/// Gerencia a cópia do arquivo de banco de dados SQLite
 class ExportLocalService implements ExportService {
   final DatabaseHelper _databaseHelper;
 
   ExportLocalService({DatabaseHelper? databaseHelper})
-      : _databaseHelper = databaseHelper ?? DatabaseHelper.instance;
+    : _databaseHelper = databaseHelper ?? DatabaseHelper.instance;
 
   @override
   Future<Result<String>> getDatabasePath() async {
@@ -38,7 +36,9 @@ class ExportLocalService implements ExportService {
       final sourceFile = File(sourcePath);
 
       if (!await sourceFile.exists()) {
-        return Result.error(Exception('Arquivo de banco de dados não encontrado'));
+        return Result.error(
+          Exception('Arquivo de banco de dados não encontrado'),
+        );
       }
 
       // Copia o arquivo para o destino

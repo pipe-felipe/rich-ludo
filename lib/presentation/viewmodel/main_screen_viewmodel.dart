@@ -7,6 +7,7 @@ import '../../domain/usecase/get_transactions_usecase.dart';
 import '../../domain/usecase/import_database_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
+import '../ui/utils/money_formatter.dart';
 
 /// ViewModel da tela principal
 /// Seguindo: https://docs.flutter.dev/app-architecture/case-study/ui-layer#define-a-view-model
@@ -109,8 +110,8 @@ class MainScreenViewModel extends ChangeNotifier {
 
     // Calcular totais do mês
     final totals = _computeTotals(_items);
-    _totalIncomeText = 'R\$ ${_formatTwoDecimals(totals.$1)}';
-    _totalExpenseText = 'R\$ ${_formatTwoDecimals(totals.$2)}';
+    _totalIncomeText = 'R\$ ${formatMoney((totals.$1 * 100).round())}';
+    _totalExpenseText = 'R\$ ${formatMoney((totals.$2 * 100).round())}';
 
     // Calcular economia acumulada
     final now = DateTime.now();
@@ -124,7 +125,8 @@ class MainScreenViewModel extends ChangeNotifier {
       now.month,
       now.year,
     );
-    _totalSavingText = 'R\$ ${_formatTwoDecimals(savingsTotals.$1 - savingsTotals.$2)}';
+    final savingsAmount = (savingsTotals.$1 - savingsTotals.$2) * 100;
+    _totalSavingText = 'R\$ ${formatMoney(savingsAmount.round())}';
 
     notifyListeners();
   }
@@ -166,16 +168,6 @@ class MainScreenViewModel extends ChangeNotifier {
     }
 
     return (incomeCents / 100.0, expenseCents / 100.0);
-  }
-
-  String _formatTwoDecimals(double value) {
-    final cents = (value * 100).round();
-    final negative = cents < 0;
-    final absCents = cents.abs();
-    final whole = absCents ~/ 100;
-    final fraction = (absCents % 100).toString().padLeft(2, '0');
-    final sign = negative ? '-' : '';
-    return '$sign$whole.$fraction';
   }
 
   String _formatMonthYear(int month, int year) {

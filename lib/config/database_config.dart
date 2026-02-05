@@ -1,5 +1,3 @@
-/// Configurações centralizadas do banco de dados SQLite
-/// Evita duplicação de constantes em múltiplos serviços
 class DatabaseConfig {
   DatabaseConfig._();
 
