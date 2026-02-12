@@ -76,6 +76,12 @@ class AppTheme {
         : LightPiColors.money;
   }
 
+  static Color thrashCan(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? DarkPiColors.thrashCan
+        : LightPiColors.thrashCan;
+  }
+
   /// Retorna a cor dourada
   static Color goldenColor() => PiColors.golden;
 

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-12
+
+### Added
+- Swipe gesture navigation between months (horizontal drag to change months)
+
+### Fixed
+- Color adjustments in the UI
+
 ## [1.0.0] - 2026-02-04
 
 ### Added

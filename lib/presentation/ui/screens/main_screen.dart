@@ -24,21 +24,32 @@ class MainScreen extends StatelessWidget {
           body: SafeArea(
             child: Stack(
               children: [
-                Column(
-                  children: [
-                    MainTopBar(
-                      totalIncomeText: viewModel.totalIncomeText,
-                      totalExpenseText: viewModel.totalExpenseText,
-                      totalSavingText: viewModel.totalSavingText,
-                      currentMonthYear: viewModel.currentMonthYearText,
-                      onPreviousMonth: viewModel.goToPreviousMonth,
-                      onNextMonth: viewModel.goToNextMonth,
-                      onCurrentMonthClick: viewModel.goToCurrentMonth,
-                    ),
-                    Expanded(
-                      child: _TransactionContent(viewModel: viewModel),
-                    ),
-                  ],
+                GestureDetector(
+                  onHorizontalDragEnd: (details) {
+                    final velocity = details.primaryVelocity ?? 0;
+                    if (velocity > 0) {
+                      viewModel.goToPreviousMonth();
+                    } else if (velocity < 0) {
+                      viewModel.goToNextMonth();
+                    }
+                  },
+                  behavior: HitTestBehavior.translucent,
+                  child: Column(
+                    children: [
+                      MainTopBar(
+                        totalIncomeText: viewModel.totalIncomeText,
+                        totalExpenseText: viewModel.totalExpenseText,
+                        totalSavingText: viewModel.totalSavingText,
+                        currentMonthYear: viewModel.currentMonthYearText,
+                        onPreviousMonth: viewModel.goToPreviousMonth,
+                        onNextMonth: viewModel.goToNextMonth,
+                        onCurrentMonthClick: viewModel.goToCurrentMonth,
+                      ),
+                      Expanded(
+                        child: _TransactionContent(viewModel: viewModel),
+                      ),
+                    ],
+                  ),
                 ),
                 Positioned(
                   bottom: 8,
