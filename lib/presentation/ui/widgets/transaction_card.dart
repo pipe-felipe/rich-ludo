@@ -50,7 +50,7 @@ class TransactionCard extends StatelessWidget {
             ),
             IconButton(
               onPressed: onDelete,
-              icon: const Icon(Icons.delete),
+              icon: Icon(Icons.delete, color: AppTheme.thrashCan(context)),
             ),
           ],
         ),

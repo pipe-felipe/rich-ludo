@@ -22,8 +22,9 @@ class DarkPiColors {
   static const onSurfaceVariant = Color(0xFFB0B0B0);
   static const outline = Color(0xFF5A5A5A);
   static const money = Color(0xFF1FB02B);
-  static const incomeBackground = Color(0x9D9FFCA3);
-  static const expenseBackground = Color(0xAAFFB1B8);
+  static const incomeBackground = Color.fromARGB(193, 20, 96, 26);
+  static const expenseBackground = Color.fromARGB(170, 117, 32, 66);
+  static const thrashCan = Color.fromARGB(255, 199, 201, 95);
 }
 
 /// Cores inspiradas em Maltese Dog - Modo Claro
@@ -50,6 +51,7 @@ class LightPiColors {
   static const money = Color(0xFF2E4F06);
   static const incomeBackground = Color(0x8B7AA444);
   static const expenseBackground = Color(0x8BF59F9F);
+  static const thrashCan = Color.fromARGB(255, 87, 87, 42);
 }
 
 /// Cores compartilhadas
