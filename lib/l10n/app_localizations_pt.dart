@@ -4,6 +4,7 @@ import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
 
+/// The translations for Portuguese (`pt`).
 class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
@@ -105,4 +106,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importError => 'Erro ao restaurar backup';
+
+  @override
+  String get recurringDeleteTitle => 'Deletar recorrente';
+
+  @override
+  String get recurringDeleteThisMonth => 'Apenas este mês';
+
+  @override
+  String get recurringDeleteBackwards => 'Este mês e anteriores';
+
+  @override
+  String get recurringDeleteForwards => 'Este mês e futuros';
+
+  @override
+  String get recurringDeleteAll => 'Todos os meses';
 }

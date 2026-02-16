@@ -1,9 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:rich_ludo/domain/model/recurring_exclusion.dart';
 import 'package:rich_ludo/domain/model/transaction.dart';
 import 'package:rich_ludo/domain/model/transaction_type.dart';
+import 'package:rich_ludo/domain/usecase/delete_recurring_transaction_usecase.dart';
 import 'package:rich_ludo/domain/usecase/delete_transaction_usecase.dart';
 import 'package:rich_ludo/domain/usecase/export_database_usecase.dart';
+import 'package:rich_ludo/domain/usecase/get_exclusions_usecase.dart';
 import 'package:rich_ludo/domain/usecase/get_transactions_usecase.dart';
 import 'package:rich_ludo/domain/usecase/import_database_usecase.dart';
 import 'package:rich_ludo/presentation/viewmodel/main_screen_viewmodel.dart';
@@ -11,31 +14,42 @@ import 'package:rich_ludo/utils/result.dart';
 
 class MockGetTransactionsUseCase extends Mock implements GetTransactionsUseCase {}
 class MockDeleteTransactionUseCase extends Mock implements DeleteTransactionUseCase {}
+class MockDeleteRecurringTransactionUseCase extends Mock implements DeleteRecurringTransactionUseCase {}
+class MockGetExclusionsUseCase extends Mock implements GetExclusionsUseCase {}
 class MockExportDatabaseUseCase extends Mock implements ExportDatabaseUseCase {}
 class MockImportDatabaseUseCase extends Mock implements ImportDatabaseUseCase {}
 
 void main() {
   late MockGetTransactionsUseCase mockGetTransactionsUseCase;
   late MockDeleteTransactionUseCase mockDeleteTransactionUseCase;
+  late MockDeleteRecurringTransactionUseCase mockDeleteRecurringTransactionUseCase;
+  late MockGetExclusionsUseCase mockGetExclusionsUseCase;
   late MockExportDatabaseUseCase mockExportDatabaseUseCase;
   late MockImportDatabaseUseCase mockImportDatabaseUseCase;
 
   setUp(() {
     mockGetTransactionsUseCase = MockGetTransactionsUseCase();
     mockDeleteTransactionUseCase = MockDeleteTransactionUseCase();
+    mockDeleteRecurringTransactionUseCase = MockDeleteRecurringTransactionUseCase();
+    mockGetExclusionsUseCase = MockGetExclusionsUseCase();
     mockExportDatabaseUseCase = MockExportDatabaseUseCase();
     mockImportDatabaseUseCase = MockImportDatabaseUseCase();
   });
 
   MainScreenViewModel createViewModel({
     List<Transaction> initialTransactions = const [],
+    List<RecurringExclusion> initialExclusions = const [],
   }) {
     when(() => mockGetTransactionsUseCase())
         .thenAnswer((_) async => Result.ok(initialTransactions));
+    when(() => mockGetExclusionsUseCase())
+        .thenAnswer((_) async => Result.ok(initialExclusions));
     
     return MainScreenViewModel(
       getTransactionsUseCase: mockGetTransactionsUseCase,
       deleteTransactionUseCase: mockDeleteTransactionUseCase,
+      deleteRecurringTransactionUseCase: mockDeleteRecurringTransactionUseCase,
+      getExclusionsUseCase: mockGetExclusionsUseCase,
       exportDatabaseUseCase: mockExportDatabaseUseCase,
       importDatabaseUseCase: mockImportDatabaseUseCase,
     );
@@ -95,10 +109,14 @@ void main() {
       test('deve ter estado error quando falha', () async {
         when(() => mockGetTransactionsUseCase())
             .thenAnswer((_) async => Result.error(Exception('Database error')));
+        when(() => mockGetExclusionsUseCase())
+            .thenAnswer((_) async => const Result.ok(<RecurringExclusion>[]));
         
         final viewModel = MainScreenViewModel(
           getTransactionsUseCase: mockGetTransactionsUseCase,
           deleteTransactionUseCase: mockDeleteTransactionUseCase,
+          deleteRecurringTransactionUseCase: mockDeleteRecurringTransactionUseCase,
+          getExclusionsUseCase: mockGetExclusionsUseCase,
           exportDatabaseUseCase: mockExportDatabaseUseCase,
           importDatabaseUseCase: mockImportDatabaseUseCase,
         );

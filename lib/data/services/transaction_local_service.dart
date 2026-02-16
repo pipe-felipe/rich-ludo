@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:sqflite/sqflite.dart' hide Transaction;
 import '../../config/database_config.dart';
+import '../../domain/model/recurring_exclusion.dart';
+import '../../domain/model/recurring_exclusion_mapper.dart';
 import '../../domain/model/transaction.dart';
 import '../../domain/model/transaction_mapper.dart';
 import '../../utils/result.dart';
@@ -122,7 +124,65 @@ class TransactionLocalService implements TransactionService {
   Future<Result<int>> deleteAll() async {
     try {
       final db = await database;
+      await db.delete(DatabaseConfig.exclusionsTableName);
       final count = await db.delete(DatabaseConfig.tableName);
+      return Result.ok(count);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<int>> updateTransaction(Transaction transaction) async {
+    try {
+      final db = await database;
+      final count = await db.update(
+        DatabaseConfig.tableName,
+        TransactionMapper.toMap(transaction),
+        where: 'id = ?',
+        whereArgs: [transaction.id],
+      );
+      return Result.ok(count);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<List<RecurringExclusion>>> getAllExclusions() async {
+    try {
+      final db = await database;
+      final maps = await db.query(DatabaseConfig.exclusionsTableName);
+      final exclusions = maps.map(RecurringExclusionMapper.fromMap).toList();
+      return Result.ok(exclusions);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<int>> addExclusion(RecurringExclusion exclusion) async {
+    try {
+      final db = await database;
+      final id = await db.insert(
+        DatabaseConfig.exclusionsTableName,
+        RecurringExclusionMapper.toMap(exclusion),
+      );
+      return Result.ok(id);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<int>> deleteExclusionsForTransaction(int transactionId) async {
+    try {
+      final db = await database;
+      final count = await db.delete(
+        DatabaseConfig.exclusionsTableName,
+        where: 'transactionId = ?',
+        whereArgs: [transactionId],
+      );
       return Result.ok(count);
     } on Exception catch (e) {
       return Result.error(e);

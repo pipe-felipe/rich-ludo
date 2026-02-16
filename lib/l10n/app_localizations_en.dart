@@ -4,6 +4,7 @@ import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
 
+/// The translations for English (`en`).
 class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
@@ -105,4 +106,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importError => 'Error restoring backup';
+
+  @override
+  String get recurringDeleteTitle => 'Delete recurring';
+
+  @override
+  String get recurringDeleteThisMonth => 'This month only';
+
+  @override
+  String get recurringDeleteBackwards => 'This month and previous';
+
+  @override
+  String get recurringDeleteForwards => 'This month and future';
+
+  @override
+  String get recurringDeleteAll => 'All months';
 }

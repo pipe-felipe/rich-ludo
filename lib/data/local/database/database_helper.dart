@@ -28,6 +28,7 @@ class DatabaseHelper {
       path,
       version: DatabaseConfig.databaseVersion,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
   }
 
@@ -43,9 +44,36 @@ class DatabaseHelper {
         isRecurring INTEGER NOT NULL DEFAULT 0,
         createdAt INTEGER NOT NULL DEFAULT 0,
         targetMonth INTEGER NOT NULL DEFAULT 0,
-        targetYear INTEGER NOT NULL DEFAULT 0
+        targetYear INTEGER NOT NULL DEFAULT 0,
+        endMonth INTEGER,
+        endYear INTEGER
       )
     ''');
+    await db.execute('''
+      CREATE TABLE ${DatabaseConfig.exclusionsTableName} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        transactionId INTEGER NOT NULL,
+        month INTEGER NOT NULL,
+        year INTEGER NOT NULL,
+        FOREIGN KEY (transactionId) REFERENCES ${DatabaseConfig.tableName} (id) ON DELETE CASCADE
+      )
+    ''');
+  }
+
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE ${DatabaseConfig.tableName} ADD COLUMN endMonth INTEGER');
+      await db.execute('ALTER TABLE ${DatabaseConfig.tableName} ADD COLUMN endYear INTEGER');
+      await db.execute('''
+        CREATE TABLE ${DatabaseConfig.exclusionsTableName} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          transactionId INTEGER NOT NULL,
+          month INTEGER NOT NULL,
+          year INTEGER NOT NULL,
+          FOREIGN KEY (transactionId) REFERENCES ${DatabaseConfig.tableName} (id) ON DELETE CASCADE
+        )
+      ''');
+    }
   }
 
   Future<void> close() async {

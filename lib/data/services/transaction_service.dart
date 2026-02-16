@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../../domain/model/recurring_exclusion.dart';
 import '../../domain/model/transaction.dart';
 import '../../utils/result.dart';
 
@@ -16,7 +17,15 @@ abstract class TransactionService {
 
   Future<Result<List<int>>> insertAll(List<Transaction> transactions);
 
+  Future<Result<int>> updateTransaction(Transaction transaction);
+
   Future<Result<int>> deleteTransaction(int id);
 
   Future<Result<int>> deleteAll();
+
+  Future<Result<List<RecurringExclusion>>> getAllExclusions();
+
+  Future<Result<int>> addExclusion(RecurringExclusion exclusion);
+
+  Future<Result<int>> deleteExclusionsForTransaction(int transactionId);
 }

@@ -16,6 +16,8 @@ class TransactionMapper {
       createdAt: map['createdAt'] as int,
       targetMonth: map['targetMonth'] as int,
       targetYear: map['targetYear'] as int,
+      endMonth: map['endMonth'] as int?,
+      endYear: map['endYear'] as int?,
     );
   }
 
@@ -30,6 +32,8 @@ class TransactionMapper {
       'createdAt': transaction.createdAt,
       'targetMonth': transaction.targetMonth,
       'targetYear': transaction.targetYear,
+      'endMonth': transaction.endMonth,
+      'endYear': transaction.endYear,
     };
   }
 }
