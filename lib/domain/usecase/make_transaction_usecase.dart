@@ -2,8 +2,6 @@ import '../model/transaction.dart';
 import '../repository/transaction_repository.dart';
 import '../../utils/result.dart';
 
-/// Caso de uso para criar uma nova transação
-/// Seguindo: https://docs.flutter.dev/app-architecture/guide#optional-domain-layer
 class MakeTransactionUseCase {
   final TransactionRepository _repository;
 

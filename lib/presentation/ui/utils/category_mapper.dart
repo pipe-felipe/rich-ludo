@@ -1,7 +1,6 @@
 import '../../../l10n/app_localizations.dart';
 import '../../viewmodel/transaction_form_viewmodel.dart';
 
-/// Converte ExpenseCategory para string localizada
 String mapExpenseCategory(ExpenseCategory category, AppLocalizations l10n) {
   switch (category) {
     case ExpenseCategory.transport:
@@ -21,7 +20,6 @@ String mapExpenseCategory(ExpenseCategory category, AppLocalizations l10n) {
   }
 }
 
-/// Converte IncomeCategory para string localizada
 String mapIncomeCategory(IncomeCategory category, AppLocalizations l10n) {
   switch (category) {
     case IncomeCategory.salary:

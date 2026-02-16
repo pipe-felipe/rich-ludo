@@ -1,12 +1,36 @@
 # RichLudo
 
-Aplicativo de controle financeiro pessoal, convertido do projeto RichPipi (Kotlin Multiplatform) para Flutter.
+Personal finance control app, converted from the RichPipi project (Kotlin Multiplatform) to Flutter.
 
-## Arquitetura
+## Description - pt-br
 
-Este projeto segue **Clean Architecture** com as seguintes camadas:
+Esse aplicativo foi criado por dois motivos.
 
-### Domain Layer (Pura em Dart, sem dependências de framework)
+O primeiro foi porque eu queria um aplicativo de gestão financeira que não fosse muito complexo, nem precisasse se conectar a muitas contas online, e também não tivesse muitas propagandas.
+
+O segundo foi porque eu queria ver como seria desenvolver em uma plataforma que eu nunca havia trabalhado – mobile – e com uma linguagem que nunca havia usado – Dart.
+
+A ideia era ver como eu me sairia apenas com conhecimentos básicos, como: arquitetura de sistemas, padrões de design, estruturas de dados etc.
+
+Tudo isso, utilizando IA para impulsionar o aprendizado
+
+## Description - en-us
+
+This app was created for two reasons.
+
+The first was because I wanted a financial management app that wasn't too complex, didn't need to connect to many online accounts, and also didn't have many ads.
+
+The second was because I wanted to see what it would be like to develop on a platform I had never worked on – mobile – and with a language I had never used – Dart.
+
+The idea was to see how I would fare using only basic knowledge, such as: system architecture, design patterns, data structures, etc.
+
+All of this, using AI to boost learning.
+
+## Architecture
+
+This project follows partially **Clean Architecture** with the following layers:
+
+### Domain Layer (Pure in Dart, no framework dependencies)
 - **Models**: `Transaction`, `TransactionType`
 - **Repository Interfaces**: `TransactionRepository`
 - **Use Cases**: `GetTransactionsUseCase`, `MakeTransactionUseCase`, `DeleteTransactionUseCase`
@@ -17,11 +41,11 @@ Este projeto segue **Clean Architecture** com as seguintes camadas:
 - **Repository Implementation**: `TransactionRepositoryImpl`
 
 ### Presentation Layer
-- **ViewModels**: `MainScreenViewModel`, `TransactionFormViewModel` (usando `ChangeNotifier`)
+- **ViewModels**: `MainScreenViewModel`, `TransactionFormViewModel` (using `ChangeNotifier`)
 - **UI**: `MainScreen`, `TransactionDialog`
-- **Theme**: Tema inspirado em Maltese Dog com suporte a modo claro/escuro
+- **Theme**: Theme inspired by Maltese Dog with light/dark mode support
 
-## Estrutura de Pastas
+## Folder Structure
 
 ```
 lib/
@@ -44,23 +68,23 @@ lib/
 └── main.dart
 ```
 
-## Funcionalidades
+## Features
 
-- ✅ Adicionar transações (receitas e despesas)
-- ✅ Listar transações por mês
-- ✅ Navegar entre meses
-- ✅ Calcular totais de receitas, despesas e economia
-- ✅ Suporte a transações recorrentes
-- ✅ Categorias de despesas e receitas
-- ✅ Persistência local com SQLite
-- ✅ Tema claro/escuro automático
-- ✅ Localização em Português
+- ✅ Add transactions (income and expenses)
+- ✅ List transactions by month
+- ✅ Navigate between months
+- ✅ Calculate totals for income, expenses, and savings
+- ✅ Support for recurring transactions
+- ✅ Expense and income categories
+- ✅ Local persistence with SQLite
+- ✅ Automatic light/dark theme
+- ✅ Localization in Portuguese
 
-## Compilação
+## Compilation
 
-Este projeto está configurado para compilar **apenas para Android e iOS**.
+This project is configured to compile **only for Android and iOS**.
 
-### Executar
+### Run
 
 ```bash
 flutter run
@@ -78,8 +102,8 @@ flutter build apk
 flutter build ios
 ```
 
-## Dependências
+## Dependencies
 
-- `provider`: Gerenciamento de estado
-- `sqflite`: Banco de dados SQLite
-- `flutter_localizations`: Internacionalização
+- `provider`: State management
+- `sqflite`: SQLite database
+- `flutter_localizations`: Internationalization

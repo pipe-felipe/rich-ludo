@@ -1,6 +1,3 @@
-/// Formats an amount in cents to a human-readable money string.
-/// 
-/// Example: 12345 -> "123.45"
 String formatMoney(int amountCents) {
   final negative = amountCents < 0;
   final absCents = amountCents.abs();

@@ -5,7 +5,6 @@ import '../../domain/usecase/make_transaction_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
 
-/// Categorias de despesa
 enum ExpenseCategory {
   transport,
   gift,
@@ -16,7 +15,6 @@ enum ExpenseCategory {
   clothes,
 }
 
-/// Categorias de receita
 enum IncomeCategory {
   salary,
   gift,
@@ -24,8 +22,6 @@ enum IncomeCategory {
   other,
 }
 
-/// Estado do formulário de transação (imutável)
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/ui-layer#ui-state
 class FormUiState {
   final String date;
   final TransactionType transactionType;
@@ -182,7 +178,6 @@ class TransactionFormViewModel extends ChangeNotifier {
     return result;
   }
 
-  /// Submete o formulário usando o Command
   Future<void> submit(int month, int year) async {
     await submitCommand.execute(month, year);
   }

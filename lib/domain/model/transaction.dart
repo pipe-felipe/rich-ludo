@@ -1,6 +1,5 @@
 import 'transaction_type.dart';
 
-/// Entidade de transação financeira
 class Transaction {
   final int id;
   final int amountCents;
@@ -11,10 +10,8 @@ class Transaction {
   final bool isRecurring;
   final int createdAt;
 
-  /// Mês alvo (1-12) onde esta transação pertence
   final int targetMonth;
 
-  /// Ano alvo (ex: 2026) onde esta transação pertence
   final int targetYear;
 
   const Transaction({

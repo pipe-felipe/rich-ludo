@@ -1,12 +1,9 @@
 import 'transaction.dart';
 import 'transaction_type.dart';
 
-/// Classe utilitária para mapeamento de Transaction
-/// Centraliza a lógica de conversão entre Map e Transaction
 class TransactionMapper {
   const TransactionMapper._();
 
-  /// Converte um Map (do banco de dados) para Transaction
   static Transaction fromMap(Map<String, dynamic> map) {
     return Transaction(
       id: map['id'] as int,
@@ -22,7 +19,6 @@ class TransactionMapper {
     );
   }
 
-  /// Converte uma Transaction para Map (para persistência no banco)
   static Map<String, dynamic> toMap(Transaction transaction) {
     return {
       'amountCents': transaction.amountCents,

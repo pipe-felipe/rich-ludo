@@ -429,7 +429,6 @@ void main() {
         
         await viewModel.load.execute();
         
-        // Deve mostrar apenas a transação do mês atual
         expect(viewModel.items.length, equals(1));
         expect(viewModel.items[0].description, equals('Transação do mês atual'));
         

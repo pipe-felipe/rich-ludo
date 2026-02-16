@@ -2,18 +2,14 @@ import 'package:rich_ludo/data/services/transaction_service.dart';
 import 'package:rich_ludo/domain/model/transaction.dart';
 import 'package:rich_ludo/utils/result.dart';
 
-/// Fake do TransactionService para testes
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/testing
 class FakeTransactionService implements TransactionService {
   final List<Transaction> _transactions = [];
   bool shouldReturnError = false;
   
-  /// Adiciona uma transação para configurar o estado inicial do teste
   void addTransaction(Transaction transaction) {
     _transactions.add(transaction);
   }
   
-  /// Limpa todas as transações
   void clear() {
     _transactions.clear();
   }

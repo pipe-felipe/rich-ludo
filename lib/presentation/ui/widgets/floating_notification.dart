@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Tipos de notificação para o card flutuante
 enum NotificationType { success, error, info }
 
-/// Widget de notificação flutuante que substitui o SnackBar vermelho
-/// Usa uma abordagem mais elegante com Card e animação
 class FloatingNotification extends StatefulWidget {
   final String message;
   final NotificationType type;

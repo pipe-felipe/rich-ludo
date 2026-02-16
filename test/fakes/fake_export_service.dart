@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:rich_ludo/data/services/export_service.dart';
 import 'package:rich_ludo/utils/result.dart';
 
-/// Fake do ExportService para testes
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/testing
 class FakeExportService implements ExportService {
   bool shouldReturnError = false;
   String fakeDatabasePath = '/fake/path/rich_ludo.db';

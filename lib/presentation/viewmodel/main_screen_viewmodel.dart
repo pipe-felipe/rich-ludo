@@ -9,8 +9,6 @@ import '../../utils/command.dart';
 import '../../utils/result.dart';
 import '../ui/utils/money_formatter.dart';
 
-/// ViewModel da tela principal
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/ui-layer#define-a-view-model
 class MainScreenViewModel extends ChangeNotifier {
   final GetTransactionsUseCase _getTransactionsUseCase;
   final DeleteTransactionUseCase _deleteTransactionUseCase;
@@ -26,16 +24,12 @@ class MainScreenViewModel extends ChangeNotifier {
   int _currentYear = DateTime.now().year;
   String _currentMonthYearText = '';
 
-  /// Command para carregar transações
   late final Command0<List<Transaction>> load;
   
-  /// Command para deletar uma transação
   late final Command1<int, int> deleteTransaction;
 
-  /// Command para exportar o banco de dados
   late final Command0<String> exportDatabase;
 
-  /// Command para importar backup do banco de dados
   late final Command0<void> importDatabase;
 
   MainScreenViewModel({
@@ -86,7 +80,6 @@ class MainScreenViewModel extends ChangeNotifier {
     
     switch (result) {
       case Ok<int>():
-        // Recarrega as transações após deletar
         await _loadTransactions();
       case Error<int>():
         debugPrint('Erro ao deletar item: ${result.error}');
@@ -96,24 +89,19 @@ class MainScreenViewModel extends ChangeNotifier {
   }
 
   void _filterAndComputeTotals() {
-    // Filtrar transações para o mês atual
     _items = _allItems.where((tx) {
       if (tx.isRecurring) {
-        // Transações recorrentes aparecem a partir do mês de início
         return (tx.targetYear < _currentYear) ||
             (tx.targetYear == _currentYear && tx.targetMonth <= _currentMonth);
       } else {
-        // Transações não recorrentes aparecem apenas no mês alvo
         return tx.targetMonth == _currentMonth && tx.targetYear == _currentYear;
       }
     }).toList();
 
-    // Calcular totais do mês
     final totals = _computeTotals(_items);
     _totalIncomeText = 'R\$ ${formatMoney((totals.$1 * 100).round())}';
     _totalExpenseText = 'R\$ ${formatMoney((totals.$2 * 100).round())}';
 
-    // Calcular economia acumulada
     final now = DateTime.now();
     final accumulatedItems = _allItems.where((tx) {
       return (tx.targetYear < _currentYear) ||
@@ -156,7 +144,6 @@ class MainScreenViewModel extends ChangeNotifier {
 
     for (final item in items) {
       if (item.type == TransactionType.income) {
-        // Apenas contar renda se não for no futuro
         final isFuture = (item.targetYear > currentYear) ||
             (item.targetYear == currentYear && item.targetMonth > currentMonth);
         if (!isFuture) {
@@ -188,7 +175,6 @@ class MainScreenViewModel extends ChangeNotifier {
     return '${monthNames[month - 1]} $year';
   }
 
-  /// Deleta um item usando o Command
   void deleteItem(int id) {
     deleteTransaction.execute(id);
   }

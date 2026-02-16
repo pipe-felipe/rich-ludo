@@ -25,8 +25,6 @@ void main() {
   runApp(const RichLudoApp());
 }
 
-/// App principal do RichLudo
-/// Dependency Injection seguindo: https://docs.flutter.dev/app-architecture/case-study/dependency-injection
 class RichLudoApp extends StatelessWidget {
   const RichLudoApp({super.key});
 
@@ -34,7 +32,6 @@ class RichLudoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Camada de Services (acesso a dados externos)
         Provider<TransactionService>(
           create: (_) => TransactionLocalService(),
         ),
@@ -42,14 +39,12 @@ class RichLudoApp extends StatelessWidget {
           create: (_) => ExportLocalService(),
         ),
         
-        // Camada de Repositories (fonte da verdade para dados)
         Provider<TransactionRepository>(
           create: (context) => TransactionRepositoryImpl(
             service: context.read<TransactionService>(),
           ),
         ),
         
-        // Camada de Use Cases
         Provider<GetTransactionsUseCase>(
           create: (context) => GetTransactionsUseCase(
             context.read<TransactionRepository>(),
@@ -76,7 +71,6 @@ class RichLudoApp extends StatelessWidget {
           ),
         ),
         
-        // Camada de ViewModels
         ChangeNotifierProvider<MainScreenViewModel>(
           create: (context) => MainScreenViewModel(
             getTransactionsUseCase: context.read<GetTransactionsUseCase>(),

@@ -75,7 +75,6 @@ class MainScreen extends StatelessWidget {
     BuildContext context,
     MainScreenViewModel viewModel,
   ) async {
-    // Obter o FormViewModel antes do dialog para garantir acesso ao provider
     final formViewModel = context.read<TransactionFormViewModel>();
     formViewModel.resetForm();
     
