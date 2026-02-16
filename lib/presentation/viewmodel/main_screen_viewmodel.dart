@@ -52,14 +52,12 @@ class MainScreenViewModel extends ChangeNotifier {
         _exportDatabaseUseCase = exportDatabaseUseCase,
         _importDatabaseUseCase = importDatabaseUseCase {
     _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
-    
-    // Inicializa Commands
+
     load = Command0<List<Transaction>>(_loadTransactions);
     deleteTransaction = Command1<int, int>(_deleteItem);
     exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
     importDatabase = Command0<void>(_importDatabaseUseCase.call);
-    
-    // Carrega dados iniciais
+
     load.execute();
   }
 

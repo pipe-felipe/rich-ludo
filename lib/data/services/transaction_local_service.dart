@@ -9,15 +9,12 @@ import '../../utils/result.dart';
 import '../local/database/database_helper.dart';
 import 'transaction_service.dart';
 
-/// Implementação do TransactionService usando SQLite local
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/data-layer#define-a-service
 class TransactionLocalService implements TransactionService {
   final DatabaseHelper _databaseHelper;
 
   TransactionLocalService({DatabaseHelper? databaseHelper})
       : _databaseHelper = databaseHelper ?? DatabaseHelper.instance;
 
-  /// Obtém a instância do banco de dados via DatabaseHelper
   Future<Database> get database => _databaseHelper.database;
 
   @override

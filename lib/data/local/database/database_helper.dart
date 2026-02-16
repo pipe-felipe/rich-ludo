@@ -15,7 +15,6 @@ class DatabaseHelper {
     return _database!;
   }
 
-  /// Retorna o caminho completo do arquivo do banco de dados
   Future<String> getDatabasePath() async {
     final dbPath = await getDatabasesPath();
     return join(dbPath, DatabaseConfig.databaseName);

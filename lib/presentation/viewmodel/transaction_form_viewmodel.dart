@@ -66,14 +66,11 @@ class FormUiState {
   }
 }
 
-/// ViewModel para o formulário de transação
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/ui-layer#define-a-view-model
 class TransactionFormViewModel extends ChangeNotifier {
   final MakeTransactionUseCase _makeTransactionUseCase;
 
   FormUiState _uiState = const FormUiState();
 
-  /// Command para submeter o formulário
   late final Command2<int, int, int> submitCommand;
 
   TransactionFormViewModel({
@@ -142,12 +139,10 @@ class TransactionFormViewModel extends ChangeNotifier {
     final amountDouble = double.tryParse(normalizedQuantity) ?? 0.0;
     final amountCents = (amountDouble * 100).round();
 
-    // Usar data atual se não fornecida
     final dateText = _uiState.date.isNotEmpty
         ? _uiState.date
         : _currentDateString();
 
-    // Calcular createdAt como início do mês selecionado
     final monthStart = DateTime(year, month, 1).millisecondsSinceEpoch;
 
     final category = _uiState.transactionType == TransactionType.expense
