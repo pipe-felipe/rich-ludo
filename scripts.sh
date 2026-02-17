@@ -6,6 +6,10 @@ function flutter_pub_get {
     flutter pub get
 }
 
+function run_tests {
+    flutter test
+}
+
 case "$1" in
     "generate_icons")
         generate_icons
@@ -13,10 +17,14 @@ case "$1" in
     "flutter_pub_get")
         flutter_pub_get
         ;;
+    "run_tests")
+        run_tests
+        ;;
     *)
         echo "Unknown command: $1"
         echo "Available commands:"
         echo "generate_icons"
         echo "flutter_pub_get"
+        echo "run_tests"
         ;;
 esac
