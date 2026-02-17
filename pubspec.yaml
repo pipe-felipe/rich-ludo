@@ -64,6 +64,9 @@ dev_dependencies:
   # Mocking library for tests
   mocktail: ^1.0.4
   
+  # SQLite FFI for database tests
+  sqflite_common_ffi: ^2.3.4+4
+
   # App icon generator
   flutter_launcher_icons: ^0.14.3
 

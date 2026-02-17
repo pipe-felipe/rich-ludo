@@ -61,8 +61,33 @@ class DatabaseHelper {
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE ${DatabaseConfig.tableName} ADD COLUMN endMonth INTEGER');
-      await db.execute('ALTER TABLE ${DatabaseConfig.tableName} ADD COLUMN endYear INTEGER');
+      await _migrateToV2(db);
+    }
+  }
+
+  Future<void> _migrateToV2(Database db) async {
+    final tableInfo = await db.rawQuery(
+      'PRAGMA table_info(${DatabaseConfig.tableName})',
+    );
+    final columnNames = tableInfo.map((col) => col['name'] as String).toSet();
+
+    if (!columnNames.contains('endMonth')) {
+      await db.execute(
+        'ALTER TABLE ${DatabaseConfig.tableName} ADD COLUMN endMonth INTEGER',
+      );
+    }
+
+    if (!columnNames.contains('endYear')) {
+      await db.execute(
+        'ALTER TABLE ${DatabaseConfig.tableName} ADD COLUMN endYear INTEGER',
+      );
+    }
+
+    final tables = await db.rawQuery(
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='${DatabaseConfig.exclusionsTableName}'",
+    );
+
+    if (tables.isEmpty) {
       await db.execute('''
         CREATE TABLE ${DatabaseConfig.exclusionsTableName} (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,6 +97,21 @@ class DatabaseHelper {
           FOREIGN KEY (transactionId) REFERENCES ${DatabaseConfig.tableName} (id) ON DELETE CASCADE
         )
       ''');
+    }
+  }
+
+  Future<void> validateAndMigrateIfNeeded() async {
+    final db = await database;
+
+    final versionResult = await db.rawQuery('PRAGMA user_version');
+    final currentVersion = versionResult.first['user_version'] as int;
+
+    if (currentVersion < DatabaseConfig.databaseVersion) {
+      if (currentVersion < 2) {
+        await _migrateToV2(db);
+      }
+
+      await db.execute('PRAGMA user_version = ${DatabaseConfig.databaseVersion}');
     }
   }
 

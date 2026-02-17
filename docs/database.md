@@ -55,7 +55,9 @@ The `onCreate` callback runs only on **first install**, creating both tables at 
 
 ### Migration (v1 → v2 on update)
 
-The `onUpgrade` callback runs when the app updates from a previous version:
+The `onUpgrade` callback runs when the app updates from a previous version.
+
+**Important:** The migration is **idempotent** - it can be executed multiple times safely. Before adding columns or creating tables, it checks if they already exist.
 
 ```sql
 -- Added in v2
@@ -70,6 +72,16 @@ CREATE TABLE recurring_exclusions (
   FOREIGN KEY (transactionId) REFERENCES transactions (id) ON DELETE CASCADE
 );
 ```
+
+### Backup Import Compatibility
+
+When importing a backup from an older version (v1), the `reopenDatabase()` method automatically calls `validateAndMigrateIfNeeded()` which:
+
+1. Checks the current database version via `PRAGMA user_version`
+2. Applies any missing migrations (idempotent)
+3. Updates the database version to the current app version
+
+This ensures backups from older app versions work correctly with newer versions.
 
 ---
 
