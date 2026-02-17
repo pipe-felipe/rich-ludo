@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -10,8 +11,10 @@ import 'data/services/transaction_service.dart';
 import 'data/services/transaction_local_service.dart';
 import 'data/repository/transaction_repository_impl.dart';
 import 'domain/repository/transaction_repository.dart';
+import 'domain/usecase/delete_recurring_transaction_usecase.dart';
 import 'domain/usecase/delete_transaction_usecase.dart';
 import 'domain/usecase/export_database_usecase.dart';
+import 'domain/usecase/get_exclusions_usecase.dart';
 import 'domain/usecase/get_transactions_usecase.dart';
 import 'domain/usecase/import_database_usecase.dart';
 import 'domain/usecase/make_transaction_usecase.dart';
@@ -22,11 +25,13 @@ import 'presentation/viewmodel/transaction_form_viewmodel.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Configura o app para usar edge-to-edge
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   runApp(const RichLudoApp());
 }
 
-/// App principal do RichLudo
-/// Dependency Injection seguindo: https://docs.flutter.dev/app-architecture/case-study/dependency-injection
 class RichLudoApp extends StatelessWidget {
   const RichLudoApp({super.key});
 
@@ -34,7 +39,6 @@ class RichLudoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Camada de Services (acesso a dados externos)
         Provider<TransactionService>(
           create: (_) => TransactionLocalService(),
         ),
@@ -42,14 +46,12 @@ class RichLudoApp extends StatelessWidget {
           create: (_) => ExportLocalService(),
         ),
         
-        // Camada de Repositories (fonte da verdade para dados)
         Provider<TransactionRepository>(
           create: (context) => TransactionRepositoryImpl(
             service: context.read<TransactionService>(),
           ),
         ),
         
-        // Camada de Use Cases
         Provider<GetTransactionsUseCase>(
           create: (context) => GetTransactionsUseCase(
             context.read<TransactionRepository>(),
@@ -65,6 +67,16 @@ class RichLudoApp extends StatelessWidget {
             context.read<TransactionRepository>(),
           ),
         ),
+        Provider<DeleteRecurringTransactionUseCase>(
+          create: (context) => DeleteRecurringTransactionUseCase(
+            context.read<TransactionRepository>(),
+          ),
+        ),
+        Provider<GetExclusionsUseCase>(
+          create: (context) => GetExclusionsUseCase(
+            context.read<TransactionRepository>(),
+          ),
+        ),
         Provider<ExportDatabaseUseCase>(
           create: (context) => ExportDatabaseUseCase(
             context.read<ExportService>(),
@@ -76,11 +88,12 @@ class RichLudoApp extends StatelessWidget {
           ),
         ),
         
-        // Camada de ViewModels
         ChangeNotifierProvider<MainScreenViewModel>(
           create: (context) => MainScreenViewModel(
             getTransactionsUseCase: context.read<GetTransactionsUseCase>(),
             deleteTransactionUseCase: context.read<DeleteTransactionUseCase>(),
+            deleteRecurringTransactionUseCase: context.read<DeleteRecurringTransactionUseCase>(),
+            getExclusionsUseCase: context.read<GetExclusionsUseCase>(),
             exportDatabaseUseCase: context.read<ExportDatabaseUseCase>(),
             importDatabaseUseCase: context.read<ImportDatabaseUseCase>(),
           ),
@@ -108,6 +121,23 @@ class RichLudoApp extends StatelessWidget {
           Locale('en', ''),
         ],
         locale: const Locale('pt', ''),
+        builder: (context, child) {
+          final brightness = Theme.of(context).brightness;
+          final colorScheme = Theme.of(context).colorScheme;
+
+          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+            systemNavigationBarColor: colorScheme.surface,
+            systemNavigationBarIconBrightness: brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+          ));
+
+          return child ?? const SizedBox.shrink();
+        },
         home: const MainScreen(),
       ),
     );

@@ -1,6 +1,5 @@
 import 'transaction_type.dart';
 
-/// Entidade de transação financeira
 class Transaction {
   final int id;
   final int amountCents;
@@ -11,11 +10,13 @@ class Transaction {
   final bool isRecurring;
   final int createdAt;
 
-  /// Mês alvo (1-12) onde esta transação pertence
   final int targetMonth;
 
-  /// Ano alvo (ex: 2026) onde esta transação pertence
   final int targetYear;
+
+  final int? endMonth;
+
+  final int? endYear;
 
   const Transaction({
     this.id = 0,
@@ -28,6 +29,8 @@ class Transaction {
     this.createdAt = 0,
     this.targetMonth = 0,
     this.targetYear = 0,
+    this.endMonth,
+    this.endYear,
   });
 
   Transaction copyWith({
@@ -41,6 +44,8 @@ class Transaction {
     int? createdAt,
     int? targetMonth,
     int? targetYear,
+    int? Function()? endMonth,
+    int? Function()? endYear,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -53,6 +58,8 @@ class Transaction {
       createdAt: createdAt ?? this.createdAt,
       targetMonth: targetMonth ?? this.targetMonth,
       targetYear: targetYear ?? this.targetYear,
+      endMonth: endMonth != null ? endMonth() : this.endMonth,
+      endYear: endYear != null ? endYear() : this.endYear,
     );
   }
 
@@ -69,7 +76,9 @@ class Transaction {
         other.isRecurring == isRecurring &&
         other.createdAt == createdAt &&
         other.targetMonth == targetMonth &&
-        other.targetYear == targetYear;
+        other.targetYear == targetYear &&
+        other.endMonth == endMonth &&
+        other.endYear == endYear;
   }
 
   @override
@@ -85,6 +94,8 @@ class Transaction {
       createdAt,
       targetMonth,
       targetYear,
+      endMonth,
+      endYear,
     );
   }
 }

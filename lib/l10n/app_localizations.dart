@@ -295,6 +295,36 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Erro ao restaurar backup'**
   String get importError;
+
+  /// No description provided for @recurringDeleteTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Deletar recorrente'**
+  String get recurringDeleteTitle;
+
+  /// No description provided for @recurringDeleteThisMonth.
+  ///
+  /// In pt, this message translates to:
+  /// **'Apenas este mês'**
+  String get recurringDeleteThisMonth;
+
+  /// No description provided for @recurringDeleteBackwards.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este mês e anteriores'**
+  String get recurringDeleteBackwards;
+
+  /// No description provided for @recurringDeleteForwards.
+  ///
+  /// In pt, this message translates to:
+  /// **'Este mês e futuros'**
+  String get recurringDeleteForwards;
+
+  /// No description provided for @recurringDeleteAll.
+  ///
+  /// In pt, this message translates to:
+  /// **'Todos os meses'**
+  String get recurringDeleteAll;
 }
 
 class _AppLocalizationsDelegate

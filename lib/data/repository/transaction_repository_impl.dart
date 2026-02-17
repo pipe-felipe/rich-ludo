@@ -1,3 +1,4 @@
+import '../../domain/model/recurring_exclusion.dart';
 import '../../domain/model/transaction.dart';
 import '../../domain/repository/transaction_repository.dart';
 import '../../utils/result.dart';
@@ -31,6 +32,11 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
+  Future<Result<int>> updateTransaction(Transaction transaction) {
+    return _service.updateTransaction(transaction);
+  }
+
+  @override
   Future<Result<int>> deleteTransaction(int id) {
     return _service.deleteTransaction(id);
   }
@@ -43,5 +49,20 @@ class TransactionRepositoryImpl implements TransactionRepository {
   @override
   Future<Result<List<int>>> insertTransactions(List<Transaction> transactions) {
     return _service.insertAll(transactions);
+  }
+
+  @override
+  Future<Result<List<RecurringExclusion>>> getExclusions() {
+    return _service.getAllExclusions();
+  }
+
+  @override
+  Future<Result<int>> addExclusion(RecurringExclusion exclusion) {
+    return _service.addExclusion(exclusion);
+  }
+
+  @override
+  Future<Result<int>> deleteExclusionsForTransaction(int transactionId) {
+    return _service.deleteExclusionsForTransaction(transactionId);
   }
 }

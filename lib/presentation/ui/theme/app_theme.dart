@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Tema do aplicativo RichLudo
 class AppTheme {
   static ThemeData lightTheme() {
     return ThemeData(
@@ -55,21 +54,18 @@ class AppTheme {
     );
   }
 
-  /// Retorna a cor de fundo para receita baseada no tema
   static Color incomeBackground(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
         ? DarkPiColors.incomeBackground
         : LightPiColors.incomeBackground;
   }
 
-  /// Retorna a cor de fundo para despesa baseada no tema
   static Color expenseBackground(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
         ? DarkPiColors.expenseBackground
         : LightPiColors.expenseBackground;
   }
 
-  /// Retorna a cor de dinheiro baseada no tema
   static Color moneyColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
         ? DarkPiColors.money
@@ -82,9 +78,6 @@ class AppTheme {
         : LightPiColors.thrashCan;
   }
 
-  /// Retorna a cor dourada
   static Color goldenColor() => PiColors.golden;
-
-  /// Retorna a cor de fundo do dock
   static Color dockBackground() => PiColors.dockBackground;
 }

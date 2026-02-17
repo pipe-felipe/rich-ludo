@@ -19,7 +19,6 @@ void main() {
 
   group('GetTransactionsForMonthUseCase', () {
     test('deve retornar transações do mês especificado', () async {
-      // Fevereiro de 2026: 1738368000000 a 1740787200000
       const monthStart = 1738368000000;
       const monthEnd = 1740787200000;
 

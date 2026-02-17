@@ -8,7 +8,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  // Este arquivo pode ser usado para testes de widgets de integração
   group('Estrutura de testes', () {
     test('setup de testes funcionando', () {
       expect(true, isTrue);

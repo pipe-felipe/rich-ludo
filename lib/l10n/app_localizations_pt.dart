@@ -106,4 +106,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importError => 'Erro ao restaurar backup';
+
+  @override
+  String get recurringDeleteTitle => 'Deletar recorrente';
+
+  @override
+  String get recurringDeleteThisMonth => 'Apenas este mês';
+
+  @override
+  String get recurringDeleteBackwards => 'Este mês e anteriores';
+
+  @override
+  String get recurringDeleteForwards => 'Este mês e futuros';
+
+  @override
+  String get recurringDeleteAll => 'Todos os meses';
 }

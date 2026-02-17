@@ -2,8 +2,6 @@ import '../model/transaction.dart';
 import '../repository/transaction_repository.dart';
 import '../../utils/result.dart';
 
-/// Caso de uso para obter transações de um mês específico
-/// Seguindo: https://docs.flutter.dev/app-architecture/guide#optional-domain-layer
 class GetTransactionsForMonthUseCase {
   final TransactionRepository _repository;
 

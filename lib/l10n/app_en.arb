@@ -32,5 +32,10 @@
   "exportSuccess": "Backup exported successfully!",
   "exportError": "Error exporting backup",
   "importSuccess": "Backup restored successfully!",
-  "importError": "Error restoring backup"
+  "importError": "Error restoring backup",
+  "recurringDeleteTitle": "Delete recurring",
+  "recurringDeleteThisMonth": "This month only",
+  "recurringDeleteBackwards": "This month and previous",
+  "recurringDeleteForwards": "This month and future",
+  "recurringDeleteAll": "All months"
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../domain/model/transaction.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/result.dart';
 import '../../viewmodel/main_screen_viewmodel.dart';
@@ -10,6 +11,7 @@ import '../widgets/error_state.dart';
 import '../widgets/floating_notification.dart';
 import '../widgets/main_bottom_bar.dart';
 import '../widgets/main_top_bar.dart';
+import '../widgets/recurring_delete_dialog.dart';
 import '../widgets/transaction_dialog.dart';
 import '../widgets/transaction_list.dart';
 
@@ -75,7 +77,6 @@ class MainScreen extends StatelessWidget {
     BuildContext context,
     MainScreenViewModel viewModel,
   ) async {
-    // Obter o FormViewModel antes do dialog para garantir acesso ao provider
     final formViewModel = context.read<TransactionFormViewModel>();
     formViewModel.resetForm();
     
@@ -189,9 +190,20 @@ class _TransactionContent extends StatelessWidget {
 
         return TransactionList(
           items: viewModel.items,
-          onDelete: viewModel.deleteItem,
+          onDelete: (transaction) => _handleDelete(context, transaction),
         );
       },
     );
+  }
+
+  Future<void> _handleDelete(BuildContext context, Transaction transaction) async {
+    if (transaction.isRecurring) {
+      final mode = await RecurringDeleteDialog.show(context);
+      if (mode != null) {
+        await viewModel.deleteRecurringItem(transaction, mode);
+      }
+    } else {
+      viewModel.deleteItem(transaction.id);
+    }
   }
 }

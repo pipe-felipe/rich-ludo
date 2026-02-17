@@ -5,7 +5,6 @@ import '../../domain/usecase/make_transaction_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
 
-/// Categorias de despesa
 enum ExpenseCategory {
   transport,
   gift,
@@ -16,7 +15,6 @@ enum ExpenseCategory {
   clothes,
 }
 
-/// Categorias de receita
 enum IncomeCategory {
   salary,
   gift,
@@ -24,8 +22,6 @@ enum IncomeCategory {
   other,
 }
 
-/// Estado do formulário de transação (imutável)
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/ui-layer#ui-state
 class FormUiState {
   final String date;
   final TransactionType transactionType;
@@ -70,14 +66,11 @@ class FormUiState {
   }
 }
 
-/// ViewModel para o formulário de transação
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/ui-layer#define-a-view-model
 class TransactionFormViewModel extends ChangeNotifier {
   final MakeTransactionUseCase _makeTransactionUseCase;
 
   FormUiState _uiState = const FormUiState();
 
-  /// Command para submeter o formulário
   late final Command2<int, int, int> submitCommand;
 
   TransactionFormViewModel({
@@ -146,12 +139,10 @@ class TransactionFormViewModel extends ChangeNotifier {
     final amountDouble = double.tryParse(normalizedQuantity) ?? 0.0;
     final amountCents = (amountDouble * 100).round();
 
-    // Usar data atual se não fornecida
     final dateText = _uiState.date.isNotEmpty
         ? _uiState.date
         : _currentDateString();
 
-    // Calcular createdAt como início do mês selecionado
     final monthStart = DateTime(year, month, 1).millisecondsSinceEpoch;
 
     final category = _uiState.transactionType == TransactionType.expense
@@ -182,7 +173,6 @@ class TransactionFormViewModel extends ChangeNotifier {
     return result;
   }
 
-  /// Submete o formulário usando o Command
   Future<void> submit(int month, int year) async {
     await submitCommand.execute(month, year);
   }

@@ -41,7 +41,6 @@ class ExportLocalService implements ExportService {
         );
       }
 
-      // Copia o arquivo para o destino
       await sourceFile.copy(destinationPath);
 
       return Result.ok(destinationPath);
@@ -63,7 +62,6 @@ class ExportLocalService implements ExportService {
       final dbPath = dbPathResult.asOk.value;
       final dbFile = File(dbPath);
 
-      // Escrever os bytes do backup no arquivo do banco
       await dbFile.writeAsBytes(backupBytes, flush: true);
 
       return Result.ok(null);
@@ -82,5 +80,6 @@ class ExportLocalService implements ExportService {
   @override
   Future<void> reopenDatabase() async {
     await _databaseHelper.database;
+    await _databaseHelper.validateAndMigrateIfNeeded();
   }
 }

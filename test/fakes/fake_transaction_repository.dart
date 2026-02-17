@@ -1,21 +1,20 @@
+import 'package:rich_ludo/domain/model/recurring_exclusion.dart';
 import 'package:rich_ludo/domain/model/transaction.dart';
 import 'package:rich_ludo/domain/repository/transaction_repository.dart';
 import 'package:rich_ludo/utils/result.dart';
 
-/// Fake do TransactionRepository para testes
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/testing
 class FakeTransactionRepository implements TransactionRepository {
   final List<Transaction> _transactions = [];
+  final List<RecurringExclusion> _exclusions = [];
   bool shouldReturnError = false;
   
-  /// Adiciona uma transação para configurar o estado inicial do teste
   void addTransaction(Transaction transaction) {
     _transactions.add(transaction);
   }
   
-  /// Limpa todas as transações
   void clear() {
     _transactions.clear();
+    _exclusions.clear();
   }
 
   @override
@@ -52,6 +51,18 @@ class FakeTransactionRepository implements TransactionRepository {
   }
 
   @override
+  Future<Result<int>> updateTransaction(Transaction transaction) async {
+    if (shouldReturnError) {
+      return Result.error(Exception('Erro simulado'));
+    }
+    final index = _transactions.indexWhere((tx) => tx.id == transaction.id);
+    if (index != -1) {
+      _transactions[index] = transaction;
+    }
+    return Result.ok(index != -1 ? 1 : 0);
+  }
+
+  @override
   Future<Result<int>> deleteTransaction(int id) async {
     if (shouldReturnError) {
       return Result.error(Exception('Erro simulado'));
@@ -83,5 +94,38 @@ class FakeTransactionRepository implements TransactionRepository {
       ids.add(newId);
     }
     return Result.ok(ids);
+  }
+
+  @override
+  Future<Result<List<RecurringExclusion>>> getExclusions() async {
+    if (shouldReturnError) {
+      return Result.error(Exception('Erro simulado'));
+    }
+    return Result.ok(List.unmodifiable(_exclusions));
+  }
+
+  @override
+  Future<Result<int>> addExclusion(RecurringExclusion exclusion) async {
+    if (shouldReturnError) {
+      return Result.error(Exception('Erro simulado'));
+    }
+    final newId = _exclusions.length + 1;
+    _exclusions.add(RecurringExclusion(
+      id: newId,
+      transactionId: exclusion.transactionId,
+      month: exclusion.month,
+      year: exclusion.year,
+    ));
+    return Result.ok(newId);
+  }
+
+  @override
+  Future<Result<int>> deleteExclusionsForTransaction(int transactionId) async {
+    if (shouldReturnError) {
+      return Result.error(Exception('Erro simulado'));
+    }
+    final initialLength = _exclusions.length;
+    _exclusions.removeWhere((ex) => ex.transactionId == transactionId);
+    return Result.ok(initialLength - _exclusions.length);
   }
 }

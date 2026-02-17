@@ -6,7 +6,6 @@ IconData getCategoryIcon(String? category, {required bool isIncome}) {
   }
 
   return switch (category) {
-    // Expense categories
     'transport' => Icons.directions_car,
     'gift' => Icons.card_giftcard,
     'recurring' => Icons.repeat,
@@ -14,7 +13,7 @@ IconData getCategoryIcon(String? category, {required bool isIncome}) {
     'stuff' => Icons.shopping_bag,
     'medicine' => Icons.medical_services,
     'clothes' => Icons.checkroom,
-    // Income categories
+
     'salary' => Icons.payments,
     'investment' => Icons.trending_up,
     'other' => Icons.attach_money,

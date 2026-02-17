@@ -106,4 +106,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get importError => 'Error restoring backup';
+
+  @override
+  String get recurringDeleteTitle => 'Delete recurring';
+
+  @override
+  String get recurringDeleteThisMonth => 'This month only';
+
+  @override
+  String get recurringDeleteBackwards => 'This month and previous';
+
+  @override
+  String get recurringDeleteForwards => 'This month and future';
+
+  @override
+  String get recurringDeleteAll => 'All months';
 }

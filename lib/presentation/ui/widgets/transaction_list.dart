@@ -5,7 +5,7 @@ import 'transaction_card.dart';
 
 class TransactionList extends StatelessWidget {
   final List<Transaction> items;
-  final void Function(int) onDelete;
+  final void Function(Transaction) onDelete;
 
   const TransactionList({
     super.key,
@@ -27,7 +27,7 @@ class TransactionList extends StatelessWidget {
         final item = items[index];
         return TransactionCard(
           item: item,
-          onDelete: () => onDelete(item.id),
+          onDelete: () => onDelete(item),
         );
       },
     );

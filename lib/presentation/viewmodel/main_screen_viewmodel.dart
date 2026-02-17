@@ -1,23 +1,27 @@
 import 'package:flutter/foundation.dart';
+import '../../domain/model/recurring_exclusion.dart';
 import '../../domain/model/transaction.dart';
 import '../../domain/model/transaction_type.dart';
+import '../../domain/usecase/delete_recurring_transaction_usecase.dart';
 import '../../domain/usecase/delete_transaction_usecase.dart';
 import '../../domain/usecase/export_database_usecase.dart';
+import '../../domain/usecase/get_exclusions_usecase.dart';
 import '../../domain/usecase/get_transactions_usecase.dart';
 import '../../domain/usecase/import_database_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
 import '../ui/utils/money_formatter.dart';
 
-/// ViewModel da tela principal
-/// Seguindo: https://docs.flutter.dev/app-architecture/case-study/ui-layer#define-a-view-model
 class MainScreenViewModel extends ChangeNotifier {
   final GetTransactionsUseCase _getTransactionsUseCase;
   final DeleteTransactionUseCase _deleteTransactionUseCase;
+  final DeleteRecurringTransactionUseCase _deleteRecurringTransactionUseCase;
+  final GetExclusionsUseCase _getExclusionsUseCase;
   final ExportDatabaseUseCase _exportDatabaseUseCase;
   final ImportDatabaseUseCase _importDatabaseUseCase;
 
   List<Transaction> _allItems = [];
+  List<RecurringExclusion> _exclusions = [];
   List<Transaction> _items = [];
   String _totalIncomeText = 'R\$ 0.00';
   String _totalExpenseText = 'R\$ 0.00';
@@ -26,36 +30,34 @@ class MainScreenViewModel extends ChangeNotifier {
   int _currentYear = DateTime.now().year;
   String _currentMonthYearText = '';
 
-  /// Command para carregar transações
   late final Command0<List<Transaction>> load;
   
-  /// Command para deletar uma transação
   late final Command1<int, int> deleteTransaction;
 
-  /// Command para exportar o banco de dados
   late final Command0<String> exportDatabase;
 
-  /// Command para importar backup do banco de dados
   late final Command0<void> importDatabase;
 
   MainScreenViewModel({
     required GetTransactionsUseCase getTransactionsUseCase,
     required DeleteTransactionUseCase deleteTransactionUseCase,
+    required DeleteRecurringTransactionUseCase deleteRecurringTransactionUseCase,
+    required GetExclusionsUseCase getExclusionsUseCase,
     required ExportDatabaseUseCase exportDatabaseUseCase,
     required ImportDatabaseUseCase importDatabaseUseCase,
   })  : _getTransactionsUseCase = getTransactionsUseCase,
         _deleteTransactionUseCase = deleteTransactionUseCase,
+        _deleteRecurringTransactionUseCase = deleteRecurringTransactionUseCase,
+        _getExclusionsUseCase = getExclusionsUseCase,
         _exportDatabaseUseCase = exportDatabaseUseCase,
         _importDatabaseUseCase = importDatabaseUseCase {
     _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
-    
-    // Inicializa Commands
+
     load = Command0<List<Transaction>>(_loadTransactions);
     deleteTransaction = Command1<int, int>(_deleteItem);
     exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
     importDatabase = Command0<void>(_importDatabaseUseCase.call);
-    
-    // Carrega dados iniciais
+
     load.execute();
   }
 
@@ -68,16 +70,29 @@ class MainScreenViewModel extends ChangeNotifier {
   String get currentMonthYearText => _currentMonthYearText;
 
   Future<Result<List<Transaction>>> _loadTransactions() async {
-    final result = await _getTransactionsUseCase();
+    final results = await Future.wait([
+      _getTransactionsUseCase(),
+      _getExclusionsUseCase(),
+    ]);
+
+    final result = results[0] as Result<List<Transaction>>;
+    final exclusionsResult = results[1] as Result<List<RecurringExclusion>>;
     
     switch (result) {
       case Ok<List<Transaction>>(:final value):
         _allItems = value;
-        _filterAndComputeTotals();
       case Error<List<Transaction>>():
         debugPrint('Erro ao carregar transações: ${result.error}');
     }
-    
+
+    switch (exclusionsResult) {
+      case Ok<List<RecurringExclusion>>(:final value):
+        _exclusions = value;
+      case Error<List<RecurringExclusion>>():
+        debugPrint('Erro ao carregar exclusões: ${exclusionsResult.error}');
+    }
+
+    _filterAndComputeTotals();
     return result;
   }
 
@@ -86,7 +101,6 @@ class MainScreenViewModel extends ChangeNotifier {
     
     switch (result) {
       case Ok<int>():
-        // Recarrega as transações após deletar
         await _loadTransactions();
       case Error<int>():
         debugPrint('Erro ao deletar item: ${result.error}');
@@ -96,24 +110,30 @@ class MainScreenViewModel extends ChangeNotifier {
   }
 
   void _filterAndComputeTotals() {
-    // Filtrar transações para o mês atual
     _items = _allItems.where((tx) {
       if (tx.isRecurring) {
-        // Transações recorrentes aparecem a partir do mês de início
-        return (tx.targetYear < _currentYear) ||
+        final afterStart = (tx.targetYear < _currentYear) ||
             (tx.targetYear == _currentYear && tx.targetMonth <= _currentMonth);
+
+        final beforeEnd = tx.endMonth == null || tx.endYear == null ||
+            (_currentYear < tx.endYear!) ||
+            (_currentYear == tx.endYear! && _currentMonth <= tx.endMonth!);
+
+        final isExcluded = _exclusions.any((ex) =>
+            ex.transactionId == tx.id &&
+            ex.month == _currentMonth &&
+            ex.year == _currentYear);
+
+        return afterStart && beforeEnd && !isExcluded;
       } else {
-        // Transações não recorrentes aparecem apenas no mês alvo
         return tx.targetMonth == _currentMonth && tx.targetYear == _currentYear;
       }
     }).toList();
 
-    // Calcular totais do mês
     final totals = _computeTotals(_items);
     _totalIncomeText = 'R\$ ${formatMoney((totals.$1 * 100).round())}';
     _totalExpenseText = 'R\$ ${formatMoney((totals.$2 * 100).round())}';
 
-    // Calcular economia acumulada
     final now = DateTime.now();
     final accumulatedItems = _allItems.where((tx) {
       return (tx.targetYear < _currentYear) ||
@@ -156,7 +176,6 @@ class MainScreenViewModel extends ChangeNotifier {
 
     for (final item in items) {
       if (item.type == TransactionType.income) {
-        // Apenas contar renda se não for no futuro
         final isFuture = (item.targetYear > currentYear) ||
             (item.targetYear == currentYear && item.targetMonth > currentMonth);
         if (!isFuture) {
@@ -188,9 +207,31 @@ class MainScreenViewModel extends ChangeNotifier {
     return '${monthNames[month - 1]} $year';
   }
 
-  /// Deleta um item usando o Command
   void deleteItem(int id) {
     deleteTransaction.execute(id);
+  }
+
+  Future<void> deleteRecurringItem(
+    Transaction transaction,
+    RecurringDeleteMode mode,
+  ) async {
+    final result = await _deleteRecurringTransactionUseCase(
+      transaction: transaction,
+      mode: mode,
+      currentMonth: _currentMonth,
+      currentYear: _currentYear,
+    );
+
+    switch (result) {
+      case Ok<int>():
+        await _loadTransactions();
+      case Error<int>():
+        debugPrint('Erro ao deletar recorrente: ${result.error}');
+    }
+  }
+
+  Transaction? findTransactionById(int id) {
+    return _allItems.where((tx) => tx.id == id).firstOrNull;
   }
 
   void goToPreviousMonth() {
