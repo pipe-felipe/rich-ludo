@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,10 @@ import 'presentation/viewmodel/transaction_form_viewmodel.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Configura o app para usar edge-to-edge
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   runApp(const RichLudoApp());
 }
 
@@ -116,6 +121,23 @@ class RichLudoApp extends StatelessWidget {
           Locale('en', ''),
         ],
         locale: const Locale('pt', ''),
+        builder: (context, child) {
+          final brightness = Theme.of(context).brightness;
+          final colorScheme = Theme.of(context).colorScheme;
+
+          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+            statusBarColor: Colors.transparent,
+            statusBarIconBrightness: brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+            systemNavigationBarColor: colorScheme.surface,
+            systemNavigationBarIconBrightness: brightness == Brightness.dark
+                ? Brightness.light
+                : Brightness.dark,
+          ));
+
+          return child ?? const SizedBox.shrink();
+        },
         home: const MainScreen(),
       ),
     );
