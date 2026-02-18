@@ -28,14 +28,18 @@ class ImportDatabaseUseCase {
       }
 
       final file = result.files.first;
-      
+
       if (file.extension != 'ludo') {
-        debugPrint('[ImportDatabaseUseCase] Arquivo inválido: ${file.extension}');
-        return Result.error(Exception('Arquivo inválido. Selecione um arquivo .ludo'));
+        debugPrint(
+          '[ImportDatabaseUseCase] Arquivo inválido: ${file.extension}',
+        );
+        return Result.error(
+          Exception('Arquivo inválido. Selecione um arquivo .ludo'),
+        );
       }
 
       Uint8List? bytes = file.bytes;
-      
+
       if (bytes == null && file.path != null) {
         final backupFile = File(file.path!);
         if (await backupFile.exists()) {
@@ -44,10 +48,14 @@ class ImportDatabaseUseCase {
       }
 
       if (bytes == null) {
-        return Result.error(Exception('Não foi possível ler o arquivo de backup'));
+        return Result.error(
+          Exception('Não foi possível ler o arquivo de backup'),
+        );
       }
 
-      debugPrint('[ImportDatabaseUseCase] Arquivo selecionado: ${file.name}, ${bytes.length} bytes');
+      debugPrint(
+        '[ImportDatabaseUseCase] Arquivo selecionado: ${file.name}, ${bytes.length} bytes',
+      );
 
       debugPrint('[ImportDatabaseUseCase] Fechando banco atual...');
       await _exportService.closeDatabase();
@@ -68,11 +76,11 @@ class ImportDatabaseUseCase {
     } catch (e, stack) {
       debugPrint('[ImportDatabaseUseCase] ERRO: $e');
       debugPrint('[ImportDatabaseUseCase] Stack: $stack');
-      
+
       try {
         await _exportService.reopenDatabase();
       } catch (_) {}
-      
+
       return Result.error(
         e is Exception ? e : Exception('Erro ao importar banco de dados: $e'),
       );

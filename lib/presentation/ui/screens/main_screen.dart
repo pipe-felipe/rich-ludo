@@ -42,6 +42,8 @@ class MainScreen extends StatelessWidget {
                         totalIncomeText: viewModel.totalIncomeText,
                         totalExpenseText: viewModel.totalExpenseText,
                         totalSavingText: viewModel.totalSavingText,
+                        totalIncomeCents: viewModel.totalIncomeCents,
+                        totalExpenseCents: viewModel.totalExpenseCents,
                         currentMonthYear: viewModel.currentMonthYearText,
                         onPreviousMonth: viewModel.goToPreviousMonth,
                         onNextMonth: viewModel.goToNextMonth,
@@ -59,8 +61,10 @@ class MainScreen extends StatelessWidget {
                   right: 0,
                   child: Center(
                     child: MainBottomBar(
-                      onAddButtonClick: () => _showTransactionDialog(context, viewModel),
-                      onRecoveryClick: () => _importDatabase(context, viewModel),
+                      onAddButtonClick: () =>
+                          _showTransactionDialog(context, viewModel),
+                      onRecoveryClick: () =>
+                          _importDatabase(context, viewModel),
                       onSaveClick: () => _exportDatabase(context, viewModel),
                     ),
                   ),
@@ -79,7 +83,7 @@ class MainScreen extends StatelessWidget {
   ) async {
     final formViewModel = context.read<TransactionFormViewModel>();
     formViewModel.resetForm();
-    
+
     await showDialog(
       context: context,
       builder: (dialogContext) => ChangeNotifierProvider.value(
@@ -98,9 +102,9 @@ class MainScreen extends StatelessWidget {
     MainScreenViewModel viewModel,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     await viewModel.exportDatabase.execute();
-    
+
     final result = viewModel.exportDatabase.result;
     if (result == null) return;
 
@@ -133,9 +137,9 @@ class MainScreen extends StatelessWidget {
     MainScreenViewModel viewModel,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    
+
     await viewModel.importDatabase.execute();
-    
+
     final result = viewModel.importDatabase.result;
     if (result == null) return;
 
@@ -196,7 +200,10 @@ class _TransactionContent extends StatelessWidget {
     );
   }
 
-  Future<void> _handleDelete(BuildContext context, Transaction transaction) async {
+  Future<void> _handleDelete(
+    BuildContext context,
+    Transaction transaction,
+  ) async {
     if (transaction.isRecurring) {
       final mode = await RecurringDeleteDialog.show(context);
       if (mode != null) {

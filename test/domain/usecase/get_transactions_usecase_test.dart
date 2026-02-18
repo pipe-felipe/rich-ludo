@@ -40,8 +40,9 @@ void main() {
         ),
       ];
 
-      when(() => mockRepository.getTransactions())
-          .thenAnswer((_) async => Result.ok(transactions));
+      when(
+        () => mockRepository.getTransactions(),
+      ).thenAnswer((_) async => Result.ok(transactions));
 
       final result = await useCase();
 
@@ -52,20 +53,25 @@ void main() {
       verify(() => mockRepository.getTransactions()).called(1);
     });
 
-    test('deve retornar Result.ok com lista vazia quando não há transações', () async {
-      when(() => mockRepository.getTransactions())
-          .thenAnswer((_) async => const Result.ok([]));
+    test(
+      'deve retornar Result.ok com lista vazia quando não há transações',
+      () async {
+        when(
+          () => mockRepository.getTransactions(),
+        ).thenAnswer((_) async => const Result.ok([]));
 
-      final result = await useCase();
+        final result = await useCase();
 
-      expect(result.isOk, isTrue);
-      expect(result.asOk.value, isEmpty);
-      verify(() => mockRepository.getTransactions()).called(1);
-    });
+        expect(result.isOk, isTrue);
+        expect(result.asOk.value, isEmpty);
+        verify(() => mockRepository.getTransactions()).called(1);
+      },
+    );
 
     test('deve retornar Result.error quando repositório falha', () async {
-      when(() => mockRepository.getTransactions())
-          .thenAnswer((_) async => Result.error(Exception('Erro de conexão')));
+      when(
+        () => mockRepository.getTransactions(),
+      ).thenAnswer((_) async => Result.error(Exception('Erro de conexão')));
 
       final result = await useCase();
 

@@ -40,13 +40,20 @@ void main() {
       await db.close();
     });
 
-    test('banco v1 deve ter schema original sem colunas endMonth/endYear', () async {
-      final tableInfo = await db.rawQuery('PRAGMA table_info(${DatabaseConfig.tableName})');
-      final columnNames = tableInfo.map((col) => col['name'] as String).toSet();
+    test(
+      'banco v1 deve ter schema original sem colunas endMonth/endYear',
+      () async {
+        final tableInfo = await db.rawQuery(
+          'PRAGMA table_info(${DatabaseConfig.tableName})',
+        );
+        final columnNames = tableInfo
+            .map((col) => col['name'] as String)
+            .toSet();
 
-      expect(columnNames.contains('endMonth'), isFalse);
-      expect(columnNames.contains('endYear'), isFalse);
-    });
+        expect(columnNames.contains('endMonth'), isFalse);
+        expect(columnNames.contains('endYear'), isFalse);
+      },
+    );
 
     test('banco v1 não deve ter tabela recurring_exclusions', () async {
       final tables = await db.rawQuery(
@@ -59,7 +66,9 @@ void main() {
     test('migração v1→v2 deve adicionar colunas endMonth e endYear', () async {
       await _migrateV1ToV2(db);
 
-      final tableInfo = await db.rawQuery('PRAGMA table_info(${DatabaseConfig.tableName})');
+      final tableInfo = await db.rawQuery(
+        'PRAGMA table_info(${DatabaseConfig.tableName})',
+      );
       final columnNames = tableInfo.map((col) => col['name'] as String).toSet();
 
       expect(columnNames.contains('endMonth'), isTrue);
@@ -77,16 +86,23 @@ void main() {
       expect(tables.first['name'], equals(DatabaseConfig.exclusionsTableName));
     });
 
-    test('migração deve ser idempotente (pode executar múltiplas vezes)', () async {
-      await _migrateV1ToV2(db);
-      await _migrateV1ToV2(db);
+    test(
+      'migração deve ser idempotente (pode executar múltiplas vezes)',
+      () async {
+        await _migrateV1ToV2(db);
+        await _migrateV1ToV2(db);
 
-      final tableInfo = await db.rawQuery('PRAGMA table_info(${DatabaseConfig.tableName})');
-      final columnNames = tableInfo.map((col) => col['name'] as String).toSet();
+        final tableInfo = await db.rawQuery(
+          'PRAGMA table_info(${DatabaseConfig.tableName})',
+        );
+        final columnNames = tableInfo
+            .map((col) => col['name'] as String)
+            .toSet();
 
-      expect(columnNames.contains('endMonth'), isTrue);
-      expect(columnNames.contains('endYear'), isTrue);
-    });
+        expect(columnNames.contains('endMonth'), isTrue);
+        expect(columnNames.contains('endYear'), isTrue);
+      },
+    );
 
     test('dados existentes v1 devem ser preservados após migração', () async {
       await db.insert(DatabaseConfig.tableName, {
@@ -112,28 +128,31 @@ void main() {
       expect(transactions.first['endYear'], isNull);
     });
 
-    test('transações v1 com isRecurring devem funcionar após migração (endMonth/endYear null)', () async {
-      await db.insert(DatabaseConfig.tableName, {
-        'amountCents': 5000,
-        'type': 'expense',
-        'category': 'Assinatura',
-        'description': 'Netflix',
-        'humanDate': '01/01/2026',
-        'isRecurring': 1,
-        'createdAt': DateTime(2026, 1, 1).millisecondsSinceEpoch,
-        'targetMonth': 1,
-        'targetYear': 2026,
-      });
+    test(
+      'transações v1 com isRecurring devem funcionar após migração (endMonth/endYear null)',
+      () async {
+        await db.insert(DatabaseConfig.tableName, {
+          'amountCents': 5000,
+          'type': 'expense',
+          'category': 'Assinatura',
+          'description': 'Netflix',
+          'humanDate': '01/01/2026',
+          'isRecurring': 1,
+          'createdAt': DateTime(2026, 1, 1).millisecondsSinceEpoch,
+          'targetMonth': 1,
+          'targetYear': 2026,
+        });
 
-      await _migrateV1ToV2(db);
+        await _migrateV1ToV2(db);
 
-      final transactions = await db.query(DatabaseConfig.tableName);
+        final transactions = await db.query(DatabaseConfig.tableName);
 
-      expect(transactions, hasLength(1));
-      expect(transactions.first['isRecurring'], equals(1));
-      expect(transactions.first['endMonth'], isNull);
-      expect(transactions.first['endYear'], isNull);
-    });
+        expect(transactions, hasLength(1));
+        expect(transactions.first['isRecurring'], equals(1));
+        expect(transactions.first['endMonth'], isNull);
+        expect(transactions.first['endYear'], isNull);
+      },
+    );
   });
 }
 
@@ -171,4 +190,3 @@ Future<void> _migrateV1ToV2(Database db) async {
     ''');
   }
 }
-

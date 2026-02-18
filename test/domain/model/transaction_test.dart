@@ -62,10 +62,7 @@ void main() {
         targetYear: 2026,
       );
 
-      final copy = original.copyWith(
-        amountCents: 2000,
-        description: 'Bônus',
-      );
+      final copy = original.copyWith(amountCents: 2000, description: 'Bônus');
 
       expect(copy.id, equals(1));
       expect(copy.amountCents, equals(2000));

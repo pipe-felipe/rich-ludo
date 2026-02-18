@@ -7,6 +7,8 @@ class MainTopBar extends StatelessWidget {
   final String totalIncomeText;
   final String totalExpenseText;
   final String totalSavingText;
+  final int totalIncomeCents;
+  final int totalExpenseCents;
   final String currentMonthYear;
   final VoidCallback onPreviousMonth;
   final VoidCallback onNextMonth;
@@ -17,6 +19,8 @@ class MainTopBar extends StatelessWidget {
     required this.totalIncomeText,
     required this.totalExpenseText,
     required this.totalSavingText,
+    required this.totalIncomeCents,
+    required this.totalExpenseCents,
     required this.currentMonthYear,
     required this.onPreviousMonth,
     required this.onNextMonth,
@@ -46,8 +50,9 @@ class MainTopBar extends StatelessWidget {
             totalExpenseText: totalExpenseText,
             totalSavingText: totalSavingText,
           ),
-          Divider(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+          _IncomeExpenseBar(
+            incomeCents: totalIncomeCents,
+            expenseCents: totalExpenseCents,
           ),
         ],
       ),
@@ -84,9 +89,9 @@ class _MonthSelector extends StatelessWidget {
           onPressed: onCurrentMonthClick,
           child: Text(
             currentMonthYear,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ),
         IconButton(
@@ -164,10 +169,10 @@ class _SummaryItem extends StatelessWidget {
   });
 
   TextAlign get _textAlign => switch (alignment) {
-        CrossAxisAlignment.start => TextAlign.start,
-        CrossAxisAlignment.end => TextAlign.end,
-        _ => TextAlign.center,
-      };
+    CrossAxisAlignment.start => TextAlign.start,
+    CrossAxisAlignment.end => TextAlign.end,
+    _ => TextAlign.center,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -190,11 +195,46 @@ class _SummaryItem extends StatelessWidget {
           Text(
             value,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: iconColor,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: iconColor,
+              fontWeight: FontWeight.w600,
+            ),
             textAlign: _textAlign,
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IncomeExpenseBar extends StatelessWidget {
+  final int incomeCents;
+  final int expenseCents;
+
+  const _IncomeExpenseBar({
+    required this.incomeCents,
+    required this.expenseCents,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final total = incomeCents + expenseCents;
+    if (total == 0) {
+      return const SizedBox(height: 4);
+    }
+    return SizedBox(
+      height: 4,
+      child: Row(
+        children: [
+          if (incomeCents > 0)
+            Flexible(
+              flex: incomeCents,
+              child: Container(color: AppTheme.moneyColor(context)),
+            ),
+          if (expenseCents > 0)
+            Flexible(
+              flex: expenseCents,
+              child: Container(color: Theme.of(context).colorScheme.error),
+            ),
         ],
       ),
     );

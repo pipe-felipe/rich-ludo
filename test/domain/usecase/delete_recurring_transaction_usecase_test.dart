@@ -72,26 +72,29 @@ void main() {
         expect(exList[0].year, equals(2026));
       });
 
-      test('deve deletar tudo quando é o único mês (start == end == current)', () async {
-        final tx = createRecurring(
-          targetMonth: 5,
-          targetYear: 2026,
-          endMonth: 5,
-          endYear: 2026,
-        );
-        fakeRepository.addTransaction(tx);
+      test(
+        'deve deletar tudo quando é o único mês (start == end == current)',
+        () async {
+          final tx = createRecurring(
+            targetMonth: 5,
+            targetYear: 2026,
+            endMonth: 5,
+            endYear: 2026,
+          );
+          fakeRepository.addTransaction(tx);
 
-        final result = await useCase(
-          transaction: tx,
-          mode: RecurringDeleteMode.thisMonth,
-          currentMonth: 5,
-          currentYear: 2026,
-        );
+          final result = await useCase(
+            transaction: tx,
+            mode: RecurringDeleteMode.thisMonth,
+            currentMonth: 5,
+            currentYear: 2026,
+          );
 
-        expect(result.isOk, isTrue);
-        final remaining = await fakeRepository.getTransactions();
-        expect(remaining.asOk.value, isEmpty);
-      });
+          expect(result.isOk, isTrue);
+          final remaining = await fakeRepository.getTransactions();
+          expect(remaining.asOk.value, isEmpty);
+        },
+      );
     });
 
     group('thisAndPreviousMonths', () {
@@ -131,26 +134,29 @@ void main() {
         expect(updated.targetYear, equals(2027));
       });
 
-      test('deve deletar tudo quando próximo mês ultrapassa endMonth', () async {
-        final tx = createRecurring(
-          targetMonth: 3,
-          targetYear: 2026,
-          endMonth: 5,
-          endYear: 2026,
-        );
-        fakeRepository.addTransaction(tx);
+      test(
+        'deve deletar tudo quando próximo mês ultrapassa endMonth',
+        () async {
+          final tx = createRecurring(
+            targetMonth: 3,
+            targetYear: 2026,
+            endMonth: 5,
+            endYear: 2026,
+          );
+          fakeRepository.addTransaction(tx);
 
-        final result = await useCase(
-          transaction: tx,
-          mode: RecurringDeleteMode.thisAndPreviousMonths,
-          currentMonth: 5,
-          currentYear: 2026,
-        );
+          final result = await useCase(
+            transaction: tx,
+            mode: RecurringDeleteMode.thisAndPreviousMonths,
+            currentMonth: 5,
+            currentYear: 2026,
+          );
 
-        expect(result.isOk, isTrue);
-        final remaining = await fakeRepository.getTransactions();
-        expect(remaining.asOk.value, isEmpty);
-      });
+          expect(result.isOk, isTrue);
+          final remaining = await fakeRepository.getTransactions();
+          expect(remaining.asOk.value, isEmpty);
+        },
+      );
     });
 
     group('thisAndFutureMonths', () {
@@ -190,21 +196,24 @@ void main() {
         expect(updated.endYear, equals(2025));
       });
 
-      test('deve deletar tudo quando mês anterior é antes do targetMonth', () async {
-        final tx = createRecurring(targetMonth: 5, targetYear: 2026);
-        fakeRepository.addTransaction(tx);
+      test(
+        'deve deletar tudo quando mês anterior é antes do targetMonth',
+        () async {
+          final tx = createRecurring(targetMonth: 5, targetYear: 2026);
+          fakeRepository.addTransaction(tx);
 
-        final result = await useCase(
-          transaction: tx,
-          mode: RecurringDeleteMode.thisAndFutureMonths,
-          currentMonth: 5,
-          currentYear: 2026,
-        );
+          final result = await useCase(
+            transaction: tx,
+            mode: RecurringDeleteMode.thisAndFutureMonths,
+            currentMonth: 5,
+            currentYear: 2026,
+          );
 
-        expect(result.isOk, isTrue);
-        final remaining = await fakeRepository.getTransactions();
-        expect(remaining.asOk.value, isEmpty);
-      });
+          expect(result.isOk, isTrue);
+          final remaining = await fakeRepository.getTransactions();
+          expect(remaining.asOk.value, isEmpty);
+        },
+      );
     });
   });
 }

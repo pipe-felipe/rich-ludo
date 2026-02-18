@@ -27,7 +27,7 @@ void main() {
     test('deve ser possível criar múltiplas instâncias', () {
       final anotherMock = MockExportService();
       final anotherUseCase = ExportDatabaseUseCase(anotherMock);
-      
+
       expect(anotherUseCase, isNot(same(useCase)));
     });
   });
@@ -35,9 +35,10 @@ void main() {
   group('ExportService integration', () {
     test('deve chamar exportDatabase quando caminho é fornecido', () async {
       const testPath = '/storage/emulated/0/Documents/backup.ludo';
-      
-      when(() => mockExportService.exportDatabase(testPath))
-          .thenAnswer((_) async => Result.ok(testPath));
+
+      when(
+        () => mockExportService.exportDatabase(testPath),
+      ).thenAnswer((_) async => Result.ok(testPath));
 
       final result = await mockExportService.exportDatabase(testPath);
 
@@ -48,9 +49,10 @@ void main() {
 
     test('deve retornar erro quando ExportService falha', () async {
       const testPath = '/invalid/path/backup.ludo';
-      
-      when(() => mockExportService.exportDatabase(testPath))
-          .thenAnswer((_) async => Result.error(Exception('Erro ao exportar')));
+
+      when(
+        () => mockExportService.exportDatabase(testPath),
+      ).thenAnswer((_) async => Result.error(Exception('Erro ao exportar')));
 
       final result = await mockExportService.exportDatabase(testPath);
 
@@ -59,10 +61,12 @@ void main() {
     });
 
     test('deve obter caminho do banco de dados', () async {
-      const expectedPath = '/data/data/com.example.rich_ludo/databases/rich_ludo.db';
-      
-      when(() => mockExportService.getDatabasePath())
-          .thenAnswer((_) async => Result.ok(expectedPath));
+      const expectedPath =
+          '/data/data/com.example.rich_ludo/databases/rich_ludo.db';
+
+      when(
+        () => mockExportService.getDatabasePath(),
+      ).thenAnswer((_) async => Result.ok(expectedPath));
 
       final result = await mockExportService.getDatabasePath();
 
@@ -71,8 +75,9 @@ void main() {
     });
 
     test('deve retornar erro quando não consegue obter caminho', () async {
-      when(() => mockExportService.getDatabasePath())
-          .thenAnswer((_) async => Result.error(Exception('Erro ao obter caminho')));
+      when(() => mockExportService.getDatabasePath()).thenAnswer(
+        (_) async => Result.error(Exception('Erro ao obter caminho')),
+      );
 
       final result = await mockExportService.getDatabasePath();
 

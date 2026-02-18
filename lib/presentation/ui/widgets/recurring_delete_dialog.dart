@@ -25,25 +25,31 @@ class RecurringDeleteDialog extends StatelessWidget {
           _DialogOption(
             icon: Icons.today,
             label: l10n.recurringDeleteThisMonth,
-            onTap: () => Navigator.of(context).pop(RecurringDeleteMode.thisMonth),
+            onTap: () =>
+                Navigator.of(context).pop(RecurringDeleteMode.thisMonth),
           ),
           const SizedBox(height: 8),
           _DialogOption(
             icon: Icons.arrow_back,
             label: l10n.recurringDeleteBackwards,
-            onTap: () => Navigator.of(context).pop(RecurringDeleteMode.thisAndPreviousMonths),
+            onTap: () => Navigator.of(
+              context,
+            ).pop(RecurringDeleteMode.thisAndPreviousMonths),
           ),
           const SizedBox(height: 8),
           _DialogOption(
             icon: Icons.arrow_forward,
             label: l10n.recurringDeleteForwards,
-            onTap: () => Navigator.of(context).pop(RecurringDeleteMode.thisAndFutureMonths),
+            onTap: () => Navigator.of(
+              context,
+            ).pop(RecurringDeleteMode.thisAndFutureMonths),
           ),
           const SizedBox(height: 8),
           _DialogOption(
             icon: Icons.delete_forever,
             label: l10n.recurringDeleteAll,
-            onTap: () => Navigator.of(context).pop(RecurringDeleteMode.allMonths),
+            onTap: () =>
+                Navigator.of(context).pop(RecurringDeleteMode.allMonths),
             isDestructive: true,
           ),
         ],
@@ -89,9 +95,9 @@ class _DialogOption extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: color,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyLarge?.copyWith(color: color),
               ),
             ),
           ],

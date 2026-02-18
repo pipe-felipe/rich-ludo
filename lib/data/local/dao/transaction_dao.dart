@@ -5,7 +5,8 @@ import '../../../domain/model/transaction_mapper.dart';
 
 class TransactionDao {
   final DatabaseHelper _databaseHelper;
-  final _transactionsController = StreamController<List<Transaction>>.broadcast();
+  final _transactionsController =
+      StreamController<List<Transaction>>.broadcast();
 
   TransactionDao(this._databaseHelper) {
     _refreshTransactions();
@@ -18,12 +19,11 @@ class TransactionDao {
 
   Future<void> _refreshTransactions() async {
     final db = await _databaseHelper.database;
-    final maps = await db.query(
-      'transactions',
-      orderBy: 'createdAt DESC',
-    );
+    final maps = await db.query('transactions', orderBy: 'createdAt DESC');
 
-    final transactions = maps.map((map) => TransactionMapper.fromMap(map)).toList();
+    final transactions = maps
+        .map((map) => TransactionMapper.fromMap(map))
+        .toList();
     _transactionsController.add(transactions);
   }
 
@@ -33,8 +33,10 @@ class TransactionDao {
   ) {
     final controller = StreamController<List<Transaction>>();
 
-    _getTransactionsForMonthOnce(monthStartMillis, monthEndExclusiveMillis)
-        .then((transactions) {
+    _getTransactionsForMonthOnce(
+      monthStartMillis,
+      monthEndExclusiveMillis,
+    ).then((transactions) {
       controller.add(transactions);
       controller.close();
     });
@@ -72,7 +74,10 @@ class TransactionDao {
 
   Future<int> addTransaction(Transaction transaction) async {
     final db = await _databaseHelper.database;
-    final id = await db.insert('transactions', TransactionMapper.toMap(transaction));
+    final id = await db.insert(
+      'transactions',
+      TransactionMapper.toMap(transaction),
+    );
     _refreshTransactions();
     return id;
   }
@@ -83,7 +88,10 @@ class TransactionDao {
 
     await db.transaction((txn) async {
       for (final transaction in transactions) {
-        final id = await txn.insert('transactions', TransactionMapper.toMap(transaction));
+        final id = await txn.insert(
+          'transactions',
+          TransactionMapper.toMap(transaction),
+        );
         ids.add(id);
       }
     });

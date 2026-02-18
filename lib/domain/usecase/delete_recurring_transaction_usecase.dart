@@ -71,7 +71,12 @@ class DeleteRecurringTransactionUseCase {
     final (nextMonth, nextYear) = _nextMonth(month, year);
 
     if (transaction.endMonth != null && transaction.endYear != null) {
-      if (_isAfter(nextMonth, nextYear, transaction.endMonth!, transaction.endYear!)) {
+      if (_isAfter(
+        nextMonth,
+        nextYear,
+        transaction.endMonth!,
+        transaction.endYear!,
+      )) {
         return _deleteAll(transaction.id);
       }
     }
@@ -90,7 +95,12 @@ class DeleteRecurringTransactionUseCase {
   ) async {
     final (prevMonth, prevYear) = _previousMonth(month, year);
 
-    if (_isBefore(prevMonth, prevYear, transaction.targetMonth, transaction.targetYear)) {
+    if (_isBefore(
+      prevMonth,
+      prevYear,
+      transaction.targetMonth,
+      transaction.targetYear,
+    )) {
       return _deleteAll(transaction.id);
     }
 

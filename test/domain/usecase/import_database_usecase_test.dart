@@ -29,15 +29,14 @@ void main() {
     test('deve ser possível criar múltiplas instâncias', () {
       final anotherMock = MockExportService();
       final anotherUseCase = ImportDatabaseUseCase(anotherMock);
-      
+
       expect(anotherUseCase, isNot(same(useCase)));
     });
   });
 
   group('ExportService integration para import', () {
     test('deve chamar closeDatabase antes de importar', () async {
-      when(() => mockExportService.closeDatabase())
-          .thenAnswer((_) async {});
+      when(() => mockExportService.closeDatabase()).thenAnswer((_) async {});
 
       await mockExportService.closeDatabase();
 
@@ -45,8 +44,7 @@ void main() {
     });
 
     test('deve chamar reopenDatabase após importar', () async {
-      when(() => mockExportService.reopenDatabase())
-          .thenAnswer((_) async {});
+      when(() => mockExportService.reopenDatabase()).thenAnswer((_) async {});
 
       await mockExportService.reopenDatabase();
 
@@ -55,9 +53,10 @@ void main() {
 
     test('deve chamar importDatabase com bytes corretos', () async {
       final testBytes = Uint8List.fromList([1, 2, 3, 4, 5]);
-      
-      when(() => mockExportService.importDatabase(testBytes))
-          .thenAnswer((_) async => Result.ok(null));
+
+      when(
+        () => mockExportService.importDatabase(testBytes),
+      ).thenAnswer((_) async => Result.ok(null));
 
       final result = await mockExportService.importDatabase(testBytes);
 
@@ -67,9 +66,10 @@ void main() {
 
     test('deve retornar erro quando importDatabase falha', () async {
       final testBytes = Uint8List.fromList([1, 2, 3]);
-      
-      when(() => mockExportService.importDatabase(testBytes))
-          .thenAnswer((_) async => Result.error(Exception('Erro ao importar')));
+
+      when(
+        () => mockExportService.importDatabase(testBytes),
+      ).thenAnswer((_) async => Result.error(Exception('Erro ao importar')));
 
       final result = await mockExportService.importDatabase(testBytes);
 
@@ -79,13 +79,12 @@ void main() {
 
     test('deve reabrir banco mesmo em caso de erro na importação', () async {
       final testBytes = Uint8List.fromList([1, 2, 3]);
-      
-      when(() => mockExportService.closeDatabase())
-          .thenAnswer((_) async {});
-      when(() => mockExportService.importDatabase(testBytes))
-          .thenAnswer((_) async => Result.error(Exception('Erro')));
-      when(() => mockExportService.reopenDatabase())
-          .thenAnswer((_) async {});
+
+      when(() => mockExportService.closeDatabase()).thenAnswer((_) async {});
+      when(
+        () => mockExportService.importDatabase(testBytes),
+      ).thenAnswer((_) async => Result.error(Exception('Erro')));
+      when(() => mockExportService.reopenDatabase()).thenAnswer((_) async {});
 
       await mockExportService.closeDatabase();
       await mockExportService.importDatabase(testBytes);

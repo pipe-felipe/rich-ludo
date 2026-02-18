@@ -37,8 +37,9 @@ void main() {
         targetYear: 2026,
       );
 
-      when(() => mockRepository.makeTransaction(any()))
-          .thenAnswer((_) async => const Result.ok(1));
+      when(
+        () => mockRepository.makeTransaction(any()),
+      ).thenAnswer((_) async => const Result.ok(1));
 
       final result = await useCase(transaction);
 
@@ -60,8 +61,9 @@ void main() {
         targetYear: 2026,
       );
 
-      when(() => mockRepository.makeTransaction(any()))
-          .thenAnswer((_) async => const Result.ok(2));
+      when(
+        () => mockRepository.makeTransaction(any()),
+      ).thenAnswer((_) async => const Result.ok(2));
 
       final result = await useCase(transaction);
 
@@ -83,8 +85,9 @@ void main() {
         targetYear: 2026,
       );
 
-      when(() => mockRepository.makeTransaction(any()))
-          .thenAnswer((_) async => Result.error(Exception('Erro de banco')));
+      when(
+        () => mockRepository.makeTransaction(any()),
+      ).thenAnswer((_) async => Result.error(Exception('Erro de banco')));
 
       final result = await useCase(transaction);
 

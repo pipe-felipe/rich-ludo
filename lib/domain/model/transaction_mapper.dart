@@ -8,7 +8,9 @@ class TransactionMapper {
     return Transaction(
       id: map['id'] as int,
       amountCents: map['amountCents'] as int,
-      type: map['type'] == 'income' ? TransactionType.income : TransactionType.expense,
+      type: map['type'] == 'income'
+          ? TransactionType.income
+          : TransactionType.expense,
       category: map['category'] as String?,
       description: map['description'] as String?,
       humanDate: (map['humanDate'] as String?) ?? '',

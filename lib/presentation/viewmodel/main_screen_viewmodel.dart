@@ -26,12 +26,14 @@ class MainScreenViewModel extends ChangeNotifier {
   String _totalIncomeText = 'R\$ 0.00';
   String _totalExpenseText = 'R\$ 0.00';
   String _totalSavingText = 'R\$ 0.00';
+  int _totalIncomeCents = 0;
+  int _totalExpenseCents = 0;
   int _currentMonth = DateTime.now().month;
   int _currentYear = DateTime.now().year;
   String _currentMonthYearText = '';
 
   late final Command0<List<Transaction>> load;
-  
+
   late final Command1<int, int> deleteTransaction;
 
   late final Command0<String> exportDatabase;
@@ -41,16 +43,17 @@ class MainScreenViewModel extends ChangeNotifier {
   MainScreenViewModel({
     required GetTransactionsUseCase getTransactionsUseCase,
     required DeleteTransactionUseCase deleteTransactionUseCase,
-    required DeleteRecurringTransactionUseCase deleteRecurringTransactionUseCase,
+    required DeleteRecurringTransactionUseCase
+    deleteRecurringTransactionUseCase,
     required GetExclusionsUseCase getExclusionsUseCase,
     required ExportDatabaseUseCase exportDatabaseUseCase,
     required ImportDatabaseUseCase importDatabaseUseCase,
-  })  : _getTransactionsUseCase = getTransactionsUseCase,
-        _deleteTransactionUseCase = deleteTransactionUseCase,
-        _deleteRecurringTransactionUseCase = deleteRecurringTransactionUseCase,
-        _getExclusionsUseCase = getExclusionsUseCase,
-        _exportDatabaseUseCase = exportDatabaseUseCase,
-        _importDatabaseUseCase = importDatabaseUseCase {
+  }) : _getTransactionsUseCase = getTransactionsUseCase,
+       _deleteTransactionUseCase = deleteTransactionUseCase,
+       _deleteRecurringTransactionUseCase = deleteRecurringTransactionUseCase,
+       _getExclusionsUseCase = getExclusionsUseCase,
+       _exportDatabaseUseCase = exportDatabaseUseCase,
+       _importDatabaseUseCase = importDatabaseUseCase {
     _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
 
     load = Command0<List<Transaction>>(_loadTransactions);
@@ -65,6 +68,8 @@ class MainScreenViewModel extends ChangeNotifier {
   String get totalIncomeText => _totalIncomeText;
   String get totalExpenseText => _totalExpenseText;
   String get totalSavingText => _totalSavingText;
+  int get totalIncomeCents => _totalIncomeCents;
+  int get totalExpenseCents => _totalExpenseCents;
   int get currentMonth => _currentMonth;
   int get currentYear => _currentYear;
   String get currentMonthYearText => _currentMonthYearText;
@@ -77,7 +82,7 @@ class MainScreenViewModel extends ChangeNotifier {
 
     final result = results[0] as Result<List<Transaction>>;
     final exclusionsResult = results[1] as Result<List<RecurringExclusion>>;
-    
+
     switch (result) {
       case Ok<List<Transaction>>(:final value):
         _allItems = value;
@@ -98,21 +103,23 @@ class MainScreenViewModel extends ChangeNotifier {
 
   Future<Result<int>> _deleteItem(int id) async {
     final result = await _deleteTransactionUseCase(id);
-    
+
     switch (result) {
       case Ok<int>():
         await _loadTransactions();
       case Error<int>():
         debugPrint('Erro ao deletar item: ${result.error}');
     }
-    
+
     return result;
   }
 
   void _filterAndComputeTotals() {
     _items = _visibleItemsForMonth(_currentMonth, _currentYear);
-    _totalIncomeText = _formatCurrency(_sumByType(_items, TransactionType.income));
-    _totalExpenseText = _formatCurrency(_sumByType(_items, TransactionType.expense));
+    _totalIncomeCents = _sumByType(_items, TransactionType.income);
+    _totalExpenseCents = _sumByType(_items, TransactionType.expense);
+    _totalIncomeText = _formatCurrency(_totalIncomeCents);
+    _totalExpenseText = _formatCurrency(_totalExpenseCents);
     _totalSavingText = _formatCurrency(_computeSavingsCents());
     notifyListeners();
   }
@@ -129,8 +136,10 @@ class MainScreenViewModel extends ChangeNotifier {
 
   bool _isRecurringActiveInMonth(Transaction tx, int month, int year) {
     final afterStart =
-        tx.targetYear < year || (tx.targetYear == year && tx.targetMonth <= month);
-    final beforeEnd = tx.endMonth == null ||
+        tx.targetYear < year ||
+        (tx.targetYear == year && tx.targetMonth <= month);
+    final beforeEnd =
+        tx.endMonth == null ||
         tx.endYear == null ||
         year < tx.endYear! ||
         (year == tx.endYear! && month <= tx.endMonth!);
@@ -138,10 +147,12 @@ class MainScreenViewModel extends ChangeNotifier {
   }
 
   bool _isExcludedInMonth(int transactionId, int month, int year) {
-    return _exclusions.any((ex) =>
-        ex.transactionId == transactionId &&
-        ex.month == month &&
-        ex.year == year);
+    return _exclusions.any(
+      (ex) =>
+          ex.transactionId == transactionId &&
+          ex.month == month &&
+          ex.year == year,
+    );
   }
 
   int _sumByType(List<Transaction> items, TransactionType type) {
@@ -163,9 +174,13 @@ class MainScreenViewModel extends ChangeNotifier {
         totalCents += _recurringContributionToSavings(tx, now);
       } else {
         final isUpToViewingMonth = _isOnOrBefore(
-          tx.targetMonth, tx.targetYear, _currentMonth, _currentYear,
+          tx.targetMonth,
+          tx.targetYear,
+          _currentMonth,
+          _currentYear,
         );
-        final isFutureIncome = tx.type == TransactionType.income &&
+        final isFutureIncome =
+            tx.type == TransactionType.income &&
             !_isOnOrBefore(tx.targetMonth, tx.targetYear, now.month, now.year);
 
         if (isUpToViewingMonth && !isFutureIncome) {
@@ -189,23 +204,27 @@ class MainScreenViewModel extends ChangeNotifier {
         break;
       }
 
-      final isFutureIncome = tx.type == TransactionType.income &&
+      final isFutureIncome =
+          tx.type == TransactionType.income &&
           !_isOnOrBefore(m, y, now.month, now.year);
 
       if (!_isExcludedInMonth(tx.id, m, y) && !isFutureIncome) {
         totalCents += _signedAmount(tx);
       }
 
-      if (m == 12) { m = 1; y++; } else { m++; }
+      if (m == 12) {
+        m = 1;
+        y++;
+      } else {
+        m++;
+      }
     }
 
     return totalCents;
   }
 
   int _signedAmount(Transaction tx) {
-    return tx.type == TransactionType.income
-        ? tx.amountCents
-        : -tx.amountCents;
+    return tx.type == TransactionType.income ? tx.amountCents : -tx.amountCents;
   }
 
   bool _isOnOrBefore(int month, int year, int refMonth, int refYear) {

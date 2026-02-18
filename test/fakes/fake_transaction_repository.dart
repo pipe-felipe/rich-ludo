@@ -7,11 +7,11 @@ class FakeTransactionRepository implements TransactionRepository {
   final List<Transaction> _transactions = [];
   final List<RecurringExclusion> _exclusions = [];
   bool shouldReturnError = false;
-  
+
   void addTransaction(Transaction transaction) {
     _transactions.add(transaction);
   }
-  
+
   void clear() {
     _transactions.clear();
     _exclusions.clear();
@@ -34,8 +34,9 @@ class FakeTransactionRepository implements TransactionRepository {
       return Result.error(Exception('Erro simulado'));
     }
     final filtered = _transactions.where((tx) {
-      return tx.isRecurring || 
-          (tx.createdAt >= monthStartMillis && tx.createdAt < monthEndExclusiveMillis);
+      return tx.isRecurring ||
+          (tx.createdAt >= monthStartMillis &&
+              tx.createdAt < monthEndExclusiveMillis);
     }).toList();
     return Result.ok(filtered);
   }
@@ -83,7 +84,9 @@ class FakeTransactionRepository implements TransactionRepository {
   }
 
   @override
-  Future<Result<List<int>>> insertTransactions(List<Transaction> transactions) async {
+  Future<Result<List<int>>> insertTransactions(
+    List<Transaction> transactions,
+  ) async {
     if (shouldReturnError) {
       return Result.error(Exception('Erro simulado'));
     }
@@ -110,12 +113,14 @@ class FakeTransactionRepository implements TransactionRepository {
       return Result.error(Exception('Erro simulado'));
     }
     final newId = _exclusions.length + 1;
-    _exclusions.add(RecurringExclusion(
-      id: newId,
-      transactionId: exclusion.transactionId,
-      month: exclusion.month,
-      year: exclusion.year,
-    ));
+    _exclusions.add(
+      RecurringExclusion(
+        id: newId,
+        transactionId: exclusion.transactionId,
+        month: exclusion.month,
+        year: exclusion.year,
+      ),
+    );
     return Result.ok(newId);
   }
 
