@@ -108,33 +108,39 @@ class _TransactionTypeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        _RadioOption(
-          label: l10n.transactionTypeExpense,
-          isSelected: selectedType == TransactionType.expense,
-          onTap: () => onTypeSelected(TransactionType.expense),
-        ),
-        const SizedBox(width: 16),
-        _RadioOption(
-          label: l10n.transactionTypeIncome,
-          isSelected: selectedType == TransactionType.income,
-          onTap: () => onTypeSelected(TransactionType.income),
-        ),
-      ],
+    return RadioGroup<TransactionType>(
+      groupValue: selectedType,
+      onChanged: (value) {
+        if (value != null) onTypeSelected(value);
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _RadioOption(
+            label: l10n.transactionTypeExpense,
+            value: TransactionType.expense,
+            onTap: () => onTypeSelected(TransactionType.expense),
+          ),
+          const SizedBox(width: 16),
+          _RadioOption(
+            label: l10n.transactionTypeIncome,
+            value: TransactionType.income,
+            onTap: () => onTypeSelected(TransactionType.income),
+          ),
+        ],
+      ),
     );
   }
 }
 
 class _RadioOption extends StatelessWidget {
   final String label;
-  final bool isSelected;
+  final TransactionType value;
   final VoidCallback onTap;
 
   const _RadioOption({
     required this.label,
-    required this.isSelected,
+    required this.value,
     required this.onTap,
   });
 
@@ -144,11 +150,7 @@ class _RadioOption extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Radio<bool>(
-            value: true,
-            groupValue: isSelected,
-            onChanged: (_) => onTap(),
-          ),
+          Radio<TransactionType>(value: value),
           Text(label, style: Theme.of(context).textTheme.bodyLarge),
         ],
       ),

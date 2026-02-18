@@ -15,12 +15,7 @@ enum ExpenseCategory {
   clothes,
 }
 
-enum IncomeCategory {
-  salary,
-  gift,
-  investment,
-  other,
-}
+enum IncomeCategory { salary, gift, investment, other }
 
 class FormUiState {
   final String date;
@@ -82,7 +77,8 @@ class TransactionFormViewModel extends ChangeNotifier {
   FormUiState get uiState => _uiState;
 
   bool get isSubmitEnabled {
-    final hasValidQuantity = _uiState.quantity.isNotEmpty && !_uiState.isQuantityError;
+    final hasValidQuantity =
+        _uiState.quantity.isNotEmpty && !_uiState.isQuantityError;
     final hasCategory = _uiState.transactionType == TransactionType.expense
         ? _uiState.expenseCategory != null
         : _uiState.incomeCategory != null;
@@ -162,14 +158,14 @@ class TransactionFormViewModel extends ChangeNotifier {
     );
 
     final result = await _makeTransactionUseCase(transaction);
-    
+
     switch (result) {
       case Ok<int>():
         resetForm();
       case Error<int>():
         debugPrint('Erro ao inserir transação: ${result.error}');
     }
-    
+
     return result;
   }
 

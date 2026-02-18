@@ -34,8 +34,9 @@ void main() {
         ),
       ];
 
-      when(() => mockRepository.getTransactionsForMonth(monthStart, monthEnd))
-          .thenAnswer((_) async => Result.ok(transactions));
+      when(
+        () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
+      ).thenAnswer((_) async => Result.ok(transactions));
 
       final result = await useCase(monthStart, monthEnd);
 
@@ -44,34 +45,42 @@ void main() {
       expect(value.length, equals(1));
       expect(value[0].targetMonth, equals(2));
       expect(value[0].targetYear, equals(2026));
-      verify(() => mockRepository.getTransactionsForMonth(monthStart, monthEnd)).called(1);
+      verify(
+        () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
+      ).called(1);
     });
 
     test('deve retornar lista vazia quando não há transações no mês', () async {
       const monthStart = 1738368000000;
       const monthEnd = 1740787200000;
 
-      when(() => mockRepository.getTransactionsForMonth(monthStart, monthEnd))
-          .thenAnswer((_) async => Result.ok(<Transaction>[]));
+      when(
+        () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
+      ).thenAnswer((_) async => Result.ok(<Transaction>[]));
 
       final result = await useCase(monthStart, monthEnd);
 
       expect(result.isOk, isTrue);
       expect(result.asOk.value, isEmpty);
-      verify(() => mockRepository.getTransactionsForMonth(monthStart, monthEnd)).called(1);
+      verify(
+        () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
+      ).called(1);
     });
 
     test('deve retornar erro quando repositório falha', () async {
       const monthStart = 1738368000000;
       const monthEnd = 1740787200000;
 
-      when(() => mockRepository.getTransactionsForMonth(monthStart, monthEnd))
-          .thenAnswer((_) async => Result.error(Exception('Database error')));
+      when(
+        () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
+      ).thenAnswer((_) async => Result.error(Exception('Database error')));
 
       final result = await useCase(monthStart, monthEnd);
 
       expect(result.isError, isTrue);
-      verify(() => mockRepository.getTransactionsForMonth(monthStart, monthEnd)).called(1);
+      verify(
+        () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
+      ).called(1);
     });
   });
 }

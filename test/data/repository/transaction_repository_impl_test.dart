@@ -38,8 +38,9 @@ void main() {
           ),
         ];
 
-        when(() => mockService.getAllTransactions())
-            .thenAnswer((_) async => Result.ok(transactions));
+        when(
+          () => mockService.getAllTransactions(),
+        ).thenAnswer((_) async => Result.ok(transactions));
 
         final result = await repository.getTransactions();
 
@@ -51,8 +52,9 @@ void main() {
       });
 
       test('deve retornar Result.error quando Service falha', () async {
-        when(() => mockService.getAllTransactions())
-            .thenAnswer((_) async => Result.error(Exception('Database error')));
+        when(
+          () => mockService.getAllTransactions(),
+        ).thenAnswer((_) async => Result.error(Exception('Database error')));
 
         final result = await repository.getTransactions();
 
@@ -78,27 +80,39 @@ void main() {
           ),
         ];
 
-        when(() => mockService.getTransactionsForMonth(monthStart, monthEnd))
-            .thenAnswer((_) async => Result.ok(transactions));
+        when(
+          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+        ).thenAnswer((_) async => Result.ok(transactions));
 
-        final result = await repository.getTransactionsForMonth(monthStart, monthEnd);
+        final result = await repository.getTransactionsForMonth(
+          monthStart,
+          monthEnd,
+        );
 
         expect(result.isOk, isTrue);
         expect(result.asOk.value.length, equals(1));
-        verify(() => mockService.getTransactionsForMonth(monthStart, monthEnd)).called(1);
+        verify(
+          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+        ).called(1);
       });
 
       test('deve retornar erro quando Service falha', () async {
         const monthStart = 1738368000000;
         const monthEnd = 1740787200000;
 
-        when(() => mockService.getTransactionsForMonth(monthStart, monthEnd))
-            .thenAnswer((_) async => Result.error(Exception('Database error')));
+        when(
+          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+        ).thenAnswer((_) async => Result.error(Exception('Database error')));
 
-        final result = await repository.getTransactionsForMonth(monthStart, monthEnd);
+        final result = await repository.getTransactionsForMonth(
+          monthStart,
+          monthEnd,
+        );
 
         expect(result.isError, isTrue);
-        verify(() => mockService.getTransactionsForMonth(monthStart, monthEnd)).called(1);
+        verify(
+          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+        ).called(1);
       });
     });
 
@@ -116,8 +130,9 @@ void main() {
           targetYear: 2026,
         );
 
-        when(() => mockService.insertTransaction(any()))
-            .thenAnswer((_) async => Result.ok(1));
+        when(
+          () => mockService.insertTransaction(any()),
+        ).thenAnswer((_) async => Result.ok(1));
 
         final result = await repository.makeTransaction(transaction);
 
@@ -134,8 +149,9 @@ void main() {
           targetYear: 2026,
         );
 
-        when(() => mockService.insertTransaction(any()))
-            .thenAnswer((_) async => Result.error(Exception('Insert failed')));
+        when(
+          () => mockService.insertTransaction(any()),
+        ).thenAnswer((_) async => Result.error(Exception('Insert failed')));
 
         final result = await repository.makeTransaction(transaction);
 
@@ -148,8 +164,9 @@ void main() {
       test('deve deletar transação por ID', () async {
         const id = 42;
 
-        when(() => mockService.deleteTransaction(id))
-            .thenAnswer((_) async => Result.ok(1));
+        when(
+          () => mockService.deleteTransaction(id),
+        ).thenAnswer((_) async => Result.ok(1));
 
         final result = await repository.deleteTransaction(id);
 
@@ -161,8 +178,9 @@ void main() {
       test('deve retornar 0 quando transação não existe', () async {
         const id = 999;
 
-        when(() => mockService.deleteTransaction(id))
-            .thenAnswer((_) async => Result.ok(0));
+        when(
+          () => mockService.deleteTransaction(id),
+        ).thenAnswer((_) async => Result.ok(0));
 
         final result = await repository.deleteTransaction(id);
 
@@ -174,8 +192,9 @@ void main() {
       test('deve retornar erro quando Service falha', () async {
         const id = 42;
 
-        when(() => mockService.deleteTransaction(id))
-            .thenAnswer((_) async => Result.error(Exception('Delete failed')));
+        when(
+          () => mockService.deleteTransaction(id),
+        ).thenAnswer((_) async => Result.error(Exception('Delete failed')));
 
         final result = await repository.deleteTransaction(id);
 
@@ -186,8 +205,9 @@ void main() {
 
     group('deleteAllTransactions', () {
       test('deve deletar todas as transações', () async {
-        when(() => mockService.deleteAll())
-            .thenAnswer((_) async => Result.ok(5));
+        when(
+          () => mockService.deleteAll(),
+        ).thenAnswer((_) async => Result.ok(5));
 
         final result = await repository.deleteAllTransactions();
 
@@ -214,8 +234,9 @@ void main() {
           ),
         ];
 
-        when(() => mockService.insertAll(any()))
-            .thenAnswer((_) async => Result.ok([1, 2]));
+        when(
+          () => mockService.insertAll(any()),
+        ).thenAnswer((_) async => Result.ok([1, 2]));
 
         final result = await repository.insertTransactions(transactions);
 

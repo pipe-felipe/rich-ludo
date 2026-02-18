@@ -7,6 +7,11 @@ class GetTransactionsForMonthUseCase {
 
   GetTransactionsForMonthUseCase(this._repository);
 
-  Future<Result<List<Transaction>>> call(int monthStartMillis, int monthEndExclusiveMillis) =>
-      _repository.getTransactionsForMonth(monthStartMillis, monthEndExclusiveMillis);
+  Future<Result<List<Transaction>>> call(
+    int monthStartMillis,
+    int monthEndExclusiveMillis,
+  ) => _repository.getTransactionsForMonth(
+    monthStartMillis,
+    monthEndExclusiveMillis,
+  );
 }

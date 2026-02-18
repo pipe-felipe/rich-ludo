@@ -44,12 +44,12 @@ extension ResultExtension<T> on Result<T> {
   }
 
   T? get valueOrNull => switch (this) {
-        Ok<T>(:final value) => value,
-        Error<T>() => null,
-      };
+    Ok<T>(:final value) => value,
+    Error<T>() => null,
+  };
 
   Exception? get errorOrNull => switch (this) {
-        Ok<T>() => null,
-        Error<T>(:final error) => error,
-      };
+    Ok<T>() => null,
+    Error<T>(:final error) => error,
+  };
 }

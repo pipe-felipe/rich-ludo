@@ -6,7 +6,8 @@ import 'package:rich_ludo/domain/usecase/make_transaction_usecase.dart';
 import 'package:rich_ludo/presentation/viewmodel/transaction_form_viewmodel.dart';
 import 'package:rich_ludo/utils/result.dart';
 
-class MockMakeTransactionUseCase extends Mock implements MakeTransactionUseCase {}
+class MockMakeTransactionUseCase extends Mock
+    implements MakeTransactionUseCase {}
 
 class FakeTransaction extends Fake implements Transaction {}
 
@@ -49,14 +50,20 @@ void main() {
       test('deve alterar tipo de transação para income', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
 
-        expect(viewModel.uiState.transactionType, equals(TransactionType.income));
+        expect(
+          viewModel.uiState.transactionType,
+          equals(TransactionType.income),
+        );
       });
 
       test('deve alterar tipo de transação para expense', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
         viewModel.onTransactionTypeChange(TransactionType.expense);
 
-        expect(viewModel.uiState.transactionType, equals(TransactionType.expense));
+        expect(
+          viewModel.uiState.transactionType,
+          equals(TransactionType.expense),
+        );
       });
     });
 
@@ -175,8 +182,9 @@ void main() {
 
     group('submitCommand', () {
       test('deve criar transação com dados corretos via Command', () async {
-        when(() => mockMakeTransactionUseCase(any()))
-            .thenAnswer((_) async => Result.ok(1));
+        when(
+          () => mockMakeTransactionUseCase(any()),
+        ).thenAnswer((_) async => Result.ok(1));
 
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
         viewModel.onQuantityChange('50.50');
@@ -189,8 +197,9 @@ void main() {
       });
 
       test('deve ter estado running durante execução', () async {
-        when(() => mockMakeTransactionUseCase(any()))
-            .thenAnswer((_) async => Result.ok(1));
+        when(
+          () => mockMakeTransactionUseCase(any()),
+        ).thenAnswer((_) async => Result.ok(1));
 
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
         viewModel.onQuantityChange('50.50');
@@ -206,8 +215,9 @@ void main() {
       });
 
       test('deve resetar formulário após submit bem-sucedido', () async {
-        when(() => mockMakeTransactionUseCase(any()))
-            .thenAnswer((_) async => Result.ok(1));
+        when(
+          () => mockMakeTransactionUseCase(any()),
+        ).thenAnswer((_) async => Result.ok(1));
 
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
         viewModel.onQuantityChange('50.50');
@@ -221,8 +231,9 @@ void main() {
       });
 
       test('deve ter estado error quando falha', () async {
-        when(() => mockMakeTransactionUseCase(any()))
-            .thenAnswer((_) async => Result.error(Exception('Database error')));
+        when(
+          () => mockMakeTransactionUseCase(any()),
+        ).thenAnswer((_) async => Result.error(Exception('Database error')));
 
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
         viewModel.onQuantityChange('50.50');

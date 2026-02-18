@@ -7,11 +7,11 @@ class FakeTransactionService implements TransactionService {
   final List<Transaction> _transactions = [];
   final List<RecurringExclusion> _exclusions = [];
   bool shouldReturnError = false;
-  
+
   void addTransaction(Transaction transaction) {
     _transactions.add(transaction);
   }
-  
+
   void clear() {
     _transactions.clear();
     _exclusions.clear();
@@ -34,8 +34,9 @@ class FakeTransactionService implements TransactionService {
       return Result.error(Exception('Erro simulado'));
     }
     final filtered = _transactions.where((tx) {
-      return tx.isRecurring || 
-          (tx.createdAt >= monthStartMillis && tx.createdAt < monthEndExclusiveMillis);
+      return tx.isRecurring ||
+          (tx.createdAt >= monthStartMillis &&
+              tx.createdAt < monthEndExclusiveMillis);
     }).toList();
     return Result.ok(filtered);
   }
@@ -120,12 +121,14 @@ class FakeTransactionService implements TransactionService {
       return Result.error(Exception('Erro simulado'));
     }
     final newId = _exclusions.length + 1;
-    _exclusions.add(RecurringExclusion(
-      id: newId,
-      transactionId: exclusion.transactionId,
-      month: exclusion.month,
-      year: exclusion.year,
-    ));
+    _exclusions.add(
+      RecurringExclusion(
+        id: newId,
+        transactionId: exclusion.transactionId,
+        month: exclusion.month,
+        year: exclusion.year,
+      ),
+    );
     return Result.ok(newId);
   }
 
@@ -136,6 +139,25 @@ class FakeTransactionService implements TransactionService {
     }
     final initialLength = _exclusions.length;
     _exclusions.removeWhere((ex) => ex.transactionId == transactionId);
+    return Result.ok(initialLength - _exclusions.length);
+  }
+
+  @override
+  Future<Result<int>> removeExclusion(
+    int transactionId,
+    int month,
+    int year,
+  ) async {
+    if (shouldReturnError) {
+      return Result.error(Exception('Erro simulado'));
+    }
+    final initialLength = _exclusions.length;
+    _exclusions.removeWhere(
+      (ex) =>
+          ex.transactionId == transactionId &&
+          ex.month == month &&
+          ex.year == year,
+    );
     return Result.ok(initialLength - _exclusions.length);
   }
 }

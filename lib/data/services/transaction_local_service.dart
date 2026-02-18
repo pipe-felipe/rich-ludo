@@ -13,7 +13,7 @@ class TransactionLocalService implements TransactionService {
   final DatabaseHelper _databaseHelper;
 
   TransactionLocalService({DatabaseHelper? databaseHelper})
-      : _databaseHelper = databaseHelper ?? DatabaseHelper.instance;
+    : _databaseHelper = databaseHelper ?? DatabaseHelper.instance;
 
   Future<Database> get database => _databaseHelper.database;
 
@@ -76,7 +76,10 @@ class TransactionLocalService implements TransactionService {
   Future<Result<int>> insertTransaction(Transaction transaction) async {
     try {
       final db = await database;
-      final id = await db.insert(DatabaseConfig.tableName, TransactionMapper.toMap(transaction));
+      final id = await db.insert(
+        DatabaseConfig.tableName,
+        TransactionMapper.toMap(transaction),
+      );
       return Result.ok(id);
     } on Exception catch (e) {
       return Result.error(e);
@@ -91,7 +94,10 @@ class TransactionLocalService implements TransactionService {
 
       await db.transaction((txn) async {
         for (final transaction in transactions) {
-          final id = await txn.insert(DatabaseConfig.tableName, TransactionMapper.toMap(transaction));
+          final id = await txn.insert(
+            DatabaseConfig.tableName,
+            TransactionMapper.toMap(transaction),
+          );
           ids.add(id);
         }
       });
@@ -179,6 +185,25 @@ class TransactionLocalService implements TransactionService {
         DatabaseConfig.exclusionsTableName,
         where: 'transactionId = ?',
         whereArgs: [transactionId],
+      );
+      return Result.ok(count);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<int>> removeExclusion(
+    int transactionId,
+    int month,
+    int year,
+  ) async {
+    try {
+      final db = await database;
+      final count = await db.delete(
+        DatabaseConfig.exclusionsTableName,
+        where: 'transactionId = ? AND month = ? AND year = ?',
+        whereArgs: [transactionId, month, year],
       );
       return Result.ok(count);
     } on Exception catch (e) {

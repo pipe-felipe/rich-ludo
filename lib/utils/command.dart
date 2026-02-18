@@ -64,5 +64,6 @@ class Command2<T, A, B> extends Command<T> {
 
   Command2(this._action);
 
-  Future<void> execute(A arg1, B arg2) => executeAction(() => _action(arg1, arg2));
+  Future<void> execute(A arg1, B arg2) =>
+      executeAction(() => _action(arg1, arg2));
 }

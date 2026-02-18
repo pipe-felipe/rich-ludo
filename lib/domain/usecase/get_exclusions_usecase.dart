@@ -7,5 +7,6 @@ class GetExclusionsUseCase {
 
   GetExclusionsUseCase(this._repository);
 
-  Future<Result<List<RecurringExclusion>>> call() => _repository.getExclusions();
+  Future<Result<List<RecurringExclusion>>> call() =>
+      _repository.getExclusions();
 }

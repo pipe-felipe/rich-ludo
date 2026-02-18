@@ -37,18 +37,12 @@ class _FloatingNotificationState extends State<FloatingNotification>
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 1),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
 
     _controller.forward();
 
@@ -117,28 +111,20 @@ class _FloatingNotificationState extends State<FloatingNotification>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  _getIcon(),
-                  color: textColor,
-                  size: 24,
-                ),
+                Icon(_getIcon(), color: textColor, size: 24),
                 const SizedBox(width: 12),
                 Flexible(
                   child: Text(
                     widget.message,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: textColor,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: textColor),
                   ),
                 ),
                 const SizedBox(width: 8),
                 IconButton(
                   onPressed: _dismiss,
-                  icon: Icon(
-                    Icons.close,
-                    color: textColor,
-                    size: 20,
-                  ),
+                  icon: Icon(Icons.close, color: textColor, size: 20),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
                     minWidth: 24,

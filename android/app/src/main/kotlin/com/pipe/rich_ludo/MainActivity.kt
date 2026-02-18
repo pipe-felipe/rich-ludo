@@ -1,4 +1,4 @@
-package com.example.rich_ludo
+package com.pipe.rich_ludo
 
 import io.flutter.embedding.android.FlutterActivity
 

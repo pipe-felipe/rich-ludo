@@ -44,10 +44,7 @@ class TransactionCard extends StatelessWidget {
               description: item.description,
               humanDate: item.humanDate,
             ),
-            _AmountText(
-              amountCents: item.amountCents,
-              isIncome: _isIncome,
-            ),
+            _AmountText(amountCents: item.amountCents, isIncome: _isIncome),
             IconButton(
               onPressed: onDelete,
               icon: Icon(Icons.delete, color: AppTheme.thrashCan(context)),
@@ -75,7 +72,7 @@ class _CategoryIcon extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: iconColor.withValues(alpha:0.15),
+        color: iconColor.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
@@ -103,15 +100,9 @@ class _TransactionDetails extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (description != null && description!.isNotEmpty)
-            Text(
-              description!,
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text(description!, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 4),
-          Text(
-            humanDate,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          Text(humanDate, style: Theme.of(context).textTheme.bodyMedium),
         ],
       ),
     );
@@ -122,10 +113,7 @@ class _AmountText extends StatelessWidget {
   final int amountCents;
   final bool isIncome;
 
-  const _AmountText({
-    required this.amountCents,
-    required this.isIncome,
-  });
+  const _AmountText({required this.amountCents, required this.isIncome});
 
   @override
   Widget build(BuildContext context) {
@@ -134,10 +122,7 @@ class _AmountText extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(left: 4),
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.bodyLarge,
-      ),
+      child: Text(text, style: Theme.of(context).textTheme.bodyLarge),
     );
   }
 }

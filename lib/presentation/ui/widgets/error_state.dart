@@ -17,15 +17,9 @@ class ErrorState extends StatelessWidget {
         children: [
           const Icon(Icons.error_outline, size: 48),
           const SizedBox(height: 16),
-          Text(
-            l10n.errorLoading,
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
+          Text(l10n.errorLoading, style: Theme.of(context).textTheme.bodyLarge),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: onRetry,
-            child: Text(l10n.tryAgain),
-          ),
+          ElevatedButton(onPressed: onRetry, child: Text(l10n.tryAgain)),
         ],
       ),
     );

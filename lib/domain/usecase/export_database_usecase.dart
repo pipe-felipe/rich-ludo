@@ -6,7 +6,6 @@ import 'package:flutter/foundation.dart';
 import '../../data/services/export_service.dart';
 import '../../utils/result.dart';
 
-
 class ExportDatabaseUseCase {
   final ExportService _exportService;
 
@@ -20,10 +19,10 @@ class ExportDatabaseUseCase {
       if (dbPathResult.isError) {
         return Result.error(dbPathResult.asError.error);
       }
-      
+
       final sourcePath = dbPathResult.asOk.value;
       final sourceFile = File(sourcePath);
-      
+
       if (!await sourceFile.exists()) {
         debugPrint('[ExportDatabaseUseCase] Banco não existe em: $sourcePath');
         return Result.error(Exception('Banco de dados não encontrado'));
@@ -35,7 +34,7 @@ class ExportDatabaseUseCase {
       final backupFileName = 'rich_ludo_backup_$timestamp.ludo';
 
       debugPrint('[ExportDatabaseUseCase] Abrindo seletor de pasta...');
-      
+
       final selectedPath = await FilePicker.platform.saveFile(
         dialogTitle: 'Escolha onde salvar o backup',
         fileName: backupFileName,
@@ -47,9 +46,9 @@ class ExportDatabaseUseCase {
         debugPrint('[ExportDatabaseUseCase] Usuário cancelou');
         return Result.error(Exception('Exportação cancelada pelo usuário'));
       }
-      
+
       debugPrint('[ExportDatabaseUseCase] Salvo em: $selectedPath');
-      
+
       return Result.ok(selectedPath);
     } catch (e, stack) {
       debugPrint('[ExportDatabaseUseCase] ERRO: $e');

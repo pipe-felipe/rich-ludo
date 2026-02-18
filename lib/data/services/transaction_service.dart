@@ -28,4 +28,10 @@ abstract class TransactionService {
   Future<Result<int>> addExclusion(RecurringExclusion exclusion);
 
   Future<Result<int>> deleteExclusionsForTransaction(int transactionId);
+
+  Future<Result<int>> removeExclusion(
+    int transactionId,
+    int month,
+    int year,
+  );
 }

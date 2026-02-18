@@ -16,24 +16,29 @@ void main() {
   });
 
   group('DeleteTransactionUseCase', () {
-    test('deve deletar transação e retornar Result.ok com linhas afetadas', () async {
-      const transactionId = 42;
-      
-      when(() => mockRepository.deleteTransaction(transactionId))
-          .thenAnswer((_) async => const Result.ok(1));
+    test(
+      'deve deletar transação e retornar Result.ok com linhas afetadas',
+      () async {
+        const transactionId = 42;
 
-      final result = await useCase(transactionId);
+        when(
+          () => mockRepository.deleteTransaction(transactionId),
+        ).thenAnswer((_) async => const Result.ok(1));
 
-      expect(result.isOk, isTrue);
-      expect(result.asOk.value, equals(1));
-      verify(() => mockRepository.deleteTransaction(transactionId)).called(1);
-    });
+        final result = await useCase(transactionId);
+
+        expect(result.isOk, isTrue);
+        expect(result.asOk.value, equals(1));
+        verify(() => mockRepository.deleteTransaction(transactionId)).called(1);
+      },
+    );
 
     test('deve retornar Result.ok com 0 quando transação não existe', () async {
       const transactionId = 999;
-      
-      when(() => mockRepository.deleteTransaction(transactionId))
-          .thenAnswer((_) async => const Result.ok(0));
+
+      when(
+        () => mockRepository.deleteTransaction(transactionId),
+      ).thenAnswer((_) async => const Result.ok(0));
 
       final result = await useCase(transactionId);
 
@@ -44,9 +49,10 @@ void main() {
 
     test('deve retornar Result.error quando repositório falha', () async {
       const transactionId = 42;
-      
-      when(() => mockRepository.deleteTransaction(transactionId))
-          .thenAnswer((_) async => Result.error(Exception('Erro de banco')));
+
+      when(
+        () => mockRepository.deleteTransaction(transactionId),
+      ).thenAnswer((_) async => Result.error(Exception('Erro de banco')));
 
       final result = await useCase(transactionId);
 

@@ -25,10 +25,7 @@ import 'presentation/viewmodel/transaction_form_viewmodel.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Configura o app para usar edge-to-edge
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
   runApp(const RichLudoApp());
 }
 
@@ -39,33 +36,26 @@ class RichLudoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider<TransactionService>(
-          create: (_) => TransactionLocalService(),
-        ),
-        Provider<ExportService>(
-          create: (_) => ExportLocalService(),
-        ),
-        
+        Provider<TransactionService>(create: (_) => TransactionLocalService()),
+        Provider<ExportService>(create: (_) => ExportLocalService()),
+
         Provider<TransactionRepository>(
           create: (context) => TransactionRepositoryImpl(
             service: context.read<TransactionService>(),
           ),
         ),
-        
+
         Provider<GetTransactionsUseCase>(
-          create: (context) => GetTransactionsUseCase(
-            context.read<TransactionRepository>(),
-          ),
+          create: (context) =>
+              GetTransactionsUseCase(context.read<TransactionRepository>()),
         ),
         Provider<MakeTransactionUseCase>(
-          create: (context) => MakeTransactionUseCase(
-            context.read<TransactionRepository>(),
-          ),
+          create: (context) =>
+              MakeTransactionUseCase(context.read<TransactionRepository>()),
         ),
         Provider<DeleteTransactionUseCase>(
-          create: (context) => DeleteTransactionUseCase(
-            context.read<TransactionRepository>(),
-          ),
+          create: (context) =>
+              DeleteTransactionUseCase(context.read<TransactionRepository>()),
         ),
         Provider<DeleteRecurringTransactionUseCase>(
           create: (context) => DeleteRecurringTransactionUseCase(
@@ -73,26 +63,24 @@ class RichLudoApp extends StatelessWidget {
           ),
         ),
         Provider<GetExclusionsUseCase>(
-          create: (context) => GetExclusionsUseCase(
-            context.read<TransactionRepository>(),
-          ),
+          create: (context) =>
+              GetExclusionsUseCase(context.read<TransactionRepository>()),
         ),
         Provider<ExportDatabaseUseCase>(
-          create: (context) => ExportDatabaseUseCase(
-            context.read<ExportService>(),
-          ),
+          create: (context) =>
+              ExportDatabaseUseCase(context.read<ExportService>()),
         ),
         Provider<ImportDatabaseUseCase>(
-          create: (context) => ImportDatabaseUseCase(
-            context.read<ExportService>(),
-          ),
+          create: (context) =>
+              ImportDatabaseUseCase(context.read<ExportService>()),
         ),
-        
+
         ChangeNotifierProvider<MainScreenViewModel>(
           create: (context) => MainScreenViewModel(
             getTransactionsUseCase: context.read<GetTransactionsUseCase>(),
             deleteTransactionUseCase: context.read<DeleteTransactionUseCase>(),
-            deleteRecurringTransactionUseCase: context.read<DeleteRecurringTransactionUseCase>(),
+            deleteRecurringTransactionUseCase: context
+                .read<DeleteRecurringTransactionUseCase>(),
             getExclusionsUseCase: context.read<GetExclusionsUseCase>(),
             exportDatabaseUseCase: context.read<ExportDatabaseUseCase>(),
             importDatabaseUseCase: context.read<ImportDatabaseUseCase>(),
@@ -116,25 +104,24 @@ class RichLudoApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('pt', ''),
-          Locale('en', ''),
-        ],
+        supportedLocales: const [Locale('pt', ''), Locale('en', '')],
         locale: const Locale('pt', ''),
         builder: (context, child) {
           final brightness = Theme.of(context).brightness;
           final colorScheme = Theme.of(context).colorScheme;
 
-          SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: brightness == Brightness.dark
-                ? Brightness.light
-                : Brightness.dark,
-            systemNavigationBarColor: colorScheme.surface,
-            systemNavigationBarIconBrightness: brightness == Brightness.dark
-                ? Brightness.light
-                : Brightness.dark,
-          ));
+          SystemChrome.setSystemUIOverlayStyle(
+            SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: brightness == Brightness.dark
+                  ? Brightness.light
+                  : Brightness.dark,
+              systemNavigationBarColor: colorScheme.surface,
+              systemNavigationBarIconBrightness: brightness == Brightness.dark
+                  ? Brightness.light
+                  : Brightness.dark,
+            ),
+          );
 
           return child ?? const SizedBox.shrink();
         },

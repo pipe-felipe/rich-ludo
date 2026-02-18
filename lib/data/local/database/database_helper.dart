@@ -111,7 +111,9 @@ class DatabaseHelper {
         await _migrateToV2(db);
       }
 
-      await db.execute('PRAGMA user_version = ${DatabaseConfig.databaseVersion}');
+      await db.execute(
+        'PRAGMA user_version = ${DatabaseConfig.databaseVersion}',
+      );
     }
   }
 
