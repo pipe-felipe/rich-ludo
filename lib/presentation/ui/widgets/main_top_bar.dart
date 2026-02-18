@@ -47,7 +47,7 @@ class MainTopBar extends StatelessWidget {
             totalSavingText: totalSavingText,
           ),
           Divider(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.06),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
           ),
         ],
       ),

@@ -110,83 +110,106 @@ class MainScreenViewModel extends ChangeNotifier {
   }
 
   void _filterAndComputeTotals() {
-    _items = _allItems.where((tx) {
-      if (tx.isRecurring) {
-        final afterStart = (tx.targetYear < _currentYear) ||
-            (tx.targetYear == _currentYear && tx.targetMonth <= _currentMonth);
-
-        final beforeEnd = tx.endMonth == null || tx.endYear == null ||
-            (_currentYear < tx.endYear!) ||
-            (_currentYear == tx.endYear! && _currentMonth <= tx.endMonth!);
-
-        final isExcluded = _exclusions.any((ex) =>
-            ex.transactionId == tx.id &&
-            ex.month == _currentMonth &&
-            ex.year == _currentYear);
-
-        return afterStart && beforeEnd && !isExcluded;
-      } else {
-        return tx.targetMonth == _currentMonth && tx.targetYear == _currentYear;
-      }
-    }).toList();
-
-    final totals = _computeTotals(_items);
-    _totalIncomeText = 'R\$ ${formatMoney((totals.$1 * 100).round())}';
-    _totalExpenseText = 'R\$ ${formatMoney((totals.$2 * 100).round())}';
-
-    final now = DateTime.now();
-    final accumulatedItems = _allItems.where((tx) {
-      return (tx.targetYear < _currentYear) ||
-          (tx.targetYear == _currentYear && tx.targetMonth <= _currentMonth);
-    }).toList();
-
-    final savingsTotals = _computeTotalsForSavings(
-      accumulatedItems,
-      now.month,
-      now.year,
-    );
-    final savingsAmount = (savingsTotals.$1 - savingsTotals.$2) * 100;
-    _totalSavingText = 'R\$ ${formatMoney(savingsAmount.round())}';
-
+    _items = _visibleItemsForMonth(_currentMonth, _currentYear);
+    _totalIncomeText = _formatCurrency(_sumByType(_items, TransactionType.income));
+    _totalExpenseText = _formatCurrency(_sumByType(_items, TransactionType.expense));
+    _totalSavingText = _formatCurrency(_computeSavingsCents());
     notifyListeners();
   }
 
-  (double income, double expense) _computeTotals(List<Transaction> items) {
-    int incomeCents = 0;
-    int expenseCents = 0;
-
-    for (final item in items) {
-      if (item.type == TransactionType.income) {
-        incomeCents += item.amountCents;
-      } else {
-        expenseCents += item.amountCents;
+  List<Transaction> _visibleItemsForMonth(int month, int year) {
+    return _allItems.where((tx) {
+      if (tx.isRecurring) {
+        return _isRecurringActiveInMonth(tx, month, year) &&
+            !_isExcludedInMonth(tx.id, month, year);
       }
-    }
-
-    return (incomeCents / 100.0, expenseCents / 100.0);
+      return tx.targetMonth == month && tx.targetYear == year;
+    }).toList();
   }
 
-  (double income, double expense) _computeTotalsForSavings(
-    List<Transaction> items,
-    int currentMonth,
-    int currentYear,
-  ) {
-    int incomeCents = 0;
-    int expenseCents = 0;
+  bool _isRecurringActiveInMonth(Transaction tx, int month, int year) {
+    final afterStart =
+        tx.targetYear < year || (tx.targetYear == year && tx.targetMonth <= month);
+    final beforeEnd = tx.endMonth == null ||
+        tx.endYear == null ||
+        year < tx.endYear! ||
+        (year == tx.endYear! && month <= tx.endMonth!);
+    return afterStart && beforeEnd;
+  }
 
-    for (final item in items) {
-      if (item.type == TransactionType.income) {
-        final isFuture = (item.targetYear > currentYear) ||
-            (item.targetYear == currentYear && item.targetMonth > currentMonth);
-        if (!isFuture) {
-          incomeCents += item.amountCents;
-        }
+  bool _isExcludedInMonth(int transactionId, int month, int year) {
+    return _exclusions.any((ex) =>
+        ex.transactionId == transactionId &&
+        ex.month == month &&
+        ex.year == year);
+  }
+
+  int _sumByType(List<Transaction> items, TransactionType type) {
+    return items
+        .where((tx) => tx.type == type)
+        .fold(0, (sum, tx) => sum + tx.amountCents);
+  }
+
+  String _formatCurrency(int cents) {
+    return 'R\$ ${formatMoney(cents)}';
+  }
+
+  int _computeSavingsCents() {
+    final now = DateTime.now();
+    int totalCents = 0;
+
+    for (final tx in _allItems) {
+      if (tx.isRecurring) {
+        totalCents += _recurringContributionToSavings(tx, now);
       } else {
-        expenseCents += item.amountCents;
+        final isUpToViewingMonth = _isOnOrBefore(
+          tx.targetMonth, tx.targetYear, _currentMonth, _currentYear,
+        );
+        final isFutureIncome = tx.type == TransactionType.income &&
+            !_isOnOrBefore(tx.targetMonth, tx.targetYear, now.month, now.year);
+
+        if (isUpToViewingMonth && !isFutureIncome) {
+          totalCents += _signedAmount(tx);
+        }
       }
     }
 
-    return (incomeCents / 100.0, expenseCents / 100.0);
+    return totalCents;
+  }
+
+  int _recurringContributionToSavings(Transaction tx, DateTime now) {
+    int totalCents = 0;
+    int m = tx.targetMonth;
+    int y = tx.targetYear;
+
+    while (_isOnOrBefore(m, y, _currentMonth, _currentYear)) {
+      if (tx.endMonth != null &&
+          tx.endYear != null &&
+          !_isOnOrBefore(m, y, tx.endMonth!, tx.endYear!)) {
+        break;
+      }
+
+      final isFutureIncome = tx.type == TransactionType.income &&
+          !_isOnOrBefore(m, y, now.month, now.year);
+
+      if (!_isExcludedInMonth(tx.id, m, y) && !isFutureIncome) {
+        totalCents += _signedAmount(tx);
+      }
+
+      if (m == 12) { m = 1; y++; } else { m++; }
+    }
+
+    return totalCents;
+  }
+
+  int _signedAmount(Transaction tx) {
+    return tx.type == TransactionType.income
+        ? tx.amountCents
+        : -tx.amountCents;
+  }
+
+  bool _isOnOrBefore(int month, int year, int refMonth, int refYear) {
+    return year < refYear || (year == refYear && month <= refMonth);
   }
 
   String _formatMonthYear(int month, int year) {
