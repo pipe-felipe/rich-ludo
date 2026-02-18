@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-02-18
+
+### Added
+- Income/expense proportional bar in the top summary replacing the static divider
+- Reactivation of excluded recurring transactions when a matching transaction is created
+- `removeExclusion` operation across the full data stack (service, repository, DAO)
+
+### Fixed
+- Savings calculation now correctly handles recurring transaction exclusions on a per-month basis
+
+### Changed
+- Transaction type selector migrated to Flutter's `RadioGroup<TransactionType>` widget
+- ViewModel refactored: decomposed monolithic method into focused helpers for clarity
+
 ## [1.2.0] - 2026-02-17
 
 ### Fixed
