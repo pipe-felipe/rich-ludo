@@ -62,7 +62,7 @@ void main() {
 
     test('deve obter caminho do banco de dados', () async {
       const expectedPath =
-          '/data/data/com.example.rich_ludo/databases/rich_ludo.db';
+          '/data/data/com.pipe.rich_ludo/databases/rich_ludo.db';
 
       when(
         () => mockExportService.getDatabasePath(),

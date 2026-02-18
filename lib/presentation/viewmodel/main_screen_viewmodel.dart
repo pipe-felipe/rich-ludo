@@ -167,23 +167,25 @@ class MainScreenViewModel extends ChangeNotifier {
 
   int _computeSavingsCents() {
     final now = DateTime.now();
+    final refMonth = now.month;
+    final refYear = now.year;
     int totalCents = 0;
 
     for (final tx in _allItems) {
       if (tx.isRecurring) {
-        totalCents += _recurringContributionToSavings(tx, now);
+        totalCents += _recurringContributionToSavings(tx, now, refMonth, refYear);
       } else {
-        final isUpToViewingMonth = _isOnOrBefore(
+        final isUpToCurrentMonth = _isOnOrBefore(
           tx.targetMonth,
           tx.targetYear,
-          _currentMonth,
-          _currentYear,
+          refMonth,
+          refYear,
         );
         final isFutureIncome =
             tx.type == TransactionType.income &&
-            !_isOnOrBefore(tx.targetMonth, tx.targetYear, now.month, now.year);
+            !_isOnOrBefore(tx.targetMonth, tx.targetYear, refMonth, refYear);
 
-        if (isUpToViewingMonth && !isFutureIncome) {
+        if (isUpToCurrentMonth && !isFutureIncome) {
           totalCents += _signedAmount(tx);
         }
       }
@@ -192,12 +194,17 @@ class MainScreenViewModel extends ChangeNotifier {
     return totalCents;
   }
 
-  int _recurringContributionToSavings(Transaction tx, DateTime now) {
+  int _recurringContributionToSavings(
+    Transaction tx,
+    DateTime now,
+    int refMonth,
+    int refYear,
+  ) {
     int totalCents = 0;
     int m = tx.targetMonth;
     int y = tx.targetYear;
 
-    while (_isOnOrBefore(m, y, _currentMonth, _currentYear)) {
+    while (_isOnOrBefore(m, y, refMonth, refYear)) {
       if (tx.endMonth != null &&
           tx.endYear != null &&
           !_isOnOrBefore(m, y, tx.endMonth!, tx.endYear!)) {

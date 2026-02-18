@@ -25,10 +25,7 @@ import 'presentation/viewmodel/transaction_form_viewmodel.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Configura o app para usar edge-to-edge
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
   runApp(const RichLudoApp());
 }
 
