@@ -141,4 +141,23 @@ class FakeTransactionService implements TransactionService {
     _exclusions.removeWhere((ex) => ex.transactionId == transactionId);
     return Result.ok(initialLength - _exclusions.length);
   }
+
+  @override
+  Future<Result<int>> removeExclusion(
+    int transactionId,
+    int month,
+    int year,
+  ) async {
+    if (shouldReturnError) {
+      return Result.error(Exception('Erro simulado'));
+    }
+    final initialLength = _exclusions.length;
+    _exclusions.removeWhere(
+      (ex) =>
+          ex.transactionId == transactionId &&
+          ex.month == month &&
+          ex.year == year,
+    );
+    return Result.ok(initialLength - _exclusions.length);
+  }
 }

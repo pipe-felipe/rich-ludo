@@ -191,4 +191,23 @@ class TransactionLocalService implements TransactionService {
       return Result.error(e);
     }
   }
+
+  @override
+  Future<Result<int>> removeExclusion(
+    int transactionId,
+    int month,
+    int year,
+  ) async {
+    try {
+      final db = await database;
+      final count = await db.delete(
+        DatabaseConfig.exclusionsTableName,
+        where: 'transactionId = ? AND month = ? AND year = ?',
+        whereArgs: [transactionId, month, year],
+      );
+      return Result.ok(count);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
 }
