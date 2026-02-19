@@ -1,6 +1,27 @@
 # RichLudo
 
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.3.1-green" alt="Version"/>
+  <img src="https://img.shields.io/badge/flutter-%E2%89%A53.10-blue" alt="Flutter"/>
+  <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey" alt="Platform"/>
+  <img src="https://img.shields.io/badge/license-GPL--3.0-orange" alt="License"/>
+</p>
+
 Personal finance control app, converted from the RichPipi project (Kotlin Multiplatform) to Flutter.
+
+## Screenshots
+
+<p align="center">
+  <img src="docs/images/app.png" width="230" alt="Main screen"/>
+  &nbsp;&nbsp;
+  <img src="docs/images/add-transaction.png" width="230" alt="Add transaction"/>
+  &nbsp;&nbsp;
+  <img src="docs/images/recurring-delete.png" width="230" alt="Recurring delete"/>
+</p>
+
+<p align="center">
+  <sub>Tela principal · Formulário de transação · Deleção de recorrente</sub>
+</p>
 
 ## Description - pt-br
 
@@ -79,6 +100,8 @@ lib/
 - ✅ Local persistence with SQLite
 - ✅ Automatic light/dark theme
 - ✅ Localization in Portuguese
+- ✅ Export/import database
+- ✅ Income/expense proportional bar
 
 ## Compilation
 
@@ -87,6 +110,7 @@ This project is configured to compile **only for Android and iOS**.
 ### Run
 
 ```bash
+flutter pub get
 flutter run
 ```
 
@@ -107,3 +131,9 @@ flutter build ios
 - `provider`: State management
 - `sqflite`: SQLite database
 - `flutter_localizations`: Internationalization
+- `file_picker`: Data export/import
+- `intl`: Internationalization utilities
+
+## License
+
+This project is licensed under the **GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for details.

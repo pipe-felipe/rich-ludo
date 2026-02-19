@@ -13,8 +13,10 @@ Perform the full release process for a new version of the project following thes
 
 4. **Update pubspec.yaml**: Bump the `version` field with the new version and increment the build number (number after `+`).
 
-5. **Commit**: Create a commit with the message `chore: release vX.Y.Z`.
+5. **Update README.md**: Update the version number in the README.
 
-6. **Tag**: Create an annotated tag `vX.Y.Z` with the message `Release vX.Y.Z`.
+6. **Commit**: Create a commit with the message `chore: release vX.Y.Z`.
 
-7. **Final instructions**: Provide the push command with tags: `git push origin <branch> --tags`.
+7. **Tag**: Create an annotated tag `vX.Y.Z` with the message `Release vX.Y.Z`.
+
+8. **Final instructions**: Provide the push command with tags: `git push origin <branch> --tags`.

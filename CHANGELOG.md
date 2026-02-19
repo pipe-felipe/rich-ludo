@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-02-18
+
+### Fixed
+- Savings calculation now correctly handles recurring transaction exclusions on a per-month basis
+
+### Changed
+- Recurring delete dialog redesigned with pill-shaped buttons for better UX
+- README improved with screenshots, badges, and updated dependency list
+
 ## [1.3.0] - 2026-02-18
 
 ### Added
