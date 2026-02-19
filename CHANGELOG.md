@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-02-18
+
+### Added
+- Android release signing with fixed keystore for consistent updates via Obtainium/sideloading
+- GitHub Actions CI/CD configured with keystore injection via GitHub Secrets
+- Keystore setup documentation in README
+
+### Changed
+- Release builds now use a fixed signing key instead of debug signing
+- Build configuration migrated from debug signing to release signing config in `build.gradle.kts`
+
 ## [1.3.1] - 2026-02-18
 
 ### Fixed

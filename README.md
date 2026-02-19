@@ -1,7 +1,7 @@
 # RichLudo
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.1-green" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-2.0.0-green" alt="Version"/>
   <img src="https://img.shields.io/badge/flutter-%E2%89%A53.10-blue" alt="Flutter"/>
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-GPL--3.0-orange" alt="License"/>
@@ -106,6 +106,37 @@ lib/
 ## Compilation
 
 This project is configured to compile **only for Android and iOS**.
+
+### Signing (Android Release)
+
+Release builds are signed with a fixed keystore to ensure consistent updates via Obtainium or sideloading.
+
+**Local setup:**
+
+1. Generate a keystore (once):
+```bash
+keytool -genkey -v -keystore android/upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+```
+
+2. Create `android/key.properties` from the template:
+```bash
+cp android/key.properties.example android/key.properties
+```
+
+3. Edit `android/key.properties` with your passwords.
+
+> The keystore and `key.properties` are in `.gitignore` and **must never be committed**.
+
+**GitHub Actions (CI/CD):**
+
+Configure these secrets in your repository (Settings → Secrets and variables → Actions):
+
+| Secret | Description |
+|--------|-------------|
+| `KEYSTORE_BASE64` | Base64-encoded keystore: `base64 -i android/upload-keystore.jks` |
+| `KEYSTORE_PASSWORD` | Store password |
+| `KEY_PASSWORD` | Key password |
+| `KEY_ALIAS` | Key alias (default: `upload`) |
 
 ### Run
 
