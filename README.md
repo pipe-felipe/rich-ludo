@@ -1,7 +1,7 @@
 # RichLudo
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.3.0-green" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-1.3.1-green" alt="Version"/>
   <img src="https://img.shields.io/badge/flutter-%E2%89%A53.10-blue" alt="Flutter"/>
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-GPL--3.0-orange" alt="License"/>
