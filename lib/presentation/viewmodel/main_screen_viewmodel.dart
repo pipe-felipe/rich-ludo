@@ -33,6 +33,7 @@ class MainScreenViewModel extends ChangeNotifier {
   int _totalExpenseCents = 0;
   int _currentMonth = DateTime.now().month;
   int _currentYear = DateTime.now().year;
+  bool _needsReload = false;
 
   late final Command0<List<Transaction>> load;
 
@@ -59,11 +60,18 @@ class MainScreenViewModel extends ChangeNotifier {
        _exportDatabaseUseCase = exportDatabaseUseCase,
        _importDatabaseUseCase = importDatabaseUseCase {
     load = Command0<List<Transaction>>(_loadTransactions);
+    load.addListener(_onLoadChanged);
     deleteTransaction = Command1<int, int>(_deleteItem);
     exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
     importDatabase = Command0<void>(_importDatabaseUseCase.call);
 
     load.execute();
+  }
+
+  @override
+  void dispose() {
+    load.removeListener(_onLoadChanged);
+    super.dispose();
   }
 
   List<Transaction> get items => _items;
@@ -75,37 +83,52 @@ class MainScreenViewModel extends ChangeNotifier {
   int get currentMonth => _currentMonth;
   int get currentYear => _currentYear;
 
-  Future<Result<List<Transaction>>> _loadTransactions({bool forceRefresh = false}) async {
-    final cacheKey = '$_currentMonth-$_currentYear';
-
-    if (forceRefresh) {
-      _cachedMonths.remove(cacheKey);
+  void _onLoadChanged() {
+    if (!load.running && _needsReload) {
+      _needsReload = false;
+      load.execute();
     }
+  }
+
+  void _requestLoad() {
+    if (load.running) {
+      _needsReload = true;
+    } else {
+      _needsReload = false;
+      load.execute();
+    }
+  }
+
+  Future<Result<List<Transaction>>> _loadTransactions() async {
+    final month = _currentMonth;
+    final year = _currentYear;
+    final cacheKey = '$month-$year';
 
     if (_cachedMonths.containsKey(cacheKey)) {
       _items = _cachedMonths[cacheKey]!;
-      // Exclusions might have changed, or we just want to ensure we have them
       final exclusionsResult = await _getExclusionsUseCase();
       if (exclusionsResult case Ok<List<RecurringExclusion>>(:final value)) {
         _exclusions = value;
       }
-      
+
       final balanceResult = await _getNonRecurringBalanceUseCase(
-        upToMonth: _currentMonth,
-        upToYear: _currentYear,
+        upToMonth: month,
+        upToYear: year,
       );
       if (balanceResult case Ok<int>(:final value)) {
         _nonRecurringBalance = value;
       }
-      
-      _filterAndComputeTotals();
+
+      if (month == _currentMonth && year == _currentYear) {
+        _filterAndComputeTotals();
+      }
       return Result.ok(_items);
     }
 
     final results = await Future.wait([
-      _getTransactionsUseCase(month: _currentMonth, year: _currentYear),
+      _getTransactionsUseCase(month: month, year: year),
       _getExclusionsUseCase(),
-      _getNonRecurringBalanceUseCase(upToMonth: _currentMonth, upToYear: _currentYear),
+      _getNonRecurringBalanceUseCase(upToMonth: month, upToYear: year),
     ]);
 
     final result = results[0] as Result<List<Transaction>>;
@@ -133,8 +156,19 @@ class MainScreenViewModel extends ChangeNotifier {
         debugPrint('Error loading balance: ${balanceResult.error}');
     }
 
-    _filterAndComputeTotals();
+    if (month == _currentMonth && year == _currentYear) {
+      _filterAndComputeTotals();
+    }
     return result;
+  }
+
+  void _invalidateCache() {
+    _cachedMonths.clear();
+  }
+
+  void invalidateAndReload() {
+    _invalidateCache();
+    _requestLoad();
   }
 
   Future<Result<int>> _deleteItem(int id) async {
@@ -142,7 +176,7 @@ class MainScreenViewModel extends ChangeNotifier {
 
     switch (result) {
       case Ok<int>():
-        await _loadTransactions();
+        break;
       case Error<int>():
         debugPrint('Error deleting item: ${result.error}');
     }
@@ -275,8 +309,11 @@ class MainScreenViewModel extends ChangeNotifier {
     return year < refYear || (year == refYear && month <= refMonth);
   }
 
-  void deleteItem(int id) {
-    deleteTransaction.execute(id);
+  Future<void> deleteItem(int id) async {
+    await deleteTransaction.execute(id);
+    if (deleteTransaction.completed) {
+      invalidateAndReload();
+    }
   }
 
   Future<void> deleteRecurringItem(
@@ -292,7 +329,7 @@ class MainScreenViewModel extends ChangeNotifier {
 
     switch (result) {
       case Ok<int>():
-        await _loadTransactions();
+        invalidateAndReload();
       case Error<int>():
         debugPrint('Error deleting recurring: ${result.error}');
     }
@@ -313,7 +350,8 @@ class MainScreenViewModel extends ChangeNotifier {
     } else {
       _currentMonth--;
     }
-    _filterAndComputeTotals();
+    notifyListeners();
+    _requestLoad();
   }
 
   void goToNextMonth() {
@@ -323,13 +361,15 @@ class MainScreenViewModel extends ChangeNotifier {
     } else {
       _currentMonth++;
     }
-    _filterAndComputeTotals();
+    notifyListeners();
+    _requestLoad();
   }
 
   void goToCurrentMonth() {
     final now = DateTime.now();
     _currentMonth = now.month;
     _currentYear = now.year;
-    _filterAndComputeTotals();
+    notifyListeners();
+    _requestLoad();
   }
 }
