@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-03-14
+
+### Fixed
+- Month navigation race condition: load requests are now queued when already running, preventing stale data
+- Delete transaction no longer triggers an inline reload; instead invalidates cache and requests a safe reload
+- Recurring item deletion now invalidates cache before reloading
+
+### Changed
+- ViewModel refactored with `_requestLoad()` and `invalidateAndReload()` to safely handle concurrent load operations
+- Month navigation (`goToPreviousMonth`, `goToNextMonth`, `goToCurrentMonth`) now notifies listeners immediately and requests load instead of filtering in-place
+
 ## [2.1.0] - 2026-03-13
 
 ### Added
