@@ -117,7 +117,7 @@ class MainScreen extends StatelessWidget {
         ),
       ),
     );
-    viewModel.load.execute();
+    viewModel.invalidateAndReload();
   }
 
   Future<void> _exportDatabase(
@@ -131,7 +131,6 @@ class MainScreen extends StatelessWidget {
     final result = viewModel.exportDatabase.result;
     if (result == null) return;
 
-    // Garantir que o contexto ainda é válido antes de mostrar notificação
     if (!context.mounted) return;
 
     switch (result) {
@@ -166,7 +165,6 @@ class MainScreen extends StatelessWidget {
     final result = viewModel.importDatabase.result;
     if (result == null) return;
 
-    // Garantir que o contexto ainda é válido antes de mostrar notificação
     if (!context.mounted) return;
 
     switch (result) {
@@ -177,7 +175,7 @@ class MainScreen extends StatelessWidget {
           type: NotificationType.success,
         );
         // Recarregar dados após importar
-        viewModel.load.execute();
+        viewModel.invalidateAndReload();
       case Error<void>(:final error):
         // Não mostrar erro se o usuário apenas cancelou
         final errorMsg = error.toString();
