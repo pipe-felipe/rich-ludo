@@ -7,13 +7,18 @@ import 'package:rich_ludo/domain/usecase/delete_recurring_transaction_usecase.da
 import 'package:rich_ludo/domain/usecase/delete_transaction_usecase.dart';
 import 'package:rich_ludo/domain/usecase/export_database_usecase.dart';
 import 'package:rich_ludo/domain/usecase/get_exclusions_usecase.dart';
-import 'package:rich_ludo/domain/usecase/get_transactions_usecase.dart';
 import 'package:rich_ludo/domain/usecase/import_database_usecase.dart';
 import 'package:rich_ludo/presentation/viewmodel/main_screen_viewmodel.dart';
 import 'package:rich_ludo/utils/result.dart';
 
+import 'package:rich_ludo/domain/usecase/get_transactions_by_month_year_usecase.dart';
+import 'package:rich_ludo/domain/usecase/get_non_recurring_balance_usecase.dart';
+
 class MockGetTransactionsUseCase extends Mock
-    implements GetTransactionsUseCase {}
+    implements GetTransactionsByMonthYearUseCase {}
+
+class MockGetNonRecurringBalanceUseCase extends Mock
+    implements GetNonRecurringBalanceUseCase {}
 
 class MockDeleteTransactionUseCase extends Mock
     implements DeleteTransactionUseCase {}
@@ -29,6 +34,7 @@ class MockImportDatabaseUseCase extends Mock implements ImportDatabaseUseCase {}
 
 void main() {
   late MockGetTransactionsUseCase mockGetTransactionsUseCase;
+  late MockGetNonRecurringBalanceUseCase mockGetNonRecurringBalanceUseCase;
   late MockDeleteTransactionUseCase mockDeleteTransactionUseCase;
   late MockDeleteRecurringTransactionUseCase
   mockDeleteRecurringTransactionUseCase;
@@ -38,6 +44,7 @@ void main() {
 
   setUp(() {
     mockGetTransactionsUseCase = MockGetTransactionsUseCase();
+    mockGetNonRecurringBalanceUseCase = MockGetNonRecurringBalanceUseCase();
     mockDeleteTransactionUseCase = MockDeleteTransactionUseCase();
     mockDeleteRecurringTransactionUseCase =
         MockDeleteRecurringTransactionUseCase();
@@ -51,14 +58,24 @@ void main() {
     List<RecurringExclusion> initialExclusions = const [],
   }) {
     when(
-      () => mockGetTransactionsUseCase(),
+      () => mockGetTransactionsUseCase(
+        month: any(named: 'month'),
+        year: any(named: 'year'),
+      ),
     ).thenAnswer((_) async => Result.ok(initialTransactions));
+    when(
+      () => mockGetNonRecurringBalanceUseCase(
+        upToMonth: any(named: 'upToMonth'),
+        upToYear: any(named: 'upToYear'),
+      ),
+    ).thenAnswer((_) async => const Result.ok(0));
     when(
       () => mockGetExclusionsUseCase(),
     ).thenAnswer((_) async => Result.ok(initialExclusions));
 
     return MainScreenViewModel(
       getTransactionsUseCase: mockGetTransactionsUseCase,
+      getNonRecurringBalanceUseCase: mockGetNonRecurringBalanceUseCase,
       deleteTransactionUseCase: mockDeleteTransactionUseCase,
       deleteRecurringTransactionUseCase: mockDeleteRecurringTransactionUseCase,
       getExclusionsUseCase: mockGetExclusionsUseCase,
@@ -120,14 +137,24 @@ void main() {
 
       test('should have error state when failed', () async {
         when(
-          () => mockGetTransactionsUseCase(),
+          () => mockGetTransactionsUseCase(
+            month: any(named: 'month'),
+            year: any(named: 'year'),
+          ),
         ).thenAnswer((_) async => Result.error(Exception('Database error')));
+        when(
+          () => mockGetNonRecurringBalanceUseCase(
+            upToMonth: any(named: 'upToMonth'),
+            upToYear: any(named: 'upToYear'),
+          ),
+        ).thenAnswer((_) async => const Result.ok(0));
         when(
           () => mockGetExclusionsUseCase(),
         ).thenAnswer((_) async => const Result.ok(<RecurringExclusion>[]));
 
         final viewModel = MainScreenViewModel(
           getTransactionsUseCase: mockGetTransactionsUseCase,
+          getNonRecurringBalanceUseCase: mockGetNonRecurringBalanceUseCase,
           deleteTransactionUseCase: mockDeleteTransactionUseCase,
           deleteRecurringTransactionUseCase:
               mockDeleteRecurringTransactionUseCase,

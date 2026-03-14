@@ -15,7 +15,8 @@ import 'domain/usecase/delete_recurring_transaction_usecase.dart';
 import 'domain/usecase/delete_transaction_usecase.dart';
 import 'domain/usecase/export_database_usecase.dart';
 import 'domain/usecase/get_exclusions_usecase.dart';
-import 'domain/usecase/get_transactions_usecase.dart';
+import 'domain/usecase/get_transactions_by_month_year_usecase.dart';
+import 'domain/usecase/get_non_recurring_balance_usecase.dart';
 import 'domain/usecase/import_database_usecase.dart';
 import 'domain/usecase/make_transaction_usecase.dart';
 import 'presentation/ui/theme/app_theme.dart';
@@ -45,9 +46,13 @@ class RichLudoApp extends StatelessWidget {
           ),
         ),
 
-        Provider<GetTransactionsUseCase>(
+        Provider<GetTransactionsByMonthYearUseCase>(
           create: (context) =>
-              GetTransactionsUseCase(context.read<TransactionRepository>()),
+              GetTransactionsByMonthYearUseCase(context.read<TransactionRepository>()),
+        ),
+        Provider<GetNonRecurringBalanceUseCase>(
+          create: (context) =>
+              GetNonRecurringBalanceUseCase(context.read<TransactionRepository>()),
         ),
         Provider<MakeTransactionUseCase>(
           create: (context) =>
@@ -77,7 +82,8 @@ class RichLudoApp extends StatelessWidget {
 
         ChangeNotifierProvider<MainScreenViewModel>(
           create: (context) => MainScreenViewModel(
-            getTransactionsUseCase: context.read<GetTransactionsUseCase>(),
+            getTransactionsUseCase: context.read<GetTransactionsByMonthYearUseCase>(),
+            getNonRecurringBalanceUseCase: context.read<GetNonRecurringBalanceUseCase>(),
             deleteTransactionUseCase: context.read<DeleteTransactionUseCase>(),
             deleteRecurringTransactionUseCase: context
                 .read<DeleteRecurringTransactionUseCase>(),

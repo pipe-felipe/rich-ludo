@@ -6,10 +6,12 @@ import '../../utils/result.dart';
 abstract class TransactionService {
   Future<Result<List<Transaction>>> getAllTransactions();
 
-  Future<Result<List<Transaction>>> getTransactionsForMonth(
-    int monthStartMillis,
-    int monthEndExclusiveMillis,
+  Future<Result<List<Transaction>>> getTransactionsByMonthYear(
+    int month,
+    int year,
   );
+
+  Future<Result<int>> getNonRecurringBalance(int upToMonth, int upToYear);
 
   Future<Result<Transaction?>> getTransactionById(int id);
 

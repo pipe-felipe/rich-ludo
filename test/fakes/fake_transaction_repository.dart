@@ -26,19 +26,27 @@ class FakeTransactionRepository implements TransactionRepository {
   }
 
   @override
-  Future<Result<List<Transaction>>> getTransactionsForMonth(
-    int monthStartMillis,
-    int monthEndExclusiveMillis,
+  Future<Result<List<Transaction>>> getTransactionsByMonthYear(
+    int month,
+    int year,
   ) async {
     if (shouldReturnError) {
       return Result.error(Exception('Erro simulado'));
     }
     final filtered = _transactions.where((tx) {
       return tx.isRecurring ||
-          (tx.createdAt >= monthStartMillis &&
-              tx.createdAt < monthEndExclusiveMillis);
+          (tx.targetMonth == month &&
+              tx.targetYear == year);
     }).toList();
     return Result.ok(filtered);
+  }
+
+  @override
+  Future<Result<int>> getNonRecurringBalance(int upToMonth, int upToYear) async {
+    if (shouldReturnError) {
+      return Result.error(Exception('Erro simulado'));
+    }
+    return const Result.ok(0);
   }
 
   @override

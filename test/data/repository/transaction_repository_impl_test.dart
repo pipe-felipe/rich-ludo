@@ -63,11 +63,8 @@ void main() {
       });
     });
 
-    group('getTransactionsForMonth', () {
-      test('should return transactions for specific month', () async {
-        const monthStart = 1738368000000;
-        const monthEnd = 1740787200000;
-
+    group('getTransactionsByMonthYear and getNonRecurringBalance', () {
+      test('should call getTransactionsByMonthYear and return list', () async {
         final transactions = [
           Transaction(
             id: 1,
@@ -81,37 +78,51 @@ void main() {
         ];
 
         when(
-          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+          () => mockService.getTransactionsByMonthYear(2, 2026),
         ).thenAnswer((_) async => Result.ok(transactions));
 
-        final result = await repository.getTransactionsForMonth(
-          monthStart,
-          monthEnd,
+        final result = await repository.getTransactionsByMonthYear(
+          2,
+          2026,
         );
 
         expect(result.isOk, isTrue);
         expect(result.asOk.value.length, equals(1));
         verify(
-          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+          () => mockService.getTransactionsByMonthYear(2, 2026),
+        ).called(1);
+      });
+
+      test('should call getNonRecurringBalance and return int', () async {
+        when(
+          () => mockService.getNonRecurringBalance(2, 2026),
+        ).thenAnswer((_) async => const Result.ok(1500));
+
+        final result = await repository.getNonRecurringBalance(
+          2,
+          2026,
+        );
+
+        expect(result.isOk, isTrue);
+        expect(result.asOk.value, equals(1500));
+        verify(
+          () => mockService.getNonRecurringBalance(2, 2026),
         ).called(1);
       });
 
       test('should return error when Service fails', () async {
-        const monthStart = 1738368000000;
-        const monthEnd = 1740787200000;
-
         when(
-          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+          () => mockService.getTransactionsByMonthYear(2, 2026),
         ).thenAnswer((_) async => Result.error(Exception('Database error')));
 
-        final result = await repository.getTransactionsForMonth(
-          monthStart,
-          monthEnd,
+        final result = await repository.getTransactionsByMonthYear(
+          2,
+          2026,
         );
 
         expect(result.isError, isTrue);
         verify(
-          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+          () => mockService.getTransactionsByMonthYear(2, 2026),
         ).called(1);
       });
     });
