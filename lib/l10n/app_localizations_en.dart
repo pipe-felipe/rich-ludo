@@ -63,6 +63,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseCategoryClothes => 'Clothes';
 
   @override
+  String get expenseCategoryHygiene => 'Hygiene';
+
+  @override
+  String get expenseCategoryCare => 'Care';
+
+  @override
   String get income => 'Income';
 
   @override

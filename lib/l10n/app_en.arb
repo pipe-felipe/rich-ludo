@@ -18,6 +18,8 @@
   "expenseCategoryStuff": "Stuff",
   "expenseCategoryMedicine": "Medicine",
   "expenseCategoryClothes": "Clothes",
+  "expenseCategoryHygiene": "Hygiene",
+  "expenseCategoryCare": "Care",
   "income": "Income",
   "saving": "Savings",
   "outgoing": "Expenses",

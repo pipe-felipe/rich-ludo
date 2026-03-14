@@ -208,6 +208,18 @@ abstract class AppLocalizations {
   /// **'Roupas'**
   String get expenseCategoryClothes;
 
+  /// No description provided for @expenseCategoryHygiene.
+  ///
+  /// In pt, this message translates to:
+  /// **'Higiene'**
+  String get expenseCategoryHygiene;
+
+  /// No description provided for @expenseCategoryCare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cuidados'**
+  String get expenseCategoryCare;
+
   /// No description provided for @income.
   ///
   /// In pt, this message translates to:

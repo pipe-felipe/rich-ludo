@@ -13,6 +13,8 @@ enum ExpenseCategory {
   stuff,
   medicine,
   clothes,
+  hygiene,
+  care,
 }
 
 enum IncomeCategory { salary, gift, investment, other }

@@ -18,6 +18,8 @@
   "expenseCategoryStuff": "Coisas",
   "expenseCategoryMedicine": "Remédio",
   "expenseCategoryClothes": "Roupas",
+  "expenseCategoryHygiene": "Higiene",
+  "expenseCategoryCare": "Cuidados",
   "income": "Renda",
   "saving": "Economia",
   "outgoing": "Despesas",
