@@ -67,11 +67,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<Result<int>> removeExclusion(
-    int transactionId,
-    int month,
-    int year,
-  ) {
+  Future<Result<int>> removeExclusion(int transactionId, int month, int year) {
     return _service.removeExclusion(transactionId, month, year);
   }
 }

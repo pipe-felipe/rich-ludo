@@ -16,24 +16,37 @@ void main() {
   });
 
   group('ExportDatabaseUseCase', () {
-    // Nota: Os testes de integração com FilePicker.platform.saveFile()
-    // requerem testes de widget/integração devido à natureza da plataforma.
-    // Aqui testamos os comportamentos que não dependem do FilePicker.
-
-    test('deve ter instância do ExportService', () {
+    test('should have ExportService instance', () {
       expect(useCase, isNotNull);
     });
 
-    test('deve ser possível criar múltiplas instâncias', () {
+    test('should be possible to create multiple instances', () {
       final anotherMock = MockExportService();
       final anotherUseCase = ExportDatabaseUseCase(anotherMock);
 
       expect(anotherUseCase, isNot(same(useCase)));
     });
+
+    test(
+      'should create the filename in the format day-month-year-rich-backup.ludo',
+      () {
+        final date = DateTime(2026, 3, 13); // 13/03/2026
+        final fileName = useCase.generateFileName(date);
+
+        expect(fileName, equals('13-03-2026-rich-backup.ludo'));
+      },
+    );
+
+    test('should ensure leading zeros for days and months less than 10', () {
+      final date = DateTime(2026, 1, 9); // 09/01/2026
+      final fileName = useCase.generateFileName(date);
+
+      expect(fileName, equals('09-01-2026-rich-backup.ludo'));
+    });
   });
 
   group('ExportService integration', () {
-    test('deve chamar exportDatabase quando caminho é fornecido', () async {
+    test('should call exportDatabase when path is provided', () async {
       const testPath = '/storage/emulated/0/Documents/backup.ludo';
 
       when(
@@ -47,7 +60,7 @@ void main() {
       verify(() => mockExportService.exportDatabase(testPath)).called(1);
     });
 
-    test('deve retornar erro quando ExportService falha', () async {
+    test('should return error when ExportService fails', () async {
       const testPath = '/invalid/path/backup.ludo';
 
       when(
@@ -60,7 +73,7 @@ void main() {
       verify(() => mockExportService.exportDatabase(testPath)).called(1);
     });
 
-    test('deve obter caminho do banco de dados', () async {
+    test('should get database path', () async {
       const expectedPath =
           '/data/data/com.pipe.rich_ludo/databases/rich_ludo.db';
 
@@ -74,10 +87,10 @@ void main() {
       expect(result.asOk.value, equals(expectedPath));
     });
 
-    test('deve retornar erro quando não consegue obter caminho', () async {
-      when(() => mockExportService.getDatabasePath()).thenAnswer(
-        (_) async => Result.error(Exception('Erro ao obter caminho')),
-      );
+    test('should return error when unable to get path', () async {
+      when(
+        () => mockExportService.getDatabasePath(),
+      ).thenAnswer((_) async => Result.error(Exception('Error getting path')));
 
       final result = await mockExportService.getDatabasePath();
 

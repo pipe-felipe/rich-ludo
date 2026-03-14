@@ -18,7 +18,7 @@ void main() {
   });
 
   group('GetTransactionsForMonthUseCase', () {
-    test('deve retornar transações do mês especificado', () async {
+    test('should return transactions of the specified month', () async {
       const monthStart = 1738368000000;
       const monthEnd = 1740787200000;
 
@@ -50,24 +50,27 @@ void main() {
       ).called(1);
     });
 
-    test('deve retornar lista vazia quando não há transações no mês', () async {
-      const monthStart = 1738368000000;
-      const monthEnd = 1740787200000;
+    test(
+      'should return an empty list when there are no transactions in the month',
+      () async {
+        const monthStart = 1738368000000;
+        const monthEnd = 1740787200000;
 
-      when(
-        () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
-      ).thenAnswer((_) async => Result.ok(<Transaction>[]));
+        when(
+          () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
+        ).thenAnswer((_) async => Result.ok(<Transaction>[]));
 
-      final result = await useCase(monthStart, monthEnd);
+        final result = await useCase(monthStart, monthEnd);
 
-      expect(result.isOk, isTrue);
-      expect(result.asOk.value, isEmpty);
-      verify(
-        () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
-      ).called(1);
-    });
+        expect(result.isOk, isTrue);
+        expect(result.asOk.value, isEmpty);
+        verify(
+          () => mockRepository.getTransactionsForMonth(monthStart, monthEnd),
+        ).called(1);
+      },
+    );
 
-    test('deve retornar erro quando repositório falha', () async {
+    test('should return an error when the repository fails', () async {
       const monthStart = 1738368000000;
       const monthEnd = 1740787200000;
 

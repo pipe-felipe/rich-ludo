@@ -8,8 +8,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group('Estrutura de testes', () {
-    test('setup de testes funcionando', () {
+  group('Test Structure', () {
+    test('should have a working test setup', () {
       expect(true, isTrue);
     });
   });

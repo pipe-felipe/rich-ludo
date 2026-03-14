@@ -29,9 +29,5 @@ abstract class TransactionService {
 
   Future<Result<int>> deleteExclusionsForTransaction(int transactionId);
 
-  Future<Result<int>> removeExclusion(
-    int transactionId,
-    int month,
-    int year,
-  );
+  Future<Result<int>> removeExclusion(int transactionId, int month, int year);
 }

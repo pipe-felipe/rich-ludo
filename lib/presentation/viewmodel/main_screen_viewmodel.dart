@@ -87,14 +87,14 @@ class MainScreenViewModel extends ChangeNotifier {
       case Ok<List<Transaction>>(:final value):
         _allItems = value;
       case Error<List<Transaction>>():
-        debugPrint('Erro ao carregar transações: ${result.error}');
+        debugPrint('Error loading transactions: ${result.error}');
     }
 
     switch (exclusionsResult) {
       case Ok<List<RecurringExclusion>>(:final value):
         _exclusions = value;
       case Error<List<RecurringExclusion>>():
-        debugPrint('Erro ao carregar exclusões: ${exclusionsResult.error}');
+        debugPrint('Error loading exclusions: ${exclusionsResult.error}');
     }
 
     _filterAndComputeTotals();
@@ -108,7 +108,7 @@ class MainScreenViewModel extends ChangeNotifier {
       case Ok<int>():
         await _loadTransactions();
       case Error<int>():
-        debugPrint('Erro ao deletar item: ${result.error}');
+        debugPrint('Error deleting item: ${result.error}');
     }
 
     return result;
@@ -173,7 +173,12 @@ class MainScreenViewModel extends ChangeNotifier {
 
     for (final tx in _allItems) {
       if (tx.isRecurring) {
-        totalCents += _recurringContributionToSavings(tx, now, refMonth, refYear);
+        totalCents += _recurringContributionToSavings(
+          tx,
+          now,
+          refMonth,
+          refYear,
+        );
       } else {
         final isUpToCurrentMonth = _isOnOrBefore(
           tx.targetMonth,
@@ -239,19 +244,24 @@ class MainScreenViewModel extends ChangeNotifier {
   }
 
   String _formatMonthYear(int month, int year) {
+    // Note: To fully localize, we should use intl package or AppLocalizations
+    // For now, returning a standardized format or we could use l10n.
+    // However, MainScreenViewModel does not have access to BuildContext easily here.
+    // A better approach is to return the month number and let the UI format it.
+    // For now, keeping the array but in English.
     const monthNames = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro',
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return '${monthNames[month - 1]} $year';
   }
@@ -275,7 +285,7 @@ class MainScreenViewModel extends ChangeNotifier {
       case Ok<int>():
         await _loadTransactions();
       case Error<int>():
-        debugPrint('Erro ao deletar recorrente: ${result.error}');
+        debugPrint('Error deleting recurring: ${result.error}');
     }
   }
 

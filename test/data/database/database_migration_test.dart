@@ -41,7 +41,7 @@ void main() {
     });
 
     test(
-      'banco v1 deve ter schema original sem colunas endMonth/endYear',
+      'v1 database should have original schema without endMonth/endYear columns',
       () async {
         final tableInfo = await db.rawQuery(
           'PRAGMA table_info(${DatabaseConfig.tableName})',
@@ -55,7 +55,7 @@ void main() {
       },
     );
 
-    test('banco v1 não deve ter tabela recurring_exclusions', () async {
+    test('v1 database should not have recurring_exclusions table', () async {
       final tables = await db.rawQuery(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='${DatabaseConfig.exclusionsTableName}'",
       );
@@ -63,7 +63,7 @@ void main() {
       expect(tables, isEmpty);
     });
 
-    test('migração v1→v2 deve adicionar colunas endMonth e endYear', () async {
+    test('v1->v2 migration should add endMonth and endYear columns', () async {
       await _migrateV1ToV2(db);
 
       final tableInfo = await db.rawQuery(
@@ -75,7 +75,7 @@ void main() {
       expect(columnNames.contains('endYear'), isTrue);
     });
 
-    test('migração v1→v2 deve criar tabela recurring_exclusions', () async {
+    test('v1->v2 migration should create recurring_exclusions table', () async {
       await _migrateV1ToV2(db);
 
       final tables = await db.rawQuery(
@@ -87,7 +87,7 @@ void main() {
     });
 
     test(
-      'migração deve ser idempotente (pode executar múltiplas vezes)',
+      'migration should be idempotent (can execute multiple times)',
       () async {
         await _migrateV1ToV2(db);
         await _migrateV1ToV2(db);
@@ -104,7 +104,7 @@ void main() {
       },
     );
 
-    test('dados existentes v1 devem ser preservados após migração', () async {
+    test('existing v1 data should be preserved after migration', () async {
       await db.insert(DatabaseConfig.tableName, {
         'amountCents': 10000,
         'type': 'income',
@@ -129,7 +129,7 @@ void main() {
     });
 
     test(
-      'transações v1 com isRecurring devem funcionar após migração (endMonth/endYear null)',
+      'v1 transactions with isRecurring should work after migration (endMonth/endYear null)',
       () async {
         await db.insert(DatabaseConfig.tableName, {
           'amountCents': 5000,

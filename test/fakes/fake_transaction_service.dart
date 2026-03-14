@@ -20,7 +20,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<List<Transaction>>> getAllTransactions() async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     return Result.ok(List.unmodifiable(_transactions));
   }
@@ -31,7 +31,7 @@ class FakeTransactionService implements TransactionService {
     int monthEndExclusiveMillis,
   ) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final filtered = _transactions.where((tx) {
       return tx.isRecurring ||
@@ -44,7 +44,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<Transaction?>> getTransactionById(int id) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final tx = _transactions.where((t) => t.id == id).firstOrNull;
     return Result.ok(tx);
@@ -53,7 +53,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<int>> insertTransaction(Transaction transaction) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final newId = _transactions.length + 1;
     _transactions.add(transaction.copyWith(id: newId));
@@ -63,7 +63,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<List<int>>> insertAll(List<Transaction> transactions) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final ids = <int>[];
     for (final tx in transactions) {
@@ -77,7 +77,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<int>> deleteTransaction(int id) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final initialLength = _transactions.length;
     _transactions.removeWhere((tx) => tx.id == id);
@@ -87,7 +87,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<int>> deleteAll() async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final count = _transactions.length;
     _transactions.clear();
@@ -98,7 +98,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<int>> updateTransaction(Transaction transaction) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final index = _transactions.indexWhere((tx) => tx.id == transaction.id);
     if (index != -1) {
@@ -110,7 +110,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<List<RecurringExclusion>>> getAllExclusions() async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     return Result.ok(List.unmodifiable(_exclusions));
   }
@@ -118,7 +118,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<int>> addExclusion(RecurringExclusion exclusion) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final newId = _exclusions.length + 1;
     _exclusions.add(
@@ -135,7 +135,7 @@ class FakeTransactionService implements TransactionService {
   @override
   Future<Result<int>> deleteExclusionsForTransaction(int transactionId) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final initialLength = _exclusions.length;
     _exclusions.removeWhere((ex) => ex.transactionId == transactionId);
@@ -149,7 +149,7 @@ class FakeTransactionService implements TransactionService {
     int year,
   ) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final initialLength = _exclusions.length;
     _exclusions.removeWhere(
