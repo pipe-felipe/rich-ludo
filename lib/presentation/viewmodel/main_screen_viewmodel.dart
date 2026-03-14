@@ -30,7 +30,6 @@ class MainScreenViewModel extends ChangeNotifier {
   int _totalExpenseCents = 0;
   int _currentMonth = DateTime.now().month;
   int _currentYear = DateTime.now().year;
-  String _currentMonthYearText = '';
 
   late final Command0<List<Transaction>> load;
 
@@ -54,8 +53,6 @@ class MainScreenViewModel extends ChangeNotifier {
        _getExclusionsUseCase = getExclusionsUseCase,
        _exportDatabaseUseCase = exportDatabaseUseCase,
        _importDatabaseUseCase = importDatabaseUseCase {
-    _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
-
     load = Command0<List<Transaction>>(_loadTransactions);
     deleteTransaction = Command1<int, int>(_deleteItem);
     exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
@@ -72,7 +69,6 @@ class MainScreenViewModel extends ChangeNotifier {
   int get totalExpenseCents => _totalExpenseCents;
   int get currentMonth => _currentMonth;
   int get currentYear => _currentYear;
-  String get currentMonthYearText => _currentMonthYearText;
 
   Future<Result<List<Transaction>>> _loadTransactions() async {
     final results = await Future.wait([
@@ -243,29 +239,6 @@ class MainScreenViewModel extends ChangeNotifier {
     return year < refYear || (year == refYear && month <= refMonth);
   }
 
-  String _formatMonthYear(int month, int year) {
-    // Note: To fully localize, we should use intl package or AppLocalizations
-    // For now, returning a standardized format or we could use l10n.
-    // However, MainScreenViewModel does not have access to BuildContext easily here.
-    // A better approach is to return the month number and let the UI format it.
-    // For now, keeping the array but in English.
-    const monthNames = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    return '${monthNames[month - 1]} $year';
-  }
-
   void deleteItem(int id) {
     deleteTransaction.execute(id);
   }
@@ -300,7 +273,6 @@ class MainScreenViewModel extends ChangeNotifier {
     } else {
       _currentMonth--;
     }
-    _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     _filterAndComputeTotals();
   }
 
@@ -311,7 +283,6 @@ class MainScreenViewModel extends ChangeNotifier {
     } else {
       _currentMonth++;
     }
-    _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     _filterAndComputeTotals();
   }
 
@@ -319,7 +290,6 @@ class MainScreenViewModel extends ChangeNotifier {
     final now = DateTime.now();
     _currentMonth = now.month;
     _currentYear = now.year;
-    _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     _filterAndComputeTotals();
   }
 }

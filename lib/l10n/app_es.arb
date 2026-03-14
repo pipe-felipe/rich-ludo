@@ -37,5 +37,17 @@
   "recurringDeleteThisMonth": "Solo este mes",
   "recurringDeleteBackwards": "Este mes y anteriores",
   "recurringDeleteForwards": "Este mes y futuros",
-  "recurringDeleteAll": "Todos los meses"
+  "recurringDeleteAll": "Todos los meses",
+  "january": "Enero",
+  "february": "Febrero",
+  "march": "Marzo",
+  "april": "Abril",
+  "may": "Mayo",
+  "june": "Junio",
+  "july": "Julio",
+  "august": "Agosto",
+  "september": "Septiembre",
+  "october": "Octubre",
+  "november": "Noviembre",
+  "december": "Diciembre"
 }

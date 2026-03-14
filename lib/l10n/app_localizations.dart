@@ -327,6 +327,78 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Todos os meses'**
   String get recurringDeleteAll;
+
+  /// No description provided for @january.
+  ///
+  /// In pt, this message translates to:
+  /// **'Janeiro'**
+  String get january;
+
+  /// No description provided for @february.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fevereiro'**
+  String get february;
+
+  /// No description provided for @march.
+  ///
+  /// In pt, this message translates to:
+  /// **'Março'**
+  String get march;
+
+  /// No description provided for @april.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abril'**
+  String get april;
+
+  /// No description provided for @may.
+  ///
+  /// In pt, this message translates to:
+  /// **'Maio'**
+  String get may;
+
+  /// No description provided for @june.
+  ///
+  /// In pt, this message translates to:
+  /// **'Junho'**
+  String get june;
+
+  /// No description provided for @july.
+  ///
+  /// In pt, this message translates to:
+  /// **'Julho'**
+  String get july;
+
+  /// No description provided for @august.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agosto'**
+  String get august;
+
+  /// No description provided for @september.
+  ///
+  /// In pt, this message translates to:
+  /// **'Setembro'**
+  String get september;
+
+  /// No description provided for @october.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outubro'**
+  String get october;
+
+  /// No description provided for @november.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novembro'**
+  String get november;
+
+  /// No description provided for @december.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dezembro'**
+  String get december;
 }
 
 class _AppLocalizationsDelegate
