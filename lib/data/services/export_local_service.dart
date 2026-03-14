@@ -18,7 +18,7 @@ class ExportLocalService implements ExportService {
       return Result.ok(fullPath);
     } catch (e) {
       return Result.error(
-        e is Exception ? e : Exception('Erro ao obter caminho do banco: $e'),
+        e is Exception ? e : Exception('Error getting database path: $e'),
       );
     }
   }
@@ -36,9 +36,7 @@ class ExportLocalService implements ExportService {
       final sourceFile = File(sourcePath);
 
       if (!await sourceFile.exists()) {
-        return Result.error(
-          Exception('Arquivo de banco de dados não encontrado'),
-        );
+        return Result.error(Exception('Database file not found'));
       }
 
       await sourceFile.copy(destinationPath);
@@ -46,7 +44,7 @@ class ExportLocalService implements ExportService {
       return Result.ok(destinationPath);
     } catch (e) {
       return Result.error(
-        e is Exception ? e : Exception('Erro ao exportar banco de dados: $e'),
+        e is Exception ? e : Exception('Error exporting database: $e'),
       );
     }
   }
@@ -67,7 +65,7 @@ class ExportLocalService implements ExportService {
       return Result.ok(null);
     } catch (e) {
       return Result.error(
-        e is Exception ? e : Exception('Erro ao importar banco de dados: $e'),
+        e is Exception ? e : Exception('Error importing database: $e'),
       );
     }
   }

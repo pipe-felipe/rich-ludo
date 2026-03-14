@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
 import 'app_localizations_pt.dart';
 
 // ignore_for_file: type=lint
@@ -95,6 +96,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('es'),
     Locale('pt'),
   ];
 
@@ -205,6 +207,18 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Roupas'**
   String get expenseCategoryClothes;
+
+  /// No description provided for @expenseCategoryHygiene.
+  ///
+  /// In pt, this message translates to:
+  /// **'Higiene'**
+  String get expenseCategoryHygiene;
+
+  /// No description provided for @expenseCategoryCare.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cuidados'**
+  String get expenseCategoryCare;
 
   /// No description provided for @income.
   ///
@@ -325,6 +339,78 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Todos os meses'**
   String get recurringDeleteAll;
+
+  /// No description provided for @january.
+  ///
+  /// In pt, this message translates to:
+  /// **'Janeiro'**
+  String get january;
+
+  /// No description provided for @february.
+  ///
+  /// In pt, this message translates to:
+  /// **'Fevereiro'**
+  String get february;
+
+  /// No description provided for @march.
+  ///
+  /// In pt, this message translates to:
+  /// **'Março'**
+  String get march;
+
+  /// No description provided for @april.
+  ///
+  /// In pt, this message translates to:
+  /// **'Abril'**
+  String get april;
+
+  /// No description provided for @may.
+  ///
+  /// In pt, this message translates to:
+  /// **'Maio'**
+  String get may;
+
+  /// No description provided for @june.
+  ///
+  /// In pt, this message translates to:
+  /// **'Junho'**
+  String get june;
+
+  /// No description provided for @july.
+  ///
+  /// In pt, this message translates to:
+  /// **'Julho'**
+  String get july;
+
+  /// No description provided for @august.
+  ///
+  /// In pt, this message translates to:
+  /// **'Agosto'**
+  String get august;
+
+  /// No description provided for @september.
+  ///
+  /// In pt, this message translates to:
+  /// **'Setembro'**
+  String get september;
+
+  /// No description provided for @october.
+  ///
+  /// In pt, this message translates to:
+  /// **'Outubro'**
+  String get october;
+
+  /// No description provided for @november.
+  ///
+  /// In pt, this message translates to:
+  /// **'Novembro'**
+  String get november;
+
+  /// No description provided for @december.
+  ///
+  /// In pt, this message translates to:
+  /// **'Dezembro'**
+  String get december;
 }
 
 class _AppLocalizationsDelegate
@@ -338,7 +424,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'pt'].contains(locale.languageCode);
+      <String>['en', 'es', 'pt'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -349,6 +435,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
     case 'pt':
       return AppLocalizationsPt();
   }

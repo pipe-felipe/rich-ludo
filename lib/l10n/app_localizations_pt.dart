@@ -63,6 +63,12 @@ class AppLocalizationsPt extends AppLocalizations {
   String get expenseCategoryClothes => 'Roupas';
 
   @override
+  String get expenseCategoryHygiene => 'Higiene';
+
+  @override
+  String get expenseCategoryCare => 'Cuidados';
+
+  @override
   String get income => 'Renda';
 
   @override
@@ -121,4 +127,40 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get recurringDeleteAll => 'Todos os meses';
+
+  @override
+  String get january => 'Janeiro';
+
+  @override
+  String get february => 'Fevereiro';
+
+  @override
+  String get march => 'Março';
+
+  @override
+  String get april => 'Abril';
+
+  @override
+  String get may => 'Maio';
+
+  @override
+  String get june => 'Junho';
+
+  @override
+  String get july => 'Julho';
+
+  @override
+  String get august => 'Agosto';
+
+  @override
+  String get september => 'Setembro';
+
+  @override
+  String get october => 'Outubro';
+
+  @override
+  String get november => 'Novembro';
+
+  @override
+  String get december => 'Dezembro';
 }

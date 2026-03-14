@@ -13,29 +13,25 @@ class ImportDatabaseUseCase {
 
   Future<Result<void>> call() async {
     try {
-      debugPrint('[ImportDatabaseUseCase] Iniciando importação...');
+      debugPrint('[ImportDatabaseUseCase] Starting import...');
 
       final result = await FilePicker.platform.pickFiles(
-        dialogTitle: 'Selecione o arquivo de backup',
+        dialogTitle: 'Select backup file',
         type: FileType.any,
         allowMultiple: false,
         withData: true,
       );
 
       if (result == null || result.files.isEmpty) {
-        debugPrint('[ImportDatabaseUseCase] Usuário cancelou');
-        return Result.error(Exception('Importação cancelada pelo usuário'));
+        debugPrint('[ImportDatabaseUseCase] User cancelled');
+        return Result.error(Exception('Import cancelled by user'));
       }
 
       final file = result.files.first;
 
       if (file.extension != 'ludo') {
-        debugPrint(
-          '[ImportDatabaseUseCase] Arquivo inválido: ${file.extension}',
-        );
-        return Result.error(
-          Exception('Arquivo inválido. Selecione um arquivo .ludo'),
-        );
+        debugPrint('[ImportDatabaseUseCase] Invalid file: ${file.extension}');
+        return Result.error(Exception('Invalid file. Select a .ludo file'));
       }
 
       Uint8List? bytes = file.bytes;
@@ -48,19 +44,17 @@ class ImportDatabaseUseCase {
       }
 
       if (bytes == null) {
-        return Result.error(
-          Exception('Não foi possível ler o arquivo de backup'),
-        );
+        return Result.error(Exception('Could not read backup file'));
       }
 
       debugPrint(
-        '[ImportDatabaseUseCase] Arquivo selecionado: ${file.name}, ${bytes.length} bytes',
+        '[ImportDatabaseUseCase] Selected file: ${file.name}, ${bytes.length} bytes',
       );
 
-      debugPrint('[ImportDatabaseUseCase] Fechando banco atual...');
+      debugPrint('[ImportDatabaseUseCase] Closing current database...');
       await _exportService.closeDatabase();
 
-      debugPrint('[ImportDatabaseUseCase] Importando backup...');
+      debugPrint('[ImportDatabaseUseCase] Importing backup...');
       final importResult = await _exportService.importDatabase(bytes);
 
       if (importResult.isError) {
@@ -68,13 +62,13 @@ class ImportDatabaseUseCase {
         return importResult;
       }
 
-      debugPrint('[ImportDatabaseUseCase] Reabrindo banco...');
+      debugPrint('[ImportDatabaseUseCase] Reopening database...');
       await _exportService.reopenDatabase();
 
-      debugPrint('[ImportDatabaseUseCase] Importação concluída com sucesso!');
+      debugPrint('[ImportDatabaseUseCase] Import completed successfully!');
       return Result.ok(null);
     } catch (e, stack) {
-      debugPrint('[ImportDatabaseUseCase] ERRO: $e');
+      debugPrint('[ImportDatabaseUseCase] ERROR: $e');
       debugPrint('[ImportDatabaseUseCase] Stack: $stack');
 
       try {
@@ -82,7 +76,7 @@ class ImportDatabaseUseCase {
       } catch (_) {}
 
       return Result.error(
-        e is Exception ? e : Exception('Erro ao importar banco de dados: $e'),
+        e is Exception ? e : Exception('Error importing database: $e'),
       );
     }
   }

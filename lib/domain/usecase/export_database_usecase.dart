@@ -13,7 +13,7 @@ class ExportDatabaseUseCase {
 
   Future<Result<String>> call() async {
     try {
-      debugPrint('[ExportDatabaseUseCase] Iniciando exportação...');
+      debugPrint('[ExportDatabaseUseCase] Starting export...');
 
       final dbPathResult = await _exportService.getDatabasePath();
       if (dbPathResult.isError) {
@@ -24,38 +24,47 @@ class ExportDatabaseUseCase {
       final sourceFile = File(sourcePath);
 
       if (!await sourceFile.exists()) {
-        debugPrint('[ExportDatabaseUseCase] Banco não existe em: $sourcePath');
-        return Result.error(Exception('Banco de dados não encontrado'));
+        debugPrint(
+          '[ExportDatabaseUseCase] Database not found at: $sourcePath',
+        );
+        return Result.error(Exception('Database not found'));
       }
 
       final bytes = await sourceFile.readAsBytes();
 
-      final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final backupFileName = 'rich_ludo_backup_$timestamp.ludo';
+      final backupFileName = generateFileName(DateTime.now());
 
-      debugPrint('[ExportDatabaseUseCase] Abrindo seletor de pasta...');
+      debugPrint('[ExportDatabaseUseCase] Opening folder picker...');
 
       final selectedPath = await FilePicker.platform.saveFile(
-        dialogTitle: 'Escolha onde salvar o backup',
+        dialogTitle: 'Select where to save backup',
         fileName: backupFileName,
         type: FileType.any,
         bytes: bytes,
       );
 
       if (selectedPath == null) {
-        debugPrint('[ExportDatabaseUseCase] Usuário cancelou');
-        return Result.error(Exception('Exportação cancelada pelo usuário'));
+        debugPrint('[ExportDatabaseUseCase] User cancelled');
+        return Result.error(Exception('Export cancelled by user'));
       }
 
-      debugPrint('[ExportDatabaseUseCase] Salvo em: $selectedPath');
+      debugPrint('[ExportDatabaseUseCase] Saved to: $selectedPath');
 
       return Result.ok(selectedPath);
     } catch (e, stack) {
-      debugPrint('[ExportDatabaseUseCase] ERRO: $e');
+      debugPrint('[ExportDatabaseUseCase] ERROR: $e');
       debugPrint('[ExportDatabaseUseCase] Stack: $stack');
       return Result.error(
-        e is Exception ? e : Exception('Erro ao exportar banco de dados: $e'),
+        e is Exception ? e : Exception('Error exporting database: $e'),
       );
     }
+  }
+
+  @visibleForTesting
+  String generateFileName(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year;
+    return '$day-$month-$year-rich-backup.ludo';
   }
 }

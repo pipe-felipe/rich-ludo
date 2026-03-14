@@ -18,6 +18,8 @@
   "expenseCategoryStuff": "Stuff",
   "expenseCategoryMedicine": "Medicine",
   "expenseCategoryClothes": "Clothes",
+  "expenseCategoryHygiene": "Hygiene",
+  "expenseCategoryCare": "Care",
   "income": "Income",
   "saving": "Savings",
   "outgoing": "Expenses",
@@ -37,5 +39,17 @@
   "recurringDeleteThisMonth": "This month only",
   "recurringDeleteBackwards": "This month and previous",
   "recurringDeleteForwards": "This month and future",
-  "recurringDeleteAll": "All months"
+  "recurringDeleteAll": "All months",
+  "january": "January",
+  "february": "February",
+  "march": "March",
+  "april": "April",
+  "may": "May",
+  "june": "June",
+  "july": "July",
+  "august": "August",
+  "september": "September",
+  "october": "October",
+  "november": "November",
+  "december": "December"
 }

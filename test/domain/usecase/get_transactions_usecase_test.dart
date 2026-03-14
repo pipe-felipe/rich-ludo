@@ -18,43 +18,46 @@ void main() {
   });
 
   group('GetTransactionsUseCase', () {
-    test('deve retornar Result.ok com transações do repositório', () async {
-      final transactions = [
-        Transaction(
-          id: 1,
-          amountCents: 1000,
-          type: TransactionType.income,
-          description: 'Salário',
-          createdAt: 1738540800000,
-          targetMonth: 2,
-          targetYear: 2026,
-        ),
-        Transaction(
-          id: 2,
-          amountCents: 500,
-          type: TransactionType.expense,
-          description: 'Almoço',
-          createdAt: 1738540800000,
-          targetMonth: 2,
-          targetYear: 2026,
-        ),
-      ];
+    test(
+      'should return Result.ok with transactions from the repository',
+      () async {
+        final transactions = [
+          Transaction(
+            id: 1,
+            amountCents: 1000,
+            type: TransactionType.income,
+            description: 'Salário',
+            createdAt: 1738540800000,
+            targetMonth: 2,
+            targetYear: 2026,
+          ),
+          Transaction(
+            id: 2,
+            amountCents: 500,
+            type: TransactionType.expense,
+            description: 'Almoço',
+            createdAt: 1738540800000,
+            targetMonth: 2,
+            targetYear: 2026,
+          ),
+        ];
 
-      when(
-        () => mockRepository.getTransactions(),
-      ).thenAnswer((_) async => Result.ok(transactions));
+        when(
+          () => mockRepository.getTransactions(),
+        ).thenAnswer((_) async => Result.ok(transactions));
 
-      final result = await useCase();
+        final result = await useCase();
 
-      expect(result.isOk, isTrue);
-      expect(result.asOk.value.length, equals(2));
-      expect(result.asOk.value[0].amountCents, equals(1000));
-      expect(result.asOk.value[1].amountCents, equals(500));
-      verify(() => mockRepository.getTransactions()).called(1);
-    });
+        expect(result.isOk, isTrue);
+        expect(result.asOk.value.length, equals(2));
+        expect(result.asOk.value[0].amountCents, equals(1000));
+        expect(result.asOk.value[1].amountCents, equals(500));
+        verify(() => mockRepository.getTransactions()).called(1);
+      },
+    );
 
     test(
-      'deve retornar Result.ok com lista vazia quando não há transações',
+      'should return Result.ok with an empty list when there are no transactions',
       () async {
         when(
           () => mockRepository.getTransactions(),
@@ -68,10 +71,10 @@ void main() {
       },
     );
 
-    test('deve retornar Result.error quando repositório falha', () async {
+    test('should return Result.error when repository fails', () async {
       when(
         () => mockRepository.getTransactions(),
-      ).thenAnswer((_) async => Result.error(Exception('Erro de conexão')));
+      ).thenAnswer((_) async => Result.error(Exception('Connection error')));
 
       final result = await useCase();
 

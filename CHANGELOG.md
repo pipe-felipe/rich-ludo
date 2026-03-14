@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-03-13
+
+### Added
+- Two new expense categories (`Expanse Category`)
+- Spanish (es) localization support
+- New use cases: `GetNonRecurringBalanceUseCase`, `GetTransactionsByMonthYearUseCase`
+- Tests for category icon and category mapper utilities
+
+### Fixed
+- Month display and navigation issues
+
+### Changed
+- Database layer refactored with improved repository, service, and use case separation
+- Backup file naming convention updated
+- Strings and texts refactored for better localization support
+- Month names moved to localization files for proper i18n
+
 ## [2.0.0] - 2026-02-18
 
 ### Added

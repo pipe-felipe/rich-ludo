@@ -25,7 +25,7 @@ void main() {
 
   group('TransactionRepositoryImpl', () {
     group('getTransactions', () {
-      test('deve retornar Result.ok com transações do Service', () async {
+      test('should return Result.ok with transactions from Service', () async {
         final transactions = [
           Transaction(
             id: 1,
@@ -51,7 +51,7 @@ void main() {
         verify(() => mockService.getAllTransactions()).called(1);
       });
 
-      test('deve retornar Result.error quando Service falha', () async {
+      test('should return Result.error when Service fails', () async {
         when(
           () => mockService.getAllTransactions(),
         ).thenAnswer((_) async => Result.error(Exception('Database error')));
@@ -63,11 +63,8 @@ void main() {
       });
     });
 
-    group('getTransactionsForMonth', () {
-      test('deve retornar transações do mês específico', () async {
-        const monthStart = 1738368000000;
-        const monthEnd = 1740787200000;
-
+    group('getTransactionsByMonthYear and getNonRecurringBalance', () {
+      test('should call getTransactionsByMonthYear and return list', () async {
         final transactions = [
           Transaction(
             id: 1,
@@ -81,43 +78,57 @@ void main() {
         ];
 
         when(
-          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+          () => mockService.getTransactionsByMonthYear(2, 2026),
         ).thenAnswer((_) async => Result.ok(transactions));
 
-        final result = await repository.getTransactionsForMonth(
-          monthStart,
-          monthEnd,
+        final result = await repository.getTransactionsByMonthYear(
+          2,
+          2026,
         );
 
         expect(result.isOk, isTrue);
         expect(result.asOk.value.length, equals(1));
         verify(
-          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+          () => mockService.getTransactionsByMonthYear(2, 2026),
         ).called(1);
       });
 
-      test('deve retornar erro quando Service falha', () async {
-        const monthStart = 1738368000000;
-        const monthEnd = 1740787200000;
-
+      test('should call getNonRecurringBalance and return int', () async {
         when(
-          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+          () => mockService.getNonRecurringBalance(2, 2026),
+        ).thenAnswer((_) async => const Result.ok(1500));
+
+        final result = await repository.getNonRecurringBalance(
+          2,
+          2026,
+        );
+
+        expect(result.isOk, isTrue);
+        expect(result.asOk.value, equals(1500));
+        verify(
+          () => mockService.getNonRecurringBalance(2, 2026),
+        ).called(1);
+      });
+
+      test('should return error when Service fails', () async {
+        when(
+          () => mockService.getTransactionsByMonthYear(2, 2026),
         ).thenAnswer((_) async => Result.error(Exception('Database error')));
 
-        final result = await repository.getTransactionsForMonth(
-          monthStart,
-          monthEnd,
+        final result = await repository.getTransactionsByMonthYear(
+          2,
+          2026,
         );
 
         expect(result.isError, isTrue);
         verify(
-          () => mockService.getTransactionsForMonth(monthStart, monthEnd),
+          () => mockService.getTransactionsByMonthYear(2, 2026),
         ).called(1);
       });
     });
 
     group('makeTransaction', () {
-      test('deve criar transação e retornar ID', () async {
+      test('should create transaction and return ID', () async {
         final transaction = Transaction(
           amountCents: 1000,
           type: TransactionType.income,
@@ -141,7 +152,7 @@ void main() {
         verify(() => mockService.insertTransaction(transaction)).called(1);
       });
 
-      test('deve retornar erro quando Service falha', () async {
+      test('should return error when Service fails', () async {
         final transaction = Transaction(
           amountCents: 1000,
           type: TransactionType.income,
@@ -161,7 +172,7 @@ void main() {
     });
 
     group('deleteTransaction', () {
-      test('deve deletar transação por ID', () async {
+      test('should delete transaction by ID', () async {
         const id = 42;
 
         when(
@@ -175,7 +186,7 @@ void main() {
         verify(() => mockService.deleteTransaction(id)).called(1);
       });
 
-      test('deve retornar 0 quando transação não existe', () async {
+      test('should return 0 when transaction does not exist', () async {
         const id = 999;
 
         when(
@@ -189,7 +200,7 @@ void main() {
         verify(() => mockService.deleteTransaction(id)).called(1);
       });
 
-      test('deve retornar erro quando Service falha', () async {
+      test('should return error when Service fails', () async {
         const id = 42;
 
         when(
@@ -204,7 +215,7 @@ void main() {
     });
 
     group('deleteAllTransactions', () {
-      test('deve deletar todas as transações', () async {
+      test('should delete all transactions', () async {
         when(
           () => mockService.deleteAll(),
         ).thenAnswer((_) async => Result.ok(5));
@@ -218,7 +229,7 @@ void main() {
     });
 
     group('insertTransactions', () {
-      test('deve inserir múltiplas transações', () async {
+      test('should insert multiple transactions', () async {
         final transactions = [
           Transaction(
             amountCents: 1000,

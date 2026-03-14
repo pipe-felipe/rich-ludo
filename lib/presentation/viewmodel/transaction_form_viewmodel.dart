@@ -13,6 +13,8 @@ enum ExpenseCategory {
   stuff,
   medicine,
   clothes,
+  hygiene,
+  care,
 }
 
 enum IncomeCategory { salary, gift, investment, other }
@@ -128,7 +130,7 @@ class TransactionFormViewModel extends ChangeNotifier {
 
   Future<Result<int>> _submitTransaction(int month, int year) async {
     if (!isSubmitEnabled) {
-      return Result.error(Exception('Formulário inválido'));
+      return Result.error(Exception('Invalid form'));
     }
 
     final normalizedQuantity = _uiState.quantity.replaceAll(',', '.');
@@ -163,7 +165,7 @@ class TransactionFormViewModel extends ChangeNotifier {
       case Ok<int>():
         resetForm();
       case Error<int>():
-        debugPrint('Erro ao inserir transação: ${result.error}');
+        debugPrint('Error inserting transaction: ${result.error}');
     }
 
     return result;

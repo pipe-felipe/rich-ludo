@@ -34,7 +34,7 @@ void main() {
 
   group('DeleteRecurringTransactionUseCase', () {
     group('allMonths', () {
-      test('deve deletar a transação completamente', () async {
+      test('should delete the transaction completely', () async {
         final tx = createRecurring();
         fakeRepository.addTransaction(tx);
 
@@ -52,7 +52,7 @@ void main() {
     });
 
     group('thisMonth', () {
-      test('deve adicionar exclusão para o mês atual', () async {
+      test('should add exclusion for the current month', () async {
         final tx = createRecurring();
         fakeRepository.addTransaction(tx);
 
@@ -73,7 +73,7 @@ void main() {
       });
 
       test(
-        'deve deletar tudo quando é o único mês (start == end == current)',
+        'should delete all when it is the only month (start == end == current)',
         () async {
           final tx = createRecurring(
             targetMonth: 5,
@@ -98,7 +98,7 @@ void main() {
     });
 
     group('thisAndPreviousMonths', () {
-      test('deve atualizar targetMonth para o mês seguinte', () async {
+      test('should update targetMonth to the next month', () async {
         final tx = createRecurring(targetMonth: 3, targetYear: 2026);
         fakeRepository.addTransaction(tx);
 
@@ -116,51 +116,51 @@ void main() {
         expect(updated.targetYear, equals(2026));
       });
 
-      test('deve virar o ano quando mês atual é dezembro', () async {
-        final tx = createRecurring(targetMonth: 10, targetYear: 2026);
-        fakeRepository.addTransaction(tx);
-
-        final result = await useCase(
-          transaction: tx,
-          mode: RecurringDeleteMode.thisAndPreviousMonths,
-          currentMonth: 12,
-          currentYear: 2026,
-        );
-
-        expect(result.isOk, isTrue);
-        final remaining = await fakeRepository.getTransactions();
-        final updated = remaining.asOk.value.first;
-        expect(updated.targetMonth, equals(1));
-        expect(updated.targetYear, equals(2027));
-      });
-
       test(
-        'deve deletar tudo quando próximo mês ultrapassa endMonth',
+        'should roll over the year when current month is December',
         () async {
-          final tx = createRecurring(
-            targetMonth: 3,
-            targetYear: 2026,
-            endMonth: 5,
-            endYear: 2026,
-          );
+          final tx = createRecurring(targetMonth: 10, targetYear: 2026);
           fakeRepository.addTransaction(tx);
 
           final result = await useCase(
             transaction: tx,
             mode: RecurringDeleteMode.thisAndPreviousMonths,
-            currentMonth: 5,
+            currentMonth: 12,
             currentYear: 2026,
           );
 
           expect(result.isOk, isTrue);
           final remaining = await fakeRepository.getTransactions();
-          expect(remaining.asOk.value, isEmpty);
+          final updated = remaining.asOk.value.first;
+          expect(updated.targetMonth, equals(1));
+          expect(updated.targetYear, equals(2027));
         },
       );
+
+      test('should delete all when next month exceeds endMonth', () async {
+        final tx = createRecurring(
+          targetMonth: 3,
+          targetYear: 2026,
+          endMonth: 5,
+          endYear: 2026,
+        );
+        fakeRepository.addTransaction(tx);
+
+        final result = await useCase(
+          transaction: tx,
+          mode: RecurringDeleteMode.thisAndPreviousMonths,
+          currentMonth: 5,
+          currentYear: 2026,
+        );
+
+        expect(result.isOk, isTrue);
+        final remaining = await fakeRepository.getTransactions();
+        expect(remaining.asOk.value, isEmpty);
+      });
     });
 
     group('thisAndFutureMonths', () {
-      test('deve definir endMonth como mês anterior', () async {
+      test('should set endMonth to previous month', () async {
         final tx = createRecurring(targetMonth: 3, targetYear: 2026);
         fakeRepository.addTransaction(tx);
 
@@ -178,7 +178,7 @@ void main() {
         expect(updated.endYear, equals(2026));
       });
 
-      test('deve virar o ano quando mês atual é janeiro', () async {
+      test('should roll over the year when current month is January', () async {
         final tx = createRecurring(targetMonth: 10, targetYear: 2025);
         fakeRepository.addTransaction(tx);
 
@@ -197,7 +197,7 @@ void main() {
       });
 
       test(
-        'deve deletar tudo quando mês anterior é antes do targetMonth',
+        'should delete all when previous month is before targetMonth',
         () async {
           final tx = createRecurring(targetMonth: 5, targetYear: 2026);
           fakeRepository.addTransaction(tx);

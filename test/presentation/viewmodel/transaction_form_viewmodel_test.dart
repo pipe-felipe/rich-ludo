@@ -27,8 +27,8 @@ void main() {
   });
 
   group('TransactionFormViewModel', () {
-    group('Estado inicial', () {
-      test('deve começar com estado padrão', () {
+    group('Initial State', () {
+      test('should start with an empty list of items', () async {
         final state = viewModel.uiState;
 
         expect(state.date, equals(''));
@@ -41,13 +41,13 @@ void main() {
         expect(state.isQuantityError, isFalse);
       });
 
-      test('isSubmitEnabled deve ser false inicialmente', () {
+      test('isSubmitEnabled should be false initially', () {
         expect(viewModel.isSubmitEnabled, isFalse);
       });
     });
 
     group('onTransactionTypeChange', () {
-      test('deve alterar tipo de transação para income', () {
+      test('should change transaction type to income', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
 
         expect(
@@ -56,7 +56,7 @@ void main() {
         );
       });
 
-      test('deve alterar tipo de transação para expense', () {
+      test('should change transaction type to expense', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
         viewModel.onTransactionTypeChange(TransactionType.expense);
 
@@ -68,7 +68,7 @@ void main() {
     });
 
     group('onExpenseCategoryChange', () {
-      test('deve alterar categoria de despesa', () {
+      test('should change expense category', () {
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
 
         expect(viewModel.uiState.expenseCategory, equals(ExpenseCategory.food));
@@ -76,7 +76,7 @@ void main() {
     });
 
     group('onIncomeCategoryChange', () {
-      test('deve alterar categoria de receita', () {
+      test('should change income category', () {
         viewModel.onIncomeCategoryChange(IncomeCategory.salary);
 
         expect(viewModel.uiState.incomeCategory, equals(IncomeCategory.salary));
@@ -84,28 +84,28 @@ void main() {
     });
 
     group('onQuantityChange', () {
-      test('deve aceitar valor numérico válido', () {
+      test('should accept valid numeric value', () {
         viewModel.onQuantityChange('100.50');
 
         expect(viewModel.uiState.quantity, equals('100.50'));
         expect(viewModel.uiState.isQuantityError, isFalse);
       });
 
-      test('deve aceitar valor com vírgula como separador decimal', () {
+      test('should accept comma as decimal separator', () {
         viewModel.onQuantityChange('100,50');
 
         expect(viewModel.uiState.quantity, equals('100,50'));
         expect(viewModel.uiState.isQuantityError, isFalse);
       });
 
-      test('deve marcar erro para valor inválido', () {
+      test('should flag error for invalid value', () {
         viewModel.onQuantityChange('abc');
 
         expect(viewModel.uiState.quantity, equals('abc'));
         expect(viewModel.uiState.isQuantityError, isTrue);
       });
 
-      test('não deve marcar erro para string vazia', () {
+      test('should not flag error for empty string', () {
         viewModel.onQuantityChange('');
 
         expect(viewModel.uiState.quantity, equals(''));
@@ -114,7 +114,7 @@ void main() {
     });
 
     group('onNotesChange', () {
-      test('deve alterar notas', () {
+      test('should change notes', () {
         viewModel.onNotesChange('Almoço de negócios');
 
         expect(viewModel.uiState.notes, equals('Almoço de negócios'));
@@ -122,13 +122,13 @@ void main() {
     });
 
     group('onRecurringChange', () {
-      test('deve alterar estado de recorrente', () {
+      test('should change recurring state', () {
         viewModel.onRecurringChange(true);
 
         expect(viewModel.uiState.isRecurring, isTrue);
       });
 
-      test('deve desativar estado de recorrente', () {
+      test('should disable recurring state', () {
         viewModel.onRecurringChange(true);
         viewModel.onRecurringChange(false);
 
@@ -137,7 +137,7 @@ void main() {
     });
 
     group('onDateChange', () {
-      test('deve alterar data', () {
+      test('should change date', () {
         viewModel.onDateChange('2026-02-03');
 
         expect(viewModel.uiState.date, equals('2026-02-03'));
@@ -145,14 +145,14 @@ void main() {
     });
 
     group('isSubmitEnabled', () {
-      test('deve ser true com categoria de despesa e quantidade válida', () {
+      test('should be true with valid expense category and quantity', () {
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
         viewModel.onQuantityChange('50.00');
 
         expect(viewModel.isSubmitEnabled, isTrue);
       });
 
-      test('deve ser true com categoria de receita e quantidade válida', () {
+      test('should be true with valid income category and quantity', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
         viewModel.onIncomeCategoryChange(IncomeCategory.salary);
         viewModel.onQuantityChange('1000');
@@ -160,19 +160,19 @@ void main() {
         expect(viewModel.isSubmitEnabled, isTrue);
       });
 
-      test('deve ser false sem categoria', () {
+      test('should be false without category', () {
         viewModel.onQuantityChange('50.00');
 
         expect(viewModel.isSubmitEnabled, isFalse);
       });
 
-      test('deve ser false sem quantidade', () {
+      test('should be false without quantity', () {
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
 
         expect(viewModel.isSubmitEnabled, isFalse);
       });
 
-      test('deve ser false com quantidade inválida', () {
+      test('should be false with invalid quantity', () {
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
         viewModel.onQuantityChange('abc');
 
@@ -181,7 +181,7 @@ void main() {
     });
 
     group('submitCommand', () {
-      test('deve criar transação com dados corretos via Command', () async {
+      test('should create transaction with correct data via Command', () async {
         when(
           () => mockMakeTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.ok(1));
@@ -196,7 +196,7 @@ void main() {
         verify(() => mockMakeTransactionUseCase(any())).called(1);
       });
 
-      test('deve ter estado running durante execução', () async {
+      test('should have running state during execution', () async {
         when(
           () => mockMakeTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.ok(1));
@@ -214,7 +214,7 @@ void main() {
         expect(viewModel.submitCommand.completed, isTrue);
       });
 
-      test('deve resetar formulário após submit bem-sucedido', () async {
+      test('should reset form after successful submit', () async {
         when(
           () => mockMakeTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.ok(1));
@@ -230,7 +230,7 @@ void main() {
         expect(viewModel.uiState.expenseCategory, isNull);
       });
 
-      test('deve ter estado error quando falha', () async {
+      test('should have error state when failed', () async {
         when(
           () => mockMakeTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.error(Exception('Database error')));
@@ -243,7 +243,7 @@ void main() {
         expect(viewModel.submitCommand.error, isTrue);
       });
 
-      test('não deve submeter quando isSubmitEnabled é false', () async {
+      test('should not submit when isSubmitEnabled is false', () async {
         await viewModel.submitCommand.execute(2, 2026);
 
         verifyNever(() => mockMakeTransactionUseCase(any()));
@@ -251,7 +251,7 @@ void main() {
     });
 
     group('resetForm', () {
-      test('deve resetar todos os campos', () {
+      test('should reset all fields', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
         viewModel.onIncomeCategoryChange(IncomeCategory.salary);
         viewModel.onQuantityChange('1000');

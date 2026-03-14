@@ -5,10 +5,12 @@ import '../../utils/result.dart';
 abstract class TransactionRepository {
   Future<Result<List<Transaction>>> getTransactions();
 
-  Future<Result<List<Transaction>>> getTransactionsForMonth(
-    int monthStartMillis,
-    int monthEndExclusiveMillis,
+  Future<Result<List<Transaction>>> getTransactionsByMonthYear(
+    int month,
+    int year,
   );
+
+  Future<Result<int>> getNonRecurringBalance(int upToMonth, int upToYear);
 
   Future<Result<int>> makeTransaction(Transaction transaction);
 
@@ -26,9 +28,5 @@ abstract class TransactionRepository {
 
   Future<Result<int>> deleteExclusionsForTransaction(int transactionId);
 
-  Future<Result<int>> removeExclusion(
-    int transactionId,
-    int month,
-    int year,
-  );
+  Future<Result<int>> removeExclusion(int transactionId, int month, int year);
 }

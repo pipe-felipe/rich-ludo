@@ -16,7 +16,7 @@ void main() {
   });
 
   group('MakeTransactionUseCase', () {
-    test('deve criar transação e retornar Result.ok com ID', () async {
+    test('should create transaction and return Result.ok with ID', () async {
       final transaction = Transaction(
         amountCents: 1000,
         type: TransactionType.income,
@@ -36,7 +36,7 @@ void main() {
       expect(transactions.asOk.value.length, equals(1));
     });
 
-    test('deve criar transação de despesa corretamente', () async {
+    test('should create expense transaction correctly', () async {
       final transaction = Transaction(
         amountCents: 500,
         type: TransactionType.expense,
@@ -57,7 +57,7 @@ void main() {
       expect(transactions.asOk.value.first.type, TransactionType.expense);
     });
 
-    test('deve retornar Result.error quando repositório falha', () async {
+    test('should return Result.error when repository fails', () async {
       repository.shouldReturnError = true;
 
       final transaction = Transaction(
@@ -78,9 +78,9 @@ void main() {
     });
   });
 
-  group('MakeTransactionUseCase - reativação de recorrente excluído', () {
+  group('MakeTransactionUseCase - reactivation of excluded recurring', () {
     test(
-      'deve remover exclusão ao adicionar item igual a recorrente excluído',
+      'should remove exclusion when adding an item equal to the excluded recurring',
       () async {
         final recurring = Transaction(
           id: 10,
@@ -120,7 +120,7 @@ void main() {
     );
 
     test(
-      'deve criar novo item quando categoria é diferente do recorrente excluído',
+      'should create a new item when category is different from the excluded recurring',
       () async {
         final recurring = Transaction(
           id: 10,
@@ -158,7 +158,7 @@ void main() {
     );
 
     test(
-      'deve criar novo item quando valor é diferente do recorrente excluído',
+      'should create a new item when value is different from the excluded recurring',
       () async {
         final recurring = Transaction(
           id: 10,
@@ -196,7 +196,7 @@ void main() {
     );
 
     test(
-      'deve criar novo item quando mês é diferente da exclusão',
+      'should create a new item when month is different from the exclusion',
       () async {
         final recurring = Transaction(
           id: 10,
@@ -234,7 +234,7 @@ void main() {
     );
 
     test(
-      'deve criar novo item quando não existe exclusão para recorrente igual',
+      'should create a new item when there is no exclusion for equal recurring',
       () async {
         final recurring = Transaction(
           id: 10,
@@ -266,7 +266,7 @@ void main() {
     );
 
     test(
-      'deve criar novo item quando tipo é diferente do recorrente excluído',
+      'should create a new item when type is different from the excluded recurring',
       () async {
         final recurring = Transaction(
           id: 10,

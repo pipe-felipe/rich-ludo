@@ -16,14 +16,16 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<Result<List<Transaction>>> getTransactionsForMonth(
-    int monthStartMillis,
-    int monthEndExclusiveMillis,
+  Future<Result<List<Transaction>>> getTransactionsByMonthYear(
+    int month,
+    int year,
   ) {
-    return _service.getTransactionsForMonth(
-      monthStartMillis,
-      monthEndExclusiveMillis,
-    );
+    return _service.getTransactionsByMonthYear(month, year);
+  }
+
+  @override
+  Future<Result<int>> getNonRecurringBalance(int upToMonth, int upToYear) {
+    return _service.getNonRecurringBalance(upToMonth, upToYear);
   }
 
   @override
@@ -67,11 +69,7 @@ class TransactionRepositoryImpl implements TransactionRepository {
   }
 
   @override
-  Future<Result<int>> removeExclusion(
-    int transactionId,
-    int month,
-    int year,
-  ) {
+  Future<Result<int>> removeExclusion(int transactionId, int month, int year) {
     return _service.removeExclusion(transactionId, month, year);
   }
 }

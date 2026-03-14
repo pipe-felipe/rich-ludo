@@ -4,7 +4,7 @@ import 'package:rich_ludo/domain/model/transaction_type.dart';
 
 void main() {
   group('Transaction', () {
-    test('deve criar transação com valores padrão', () {
+    test('should create transaction with default values', () {
       final transaction = Transaction(
         amountCents: 1000,
         type: TransactionType.income,
@@ -22,7 +22,7 @@ void main() {
       expect(transaction.targetYear, equals(0));
     });
 
-    test('deve criar transação com todos os valores', () {
+    test('should create transaction with all values', () {
       final transaction = Transaction(
         id: 1,
         amountCents: 5000,
@@ -48,7 +48,7 @@ void main() {
       expect(transaction.targetYear, equals(2026));
     });
 
-    test('copyWith deve criar cópia com valores alterados', () {
+    test('copyWith should create a copy with changed values', () {
       final original = Transaction(
         id: 1,
         amountCents: 1000,
@@ -76,7 +76,7 @@ void main() {
       expect(copy.targetYear, equals(2026));
     });
 
-    test('igualdade deve funcionar corretamente para transações iguais', () {
+    test('equality should work correctly for equal transactions', () {
       final t1 = Transaction(
         id: 1,
         amountCents: 1000,
@@ -107,7 +107,7 @@ void main() {
       expect(t1.hashCode, equals(t2.hashCode));
     });
 
-    test('igualdade deve retornar false para transações diferentes', () {
+    test('equality should return false for different transactions', () {
       final t1 = Transaction(
         id: 1,
         amountCents: 1000,
@@ -125,11 +125,11 @@ void main() {
   });
 
   group('TransactionType', () {
-    test('deve ter dois valores', () {
+    test('should have two values', () {
       expect(TransactionType.values.length, equals(2));
     });
 
-    test('deve conter income e expense', () {
+    test('should contain income and expense', () {
       expect(TransactionType.values, contains(TransactionType.income));
       expect(TransactionType.values, contains(TransactionType.expense));
     });

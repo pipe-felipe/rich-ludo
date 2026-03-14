@@ -6,21 +6,24 @@ import '../../domain/usecase/delete_recurring_transaction_usecase.dart';
 import '../../domain/usecase/delete_transaction_usecase.dart';
 import '../../domain/usecase/export_database_usecase.dart';
 import '../../domain/usecase/get_exclusions_usecase.dart';
-import '../../domain/usecase/get_transactions_usecase.dart';
+import '../../domain/usecase/get_transactions_by_month_year_usecase.dart';
+import '../../domain/usecase/get_non_recurring_balance_usecase.dart';
 import '../../domain/usecase/import_database_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
 import '../ui/utils/money_formatter.dart';
 
 class MainScreenViewModel extends ChangeNotifier {
-  final GetTransactionsUseCase _getTransactionsUseCase;
+  final GetTransactionsByMonthYearUseCase _getTransactionsUseCase;
+  final GetNonRecurringBalanceUseCase _getNonRecurringBalanceUseCase;
   final DeleteTransactionUseCase _deleteTransactionUseCase;
   final DeleteRecurringTransactionUseCase _deleteRecurringTransactionUseCase;
   final GetExclusionsUseCase _getExclusionsUseCase;
   final ExportDatabaseUseCase _exportDatabaseUseCase;
   final ImportDatabaseUseCase _importDatabaseUseCase;
 
-  List<Transaction> _allItems = [];
+  final Map<String, List<Transaction>> _cachedMonths = {};
+  int _nonRecurringBalance = 0;
   List<RecurringExclusion> _exclusions = [];
   List<Transaction> _items = [];
   String _totalIncomeText = 'R\$ 0.00';
@@ -30,7 +33,6 @@ class MainScreenViewModel extends ChangeNotifier {
   int _totalExpenseCents = 0;
   int _currentMonth = DateTime.now().month;
   int _currentYear = DateTime.now().year;
-  String _currentMonthYearText = '';
 
   late final Command0<List<Transaction>> load;
 
@@ -41,7 +43,8 @@ class MainScreenViewModel extends ChangeNotifier {
   late final Command0<void> importDatabase;
 
   MainScreenViewModel({
-    required GetTransactionsUseCase getTransactionsUseCase,
+    required GetTransactionsByMonthYearUseCase getTransactionsUseCase,
+    required GetNonRecurringBalanceUseCase getNonRecurringBalanceUseCase,
     required DeleteTransactionUseCase deleteTransactionUseCase,
     required DeleteRecurringTransactionUseCase
     deleteRecurringTransactionUseCase,
@@ -49,13 +52,12 @@ class MainScreenViewModel extends ChangeNotifier {
     required ExportDatabaseUseCase exportDatabaseUseCase,
     required ImportDatabaseUseCase importDatabaseUseCase,
   }) : _getTransactionsUseCase = getTransactionsUseCase,
+       _getNonRecurringBalanceUseCase = getNonRecurringBalanceUseCase,
        _deleteTransactionUseCase = deleteTransactionUseCase,
        _deleteRecurringTransactionUseCase = deleteRecurringTransactionUseCase,
        _getExclusionsUseCase = getExclusionsUseCase,
        _exportDatabaseUseCase = exportDatabaseUseCase,
        _importDatabaseUseCase = importDatabaseUseCase {
-    _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
-
     load = Command0<List<Transaction>>(_loadTransactions);
     deleteTransaction = Command1<int, int>(_deleteItem);
     exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
@@ -72,29 +74,63 @@ class MainScreenViewModel extends ChangeNotifier {
   int get totalExpenseCents => _totalExpenseCents;
   int get currentMonth => _currentMonth;
   int get currentYear => _currentYear;
-  String get currentMonthYearText => _currentMonthYearText;
 
-  Future<Result<List<Transaction>>> _loadTransactions() async {
+  Future<Result<List<Transaction>>> _loadTransactions({bool forceRefresh = false}) async {
+    final cacheKey = '$_currentMonth-$_currentYear';
+
+    if (forceRefresh) {
+      _cachedMonths.remove(cacheKey);
+    }
+
+    if (_cachedMonths.containsKey(cacheKey)) {
+      _items = _cachedMonths[cacheKey]!;
+      // Exclusions might have changed, or we just want to ensure we have them
+      final exclusionsResult = await _getExclusionsUseCase();
+      if (exclusionsResult case Ok<List<RecurringExclusion>>(:final value)) {
+        _exclusions = value;
+      }
+      
+      final balanceResult = await _getNonRecurringBalanceUseCase(
+        upToMonth: _currentMonth,
+        upToYear: _currentYear,
+      );
+      if (balanceResult case Ok<int>(:final value)) {
+        _nonRecurringBalance = value;
+      }
+      
+      _filterAndComputeTotals();
+      return Result.ok(_items);
+    }
+
     final results = await Future.wait([
-      _getTransactionsUseCase(),
+      _getTransactionsUseCase(month: _currentMonth, year: _currentYear),
       _getExclusionsUseCase(),
+      _getNonRecurringBalanceUseCase(upToMonth: _currentMonth, upToYear: _currentYear),
     ]);
 
     final result = results[0] as Result<List<Transaction>>;
     final exclusionsResult = results[1] as Result<List<RecurringExclusion>>;
+    final balanceResult = results[2] as Result<int>;
 
     switch (result) {
       case Ok<List<Transaction>>(:final value):
-        _allItems = value;
+        _cachedMonths[cacheKey] = value;
       case Error<List<Transaction>>():
-        debugPrint('Erro ao carregar transações: ${result.error}');
+        debugPrint('Error loading transactions: ${result.error}');
     }
 
     switch (exclusionsResult) {
       case Ok<List<RecurringExclusion>>(:final value):
         _exclusions = value;
       case Error<List<RecurringExclusion>>():
-        debugPrint('Erro ao carregar exclusões: ${exclusionsResult.error}');
+        debugPrint('Error loading exclusions: ${exclusionsResult.error}');
+    }
+
+    switch (balanceResult) {
+      case Ok<int>(:final value):
+        _nonRecurringBalance = value;
+      case Error<int>():
+        debugPrint('Error loading balance: ${balanceResult.error}');
     }
 
     _filterAndComputeTotals();
@@ -108,7 +144,7 @@ class MainScreenViewModel extends ChangeNotifier {
       case Ok<int>():
         await _loadTransactions();
       case Error<int>():
-        debugPrint('Erro ao deletar item: ${result.error}');
+        debugPrint('Error deleting item: ${result.error}');
     }
 
     return result;
@@ -125,7 +161,10 @@ class MainScreenViewModel extends ChangeNotifier {
   }
 
   List<Transaction> _visibleItemsForMonth(int month, int year) {
-    return _allItems.where((tx) {
+    final cacheKey = '$month-$year';
+    final monthItems = _cachedMonths[cacheKey] ?? [];
+
+    return monthItems.where((tx) {
       if (tx.isRecurring) {
         return _isRecurringActiveInMonth(tx, month, year) &&
             !_isExcludedInMonth(tx.id, month, year);
@@ -169,25 +208,23 @@ class MainScreenViewModel extends ChangeNotifier {
     final now = DateTime.now();
     final refMonth = now.month;
     final refYear = now.year;
-    int totalCents = 0;
 
-    for (final tx in _allItems) {
+    // Start with the past accumulated non-recurring balance
+    int totalCents = _nonRecurringBalance;
+
+    // Collect all unique recurring transactions available in the current fetched content.
+    // Notice: global recurring txs are returned in any getTransactionsUseCase call.
+    final cacheKey = '$_currentMonth-$_currentYear';
+    final monthItems = _cachedMonths[cacheKey] ?? [];
+
+    for (final tx in monthItems) {
       if (tx.isRecurring) {
-        totalCents += _recurringContributionToSavings(tx, now, refMonth, refYear);
-      } else {
-        final isUpToCurrentMonth = _isOnOrBefore(
-          tx.targetMonth,
-          tx.targetYear,
+        totalCents += _recurringContributionToSavings(
+          tx,
+          now,
           refMonth,
           refYear,
         );
-        final isFutureIncome =
-            tx.type == TransactionType.income &&
-            !_isOnOrBefore(tx.targetMonth, tx.targetYear, refMonth, refYear);
-
-        if (isUpToCurrentMonth && !isFutureIncome) {
-          totalCents += _signedAmount(tx);
-        }
       }
     }
 
@@ -238,24 +275,6 @@ class MainScreenViewModel extends ChangeNotifier {
     return year < refYear || (year == refYear && month <= refMonth);
   }
 
-  String _formatMonthYear(int month, int year) {
-    const monthNames = [
-      'Janeiro',
-      'Fevereiro',
-      'Março',
-      'Abril',
-      'Maio',
-      'Junho',
-      'Julho',
-      'Agosto',
-      'Setembro',
-      'Outubro',
-      'Novembro',
-      'Dezembro',
-    ];
-    return '${monthNames[month - 1]} $year';
-  }
-
   void deleteItem(int id) {
     deleteTransaction.execute(id);
   }
@@ -275,12 +294,16 @@ class MainScreenViewModel extends ChangeNotifier {
       case Ok<int>():
         await _loadTransactions();
       case Error<int>():
-        debugPrint('Erro ao deletar recorrente: ${result.error}');
+        debugPrint('Error deleting recurring: ${result.error}');
     }
   }
 
   Transaction? findTransactionById(int id) {
-    return _allItems.where((tx) => tx.id == id).firstOrNull;
+    for (final monthTxs in _cachedMonths.values) {
+      final found = monthTxs.where((tx) => tx.id == id).firstOrNull;
+      if (found != null) return found;
+    }
+    return null;
   }
 
   void goToPreviousMonth() {
@@ -290,7 +313,6 @@ class MainScreenViewModel extends ChangeNotifier {
     } else {
       _currentMonth--;
     }
-    _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     _filterAndComputeTotals();
   }
 
@@ -301,7 +323,6 @@ class MainScreenViewModel extends ChangeNotifier {
     } else {
       _currentMonth++;
     }
-    _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     _filterAndComputeTotals();
   }
 
@@ -309,7 +330,6 @@ class MainScreenViewModel extends ChangeNotifier {
     final now = DateTime.now();
     _currentMonth = now.month;
     _currentYear = now.year;
-    _currentMonthYearText = _formatMonthYear(_currentMonth, _currentYear);
     _filterAndComputeTotals();
   }
 }

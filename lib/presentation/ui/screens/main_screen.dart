@@ -44,7 +44,11 @@ class MainScreen extends StatelessWidget {
                         totalSavingText: viewModel.totalSavingText,
                         totalIncomeCents: viewModel.totalIncomeCents,
                         totalExpenseCents: viewModel.totalExpenseCents,
-                        currentMonthYear: viewModel.currentMonthYearText,
+                        currentMonthYear: _formatMonthYear(
+                          context,
+                          viewModel.currentMonth,
+                          viewModel.currentYear,
+                        ),
                         onPreviousMonth: viewModel.goToPreviousMonth,
                         onNextMonth: viewModel.goToNextMonth,
                         onCurrentMonthClick: viewModel.goToCurrentMonth,
@@ -75,6 +79,25 @@ class MainScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  String _formatMonthYear(BuildContext context, int month, int year) {
+    final l10n = AppLocalizations.of(context)!;
+    final monthNames = [
+      l10n.january,
+      l10n.february,
+      l10n.march,
+      l10n.april,
+      l10n.may,
+      l10n.june,
+      l10n.july,
+      l10n.august,
+      l10n.september,
+      l10n.october,
+      l10n.november,
+      l10n.december,
+    ];
+    return '${monthNames[month - 1]} $year';
   }
 
   Future<void> _showTransactionDialog(

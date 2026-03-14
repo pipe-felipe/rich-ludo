@@ -7,13 +7,18 @@ import 'package:rich_ludo/domain/usecase/delete_recurring_transaction_usecase.da
 import 'package:rich_ludo/domain/usecase/delete_transaction_usecase.dart';
 import 'package:rich_ludo/domain/usecase/export_database_usecase.dart';
 import 'package:rich_ludo/domain/usecase/get_exclusions_usecase.dart';
-import 'package:rich_ludo/domain/usecase/get_transactions_usecase.dart';
 import 'package:rich_ludo/domain/usecase/import_database_usecase.dart';
 import 'package:rich_ludo/presentation/viewmodel/main_screen_viewmodel.dart';
 import 'package:rich_ludo/utils/result.dart';
 
+import 'package:rich_ludo/domain/usecase/get_transactions_by_month_year_usecase.dart';
+import 'package:rich_ludo/domain/usecase/get_non_recurring_balance_usecase.dart';
+
 class MockGetTransactionsUseCase extends Mock
-    implements GetTransactionsUseCase {}
+    implements GetTransactionsByMonthYearUseCase {}
+
+class MockGetNonRecurringBalanceUseCase extends Mock
+    implements GetNonRecurringBalanceUseCase {}
 
 class MockDeleteTransactionUseCase extends Mock
     implements DeleteTransactionUseCase {}
@@ -29,6 +34,7 @@ class MockImportDatabaseUseCase extends Mock implements ImportDatabaseUseCase {}
 
 void main() {
   late MockGetTransactionsUseCase mockGetTransactionsUseCase;
+  late MockGetNonRecurringBalanceUseCase mockGetNonRecurringBalanceUseCase;
   late MockDeleteTransactionUseCase mockDeleteTransactionUseCase;
   late MockDeleteRecurringTransactionUseCase
   mockDeleteRecurringTransactionUseCase;
@@ -38,6 +44,7 @@ void main() {
 
   setUp(() {
     mockGetTransactionsUseCase = MockGetTransactionsUseCase();
+    mockGetNonRecurringBalanceUseCase = MockGetNonRecurringBalanceUseCase();
     mockDeleteTransactionUseCase = MockDeleteTransactionUseCase();
     mockDeleteRecurringTransactionUseCase =
         MockDeleteRecurringTransactionUseCase();
@@ -51,14 +58,24 @@ void main() {
     List<RecurringExclusion> initialExclusions = const [],
   }) {
     when(
-      () => mockGetTransactionsUseCase(),
+      () => mockGetTransactionsUseCase(
+        month: any(named: 'month'),
+        year: any(named: 'year'),
+      ),
     ).thenAnswer((_) async => Result.ok(initialTransactions));
+    when(
+      () => mockGetNonRecurringBalanceUseCase(
+        upToMonth: any(named: 'upToMonth'),
+        upToYear: any(named: 'upToYear'),
+      ),
+    ).thenAnswer((_) async => const Result.ok(0));
     when(
       () => mockGetExclusionsUseCase(),
     ).thenAnswer((_) async => Result.ok(initialExclusions));
 
     return MainScreenViewModel(
       getTransactionsUseCase: mockGetTransactionsUseCase,
+      getNonRecurringBalanceUseCase: mockGetNonRecurringBalanceUseCase,
       deleteTransactionUseCase: mockDeleteTransactionUseCase,
       deleteRecurringTransactionUseCase: mockDeleteRecurringTransactionUseCase,
       getExclusionsUseCase: mockGetExclusionsUseCase,
@@ -68,8 +85,8 @@ void main() {
   }
 
   group('MainScreenViewModel', () {
-    group('Estado inicial', () {
-      test('deve iniciar com lista de itens vazia', () async {
+    group('Initial State', () {
+      test('should start with an empty list of items', () async {
         final viewModel = createViewModel();
 
         // Aguardar o Command completar
@@ -80,7 +97,7 @@ void main() {
         viewModel.dispose();
       });
 
-      test('deve iniciar com totais zerados', () async {
+      test('should start with zero totals', () async {
         final viewModel = createViewModel();
 
         await viewModel.load.execute();
@@ -91,7 +108,7 @@ void main() {
         viewModel.dispose();
       });
 
-      test('deve iniciar com mês e ano atuais', () {
+      test('should start with current month and year', () {
         final viewModel = createViewModel();
         final now = DateTime.now();
 
@@ -103,7 +120,7 @@ void main() {
     });
 
     group('Command load', () {
-      test('deve ter estado running enquanto carrega', () async {
+      test('should have running state while loading', () async {
         final viewModel = createViewModel();
 
         final future = viewModel.load.execute();
@@ -118,16 +135,26 @@ void main() {
         viewModel.dispose();
       });
 
-      test('deve ter estado error quando falha', () async {
+      test('should have error state when failed', () async {
         when(
-          () => mockGetTransactionsUseCase(),
+          () => mockGetTransactionsUseCase(
+            month: any(named: 'month'),
+            year: any(named: 'year'),
+          ),
         ).thenAnswer((_) async => Result.error(Exception('Database error')));
+        when(
+          () => mockGetNonRecurringBalanceUseCase(
+            upToMonth: any(named: 'upToMonth'),
+            upToYear: any(named: 'upToYear'),
+          ),
+        ).thenAnswer((_) async => const Result.ok(0));
         when(
           () => mockGetExclusionsUseCase(),
         ).thenAnswer((_) async => const Result.ok(<RecurringExclusion>[]));
 
         final viewModel = MainScreenViewModel(
           getTransactionsUseCase: mockGetTransactionsUseCase,
+          getNonRecurringBalanceUseCase: mockGetNonRecurringBalanceUseCase,
           deleteTransactionUseCase: mockDeleteTransactionUseCase,
           deleteRecurringTransactionUseCase:
               mockDeleteRecurringTransactionUseCase,
@@ -144,8 +171,8 @@ void main() {
       });
     });
 
-    group('Navegação de meses', () {
-      test('goToNextMonth deve avançar o mês', () async {
+    group('Month Navigation', () {
+      test('goToNextMonth should advance the month', () async {
         final viewModel = createViewModel();
         await viewModel.load.execute();
 
@@ -165,7 +192,7 @@ void main() {
         viewModel.dispose();
       });
 
-      test('goToPreviousMonth deve retroceder o mês', () async {
+      test('goToPreviousMonth should go back a month', () async {
         final viewModel = createViewModel();
         await viewModel.load.execute();
 
@@ -185,7 +212,7 @@ void main() {
         viewModel.dispose();
       });
 
-      test('goToNextMonth deve virar o ano quando Dezembro', () async {
+      test('goToNextMonth should roll over the year when December', () async {
         final viewModel = createViewModel();
         await viewModel.load.execute();
 
@@ -203,25 +230,28 @@ void main() {
         viewModel.dispose();
       });
 
-      test('goToPreviousMonth deve virar o ano quando Janeiro', () async {
-        final viewModel = createViewModel();
-        await viewModel.load.execute();
+      test(
+        'goToPreviousMonth should roll over the year when January',
+        () async {
+          final viewModel = createViewModel();
+          await viewModel.load.execute();
 
-        // Navegar até janeiro
-        while (viewModel.currentMonth != 1) {
+          // Navegar até janeiro
+          while (viewModel.currentMonth != 1) {
+            viewModel.goToPreviousMonth();
+          }
+
+          final yearBefore = viewModel.currentYear;
           viewModel.goToPreviousMonth();
-        }
 
-        final yearBefore = viewModel.currentYear;
-        viewModel.goToPreviousMonth();
+          expect(viewModel.currentMonth, equals(12));
+          expect(viewModel.currentYear, equals(yearBefore - 1));
 
-        expect(viewModel.currentMonth, equals(12));
-        expect(viewModel.currentYear, equals(yearBefore - 1));
+          viewModel.dispose();
+        },
+      );
 
-        viewModel.dispose();
-      });
-
-      test('goToCurrentMonth deve voltar para o mês atual', () async {
+      test('goToCurrentMonth should return to current month', () async {
         final viewModel = createViewModel();
         await viewModel.load.execute();
 
@@ -241,8 +271,8 @@ void main() {
       });
     });
 
-    group('Atualização de transações', () {
-      test('deve atualizar items quando load executa com sucesso', () async {
+    group('Transactions Update', () {
+      test('should update items when load executes successfully', () async {
         final now = DateTime.now();
 
         final transactions = [
@@ -267,7 +297,7 @@ void main() {
         viewModel.dispose();
       });
 
-      test('deve calcular total de receitas corretamente', () async {
+      test('should calculate total income correctly', () async {
         final now = DateTime.now();
 
         final transactions = [
@@ -298,7 +328,7 @@ void main() {
         viewModel.dispose();
       });
 
-      test('deve calcular total de despesas corretamente', () async {
+      test('should calculate total expenses correctly', () async {
         final now = DateTime.now();
 
         final transactions = [
@@ -330,8 +360,8 @@ void main() {
       });
     });
 
-    group('Deletar transação', () {
-      test('deve chamar use case de delete via Command', () async {
+    group('Delete transaction', () {
+      test('should call delete use case via Command', () async {
         when(
           () => mockDeleteTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.ok(1));
@@ -347,7 +377,7 @@ void main() {
       });
 
       test(
-        'deleteTransaction Command deve ter estado running durante execução',
+        'deleteTransaction Command should have running state during execution',
         () async {
           when(
             () => mockDeleteTransactionUseCase(any()),
@@ -370,8 +400,8 @@ void main() {
       );
     });
 
-    group('Exportar banco de dados', () {
-      test('deve chamar use case de export via Command', () async {
+    group('Export database', () {
+      test('should call export use case via Command', () async {
         when(
           () => mockExportDatabaseUseCase(),
         ).thenAnswer((_) async => Result.ok('/path/to/backup.ludo'));
@@ -387,7 +417,7 @@ void main() {
       });
 
       test(
-        'exportDatabase Command deve ter estado running durante execução',
+        'exportDatabase Command should have running state during execution',
         () async {
           when(
             () => mockExportDatabaseUseCase(),
@@ -410,10 +440,10 @@ void main() {
       );
 
       test(
-        'exportDatabase Command deve ter estado error quando falha',
+        'exportDatabase Command should have error state when failed',
         () async {
           when(() => mockExportDatabaseUseCase()).thenAnswer(
-            (_) async => Result.error(Exception('Erro ao exportar')),
+            (_) async => Result.error(Exception('Error exporting database')),
           );
 
           final viewModel = createViewModel();
@@ -427,33 +457,30 @@ void main() {
         },
       );
 
-      test(
-        'exportDatabase Command deve retornar caminho do arquivo exportado',
-        () async {
-          const expectedPath = '/storage/emulated/0/Documents/backup.ludo';
+      test('exportDatabase Command should return exported file path', () async {
+        const expectedPath = '/storage/emulated/0/Documents/backup.ludo';
 
-          when(
-            () => mockExportDatabaseUseCase(),
-          ).thenAnswer((_) async => Result.ok(expectedPath));
+        when(
+          () => mockExportDatabaseUseCase(),
+        ).thenAnswer((_) async => Result.ok(expectedPath));
 
-          final viewModel = createViewModel();
-          await viewModel.load.execute();
+        final viewModel = createViewModel();
+        await viewModel.load.execute();
 
-          await viewModel.exportDatabase.execute();
+        await viewModel.exportDatabase.execute();
 
-          expect(viewModel.exportDatabase.result?.isOk, isTrue);
-          expect(
-            viewModel.exportDatabase.result?.asOk.value,
-            equals(expectedPath),
-          );
+        expect(viewModel.exportDatabase.result?.isOk, isTrue);
+        expect(
+          viewModel.exportDatabase.result?.asOk.value,
+          equals(expectedPath),
+        );
 
-          viewModel.dispose();
-        },
-      );
+        viewModel.dispose();
+      });
     });
 
-    group('Filtro de transações do mês atual', () {
-      test('deve mostrar apenas transações do mês atual', () async {
+    group('Current month transactions filter', () {
+      test('should show only current month transactions', () async {
         final now = DateTime.now();
         final nextMonth = now.month == 12 ? 1 : now.month + 1;
         final nextMonthYear = now.month == 12 ? now.year + 1 : now.year;

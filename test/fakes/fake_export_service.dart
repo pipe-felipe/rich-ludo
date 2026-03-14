@@ -13,7 +13,7 @@ class FakeExportService implements ExportService {
   @override
   Future<Result<String>> getDatabasePath() async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado ao obter caminho'));
+      return Result.error(Exception('Simulated error when getting path'));
     }
     return Result.ok(fakeDatabasePath);
   }
@@ -21,7 +21,7 @@ class FakeExportService implements ExportService {
   @override
   Future<Result<String>> exportDatabase(String destinationPath) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado ao exportar'));
+      return Result.error(Exception('Simulated error when exporting'));
     }
     lastExportDestination = destinationPath;
     return Result.ok(destinationPath);
@@ -30,7 +30,7 @@ class FakeExportService implements ExportService {
   @override
   Future<Result<void>> importDatabase(Uint8List backupBytes) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado ao importar'));
+      return Result.error(Exception('Simulated error when importing'));
     }
     lastImportedBytes = backupBytes;
     return Result.ok(null);

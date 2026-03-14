@@ -240,7 +240,7 @@ class _CategoryDropdown extends StatelessWidget {
           return ExpenseCategory.values.map((category) {
             return Row(
               children: [
-                Icon(getCategoryIcon(category.name, isIncome: false), size: 18),
+                Icon(category.icon, size: 18),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -257,7 +257,7 @@ class _CategoryDropdown extends StatelessWidget {
             value: category,
             child: Row(
               children: [
-                Icon(getCategoryIcon(category.name, isIncome: false), size: 18),
+                Icon(category.icon, size: 18),
                 const SizedBox(width: 6),
                 Text(mapExpenseCategory(category, l10n)),
               ],
@@ -280,7 +280,7 @@ class _CategoryDropdown extends StatelessWidget {
           return IncomeCategory.values.map((category) {
             return Row(
               children: [
-                Icon(getCategoryIcon(category.name, isIncome: true), size: 18),
+                Icon(category.icon, size: 18),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -297,7 +297,7 @@ class _CategoryDropdown extends StatelessWidget {
             value: category,
             child: Row(
               children: [
-                Icon(getCategoryIcon(category.name, isIncome: true), size: 18),
+                Icon(category.icon, size: 18),
                 const SizedBox(width: 6),
                 Text(mapIncomeCategory(category, l10n)),
               ],

@@ -33,20 +33,48 @@ class TransactionLocalService implements TransactionService {
   }
 
   @override
-  Future<Result<List<Transaction>>> getTransactionsForMonth(
-    int monthStartMillis,
-    int monthEndExclusiveMillis,
+  Future<Result<List<Transaction>>> getTransactionsByMonthYear(
+    int month,
+    int year,
   ) async {
     try {
       final db = await database;
       final maps = await db.query(
         DatabaseConfig.tableName,
-        where: 'isRecurring = 1 OR (createdAt >= ? AND createdAt < ?)',
-        whereArgs: [monthStartMillis, monthEndExclusiveMillis],
+        where: 'isRecurring = 1 OR (targetMonth = ? AND targetYear = ?)',
+        whereArgs: [month, year],
         orderBy: 'createdAt DESC',
       );
       final transactions = maps.map(TransactionMapper.fromMap).toList();
       return Result.ok(transactions);
+    } on Exception catch (e) {
+      return Result.error(e);
+    }
+  }
+
+  @override
+  Future<Result<int>> getNonRecurringBalance(int upToMonth, int upToYear) async {
+    try {
+      final db = await database;
+      // We sum the signed amount (income is positive, expense is negative)
+      // for all past non-recurring transactions until the provided date.
+      final result = await db.rawQuery('''
+        SELECT SUM(
+          CASE 
+            WHEN type = 'income' THEN amountCents 
+            ELSE -amountCents 
+          END
+        ) as balance
+        FROM ${DatabaseConfig.tableName}
+        WHERE isRecurring = 0 
+          AND (targetYear < ? OR (targetYear = ? AND targetMonth <= ?))
+      ''', [upToYear, upToYear, upToMonth]);
+
+      int balance = 0;
+      if (result.isNotEmpty && result.first['balance'] != null) {
+        balance = result.first['balance'] as int;
+      }
+      return Result.ok(balance);
     } on Exception catch (e) {
       return Result.error(e);
     }
