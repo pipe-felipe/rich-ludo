@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rich_ludo/presentation/ui/screens/chart_screen.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
@@ -50,10 +51,11 @@ class MainTopBar extends StatelessWidget {
             totalExpenseText: totalExpenseText,
             totalSavingText: totalSavingText,
           ),
-          _IncomeExpenseBar(
+          _IncomeExpenseColorBar(
             incomeCents: totalIncomeCents,
             expenseCents: totalExpenseCents,
           ),
+          _ChartNavigatorButton(),
         ],
       ),
     );
@@ -206,11 +208,11 @@ class _SummaryItem extends StatelessWidget {
   }
 }
 
-class _IncomeExpenseBar extends StatelessWidget {
+class _IncomeExpenseColorBar extends StatelessWidget {
   final int incomeCents;
   final int expenseCents;
 
-  const _IncomeExpenseBar({
+  const _IncomeExpenseColorBar({
     required this.incomeCents,
     required this.expenseCents,
   });
@@ -237,6 +239,23 @@ class _IncomeExpenseBar extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _ChartNavigatorButton extends StatelessWidget {
+  const _ChartNavigatorButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.pie_chart_outline),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ChartScreen()),
+        );
+      },
     );
   }
 }
