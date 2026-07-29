@@ -105,7 +105,7 @@ class MainScreenViewModel extends ChangeNotifier {
     final cacheKey = '$month-$year';
 
     if (_cachedMonths.containsKey(cacheKey)) {
-      _items = _cachedMonths[cacheKey]!;
+      final cachedItems = _cachedMonths[cacheKey]!;
       final exclusionsResult = await _getExclusionsUseCase();
       if (exclusionsResult case Ok<List<RecurringExclusion>>(:final value)) {
         _exclusions = value;
@@ -122,7 +122,7 @@ class MainScreenViewModel extends ChangeNotifier {
       if (month == _currentMonth && year == _currentYear) {
         _filterAndComputeTotals();
       }
-      return Result.ok(_items);
+      return Result.ok(cachedItems);
     }
 
     final results = await Future.wait([
@@ -309,6 +309,15 @@ class MainScreenViewModel extends ChangeNotifier {
     return year < refYear || (year == refYear && month <= refMonth);
   }
 
+  void _clearSelectedMonthData() {
+    _items = [];
+    _totalIncomeCents = 0;
+    _totalExpenseCents = 0;
+    _totalIncomeText = _formatCurrency(0);
+    _totalExpenseText = _formatCurrency(0);
+    _totalSavingText = _formatCurrency(0);
+  }
+
   Future<void> deleteItem(int id) async {
     await deleteTransaction.execute(id);
     if (deleteTransaction.completed) {
@@ -350,6 +359,7 @@ class MainScreenViewModel extends ChangeNotifier {
     } else {
       _currentMonth--;
     }
+    _clearSelectedMonthData();
     notifyListeners();
     _requestLoad();
   }
@@ -361,6 +371,7 @@ class MainScreenViewModel extends ChangeNotifier {
     } else {
       _currentMonth++;
     }
+    _clearSelectedMonthData();
     notifyListeners();
     _requestLoad();
   }
@@ -369,6 +380,7 @@ class MainScreenViewModel extends ChangeNotifier {
     final now = DateTime.now();
     _currentMonth = now.month;
     _currentYear = now.year;
+    _clearSelectedMonthData();
     notifyListeners();
     _requestLoad();
   }

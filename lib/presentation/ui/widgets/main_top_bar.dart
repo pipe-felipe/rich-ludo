@@ -217,19 +217,30 @@ class _IncomeExpenseBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final total = incomeCents + expenseCents;
-    if (total == 0) {
+    if (incomeCents <= 0 && expenseCents <= 0) {
       return const SizedBox(height: 4);
     }
+
+    // The bar is a gauge of the selected month's income: red is the share
+    // already spent, green is what remains. Spending all or more of the
+    // income than was earned has no "remaining" share, so the gauge is
+    // fully red instead of a diluted income-vs-expense split.
+    final remainingCents = incomeCents - expenseCents;
+    if (incomeCents <= 0 || remainingCents <= 0) {
+      return SizedBox(
+        height: 4,
+        child: Container(color: Theme.of(context).colorScheme.error),
+      );
+    }
+
     return SizedBox(
       height: 4,
       child: Row(
         children: [
-          if (incomeCents > 0)
-            Flexible(
-              flex: incomeCents,
-              child: Container(color: AppTheme.moneyColor(context)),
-            ),
+          Flexible(
+            flex: remainingCents,
+            child: Container(color: AppTheme.moneyColor(context)),
+          ),
           if (expenseCents > 0)
             Flexible(
               flex: expenseCents,
