@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rich_ludo/domain/model/recurring_exclusion.dart';
@@ -56,13 +58,25 @@ void main() {
   MainScreenViewModel createViewModel({
     List<Transaction> initialTransactions = const [],
     List<RecurringExclusion> initialExclusions = const [],
+    List<Transaction> Function(int month, int year)? transactionsForMonth,
+    Future<Result<List<Transaction>>> Function(int month, int year)?
+    transactionsLoader,
   }) {
     when(
       () => mockGetTransactionsUseCase(
         month: any(named: 'month'),
         year: any(named: 'year'),
       ),
-    ).thenAnswer((_) async => Result.ok(initialTransactions));
+    ).thenAnswer((invocation) {
+      final month = invocation.namedArguments[#month] as int;
+      final year = invocation.namedArguments[#year] as int;
+      if (transactionsLoader != null) {
+        return transactionsLoader(month, year);
+      }
+      final transactions =
+          transactionsForMonth?.call(month, year) ?? initialTransactions;
+      return Future.value(Result.ok(transactions));
+    });
     when(
       () => mockGetNonRecurringBalanceUseCase(
         upToMonth: any(named: 'upToMonth'),
@@ -82,6 +96,12 @@ void main() {
       exportDatabaseUseCase: mockExportDatabaseUseCase,
       importDatabaseUseCase: mockImportDatabaseUseCase,
     );
+  }
+
+  Future<void> waitForLoad(MainScreenViewModel viewModel) async {
+    while (viewModel.load.running) {
+      await Future<void>.delayed(Duration.zero);
+    }
   }
 
   group('MainScreenViewModel', () {
@@ -269,6 +289,101 @@ void main() {
 
         viewModel.dispose();
       });
+
+      test(
+        'should recalculate selected month totals and reuse the cache',
+        () async {
+          final now = DateTime.now();
+          final nextMonth = DateTime(now.year, now.month + 1);
+          final currentMonthTransactions = [
+            Transaction(
+              id: 1,
+              amountCents: 10000,
+              type: TransactionType.income,
+              targetMonth: now.month,
+              targetYear: now.year,
+            ),
+            Transaction(
+              id: 2,
+              amountCents: 2500,
+              type: TransactionType.expense,
+              targetMonth: now.month,
+              targetYear: now.year,
+            ),
+            Transaction(
+              id: 5,
+              amountCents: 99999,
+              type: TransactionType.income,
+              targetMonth: nextMonth.month,
+              targetYear: nextMonth.year,
+            ),
+            Transaction(
+              id: 6,
+              amountCents: 88888,
+              type: TransactionType.expense,
+              targetMonth: nextMonth.month,
+              targetYear: nextMonth.year,
+            ),
+          ];
+          final nextMonthTransactions = [
+            Transaction(
+              id: 3,
+              amountCents: 40000,
+              type: TransactionType.income,
+              targetMonth: nextMonth.month,
+              targetYear: nextMonth.year,
+            ),
+            Transaction(
+              id: 4,
+              amountCents: 7000,
+              type: TransactionType.expense,
+              targetMonth: nextMonth.month,
+              targetYear: nextMonth.year,
+            ),
+          ];
+
+          final viewModel = createViewModel(
+            transactionsForMonth: (month, year) {
+              if (month == now.month && year == now.year) {
+                return currentMonthTransactions;
+              }
+              if (month == nextMonth.month && year == nextMonth.year) {
+                return nextMonthTransactions;
+              }
+              return const [];
+            },
+          );
+          await waitForLoad(viewModel);
+
+          expect(viewModel.totalIncomeCents, equals(10000));
+          expect(viewModel.totalExpenseCents, equals(2500));
+          expect(viewModel.items, hasLength(2));
+
+          viewModel.goToNextMonth();
+          await waitForLoad(viewModel);
+
+          expect(viewModel.totalIncomeCents, equals(40000));
+          expect(viewModel.totalExpenseCents, equals(7000));
+          expect(viewModel.items, hasLength(2));
+
+          viewModel.goToPreviousMonth();
+          await waitForLoad(viewModel);
+
+          expect(viewModel.totalIncomeCents, equals(10000));
+          expect(viewModel.totalExpenseCents, equals(2500));
+          verify(
+            () => mockGetTransactionsUseCase(month: now.month, year: now.year),
+          ).called(1);
+          verify(
+            () => mockGetTransactionsUseCase(
+              month: nextMonth.month,
+              year: nextMonth.year,
+            ),
+          ).called(1);
+
+          viewModel.dispose();
+        },
+      );
     });
 
     group('Transactions Update', () {
@@ -518,6 +633,319 @@ void main() {
 
         viewModel.dispose();
       });
+
+      test(
+        'should apply recurring transactions and exclusions to the selected month',
+        () async {
+          final now = DateTime.now();
+          final nextMonth = DateTime(now.year, now.month + 1);
+          final recurringIncome = Transaction(
+            id: 10,
+            amountCents: 12000,
+            type: TransactionType.income,
+            isRecurring: true,
+            targetMonth: now.month == 1 ? 12 : now.month - 1,
+            targetYear: now.month == 1 ? now.year - 1 : now.year,
+          );
+          final recurringExpense = Transaction(
+            id: 11,
+            amountCents: 4000,
+            type: TransactionType.expense,
+            isRecurring: true,
+            targetMonth: recurringIncome.targetMonth,
+            targetYear: recurringIncome.targetYear,
+          );
+
+          final viewModel = createViewModel(
+            initialExclusions: [
+              RecurringExclusion(
+                transactionId: recurringExpense.id,
+                month: now.month,
+                year: now.year,
+              ),
+            ],
+            transactionsForMonth: (month, year) {
+              if (month == now.month && year == now.year ||
+                  month == nextMonth.month && year == nextMonth.year) {
+                return [recurringIncome, recurringExpense];
+              }
+              return const [];
+            },
+          );
+          await waitForLoad(viewModel);
+
+          expect(viewModel.totalIncomeCents, equals(12000));
+          expect(viewModel.totalExpenseCents, isZero);
+
+          viewModel.goToNextMonth();
+          await waitForLoad(viewModel);
+
+          expect(viewModel.totalIncomeCents, equals(12000));
+          expect(viewModel.totalExpenseCents, equals(4000));
+
+          viewModel.dispose();
+        },
+      );
+    });
+
+    group('Selected month summary', () {
+      test('should calculate totals from selected month items only', () async {
+        final selectedDate = DateTime.now();
+        final otherMonth = DateTime(selectedDate.year, selectedDate.month - 1);
+        final transactions = [
+          Transaction(
+            id: 1,
+            amountCents: 12500,
+            type: TransactionType.income,
+            description: 'Selected month income',
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+          ),
+          Transaction(
+            id: 2,
+            amountCents: 4500,
+            type: TransactionType.expense,
+            description: 'Selected month expense',
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+          ),
+          Transaction(
+            id: 3,
+            amountCents: 99999,
+            type: TransactionType.income,
+            description: 'Other month income',
+            targetMonth: otherMonth.month,
+            targetYear: otherMonth.year,
+          ),
+          Transaction(
+            id: 4,
+            amountCents: 88888,
+            type: TransactionType.expense,
+            description: 'Other month expense',
+            targetMonth: otherMonth.month,
+            targetYear: otherMonth.year,
+          ),
+        ];
+
+        final viewModel = createViewModel(initialTransactions: transactions);
+        await waitForLoad(viewModel);
+
+        expect(
+          viewModel.items.map((transaction) => transaction.description),
+          containsAll(<String?>[
+            'Selected month income',
+            'Selected month expense',
+          ]),
+        );
+        expect(viewModel.items, hasLength(2));
+        expect(viewModel.totalIncomeCents, equals(12500));
+        expect(viewModel.totalExpenseCents, equals(4500));
+        expect(viewModel.totalIncomeText, equals('R\$ 125.00'));
+        expect(viewModel.totalExpenseText, equals('R\$ 45.00'));
+
+        viewModel.dispose();
+      });
+
+      test(
+        'should exclude future recurring transactions from the list',
+        () async {
+          final selectedDate = DateTime.now();
+          final futureDate = DateTime(
+            selectedDate.year,
+            selectedDate.month + 1,
+          );
+          final futureRecurring = Transaction(
+            id: 20,
+            amountCents: 7000,
+            type: TransactionType.income,
+            description: 'Future recurring income',
+            isRecurring: true,
+            targetMonth: futureDate.month,
+            targetYear: futureDate.year,
+          );
+
+          final viewModel = createViewModel(
+            transactionsForMonth: (_, _) => [futureRecurring],
+          );
+          await waitForLoad(viewModel);
+
+          expect(viewModel.items, isEmpty);
+          expect(viewModel.totalIncomeCents, isZero);
+
+          viewModel.goToNextMonth();
+          await waitForLoad(viewModel);
+
+          expect(viewModel.items, hasLength(1));
+          expect(viewModel.totalIncomeCents, equals(7000));
+
+          viewModel.dispose();
+        },
+      );
+
+      test(
+        'should apply recurring start and end months while navigating',
+        () async {
+          final selectedDate = DateTime.now();
+          final nextDate = DateTime(selectedDate.year, selectedDate.month + 1);
+          final afterEndDate = DateTime(
+            selectedDate.year,
+            selectedDate.month + 2,
+          );
+          final recurringExpense = Transaction(
+            id: 21,
+            amountCents: 3200,
+            type: TransactionType.expense,
+            description: 'Bounded recurring expense',
+            isRecurring: true,
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+            endMonth: nextDate.month,
+            endYear: nextDate.year,
+          );
+
+          final viewModel = createViewModel(
+            transactionsForMonth: (_, _) => [recurringExpense],
+          );
+          await waitForLoad(viewModel);
+
+          viewModel.goToPreviousMonth();
+          await waitForLoad(viewModel);
+          expect(viewModel.items, isEmpty);
+
+          viewModel.goToNextMonth();
+          await waitForLoad(viewModel);
+          expect(viewModel.items, hasLength(1));
+
+          viewModel.goToNextMonth();
+          await waitForLoad(viewModel);
+          expect(viewModel.items, hasLength(1));
+          expect(viewModel.totalExpenseCents, equals(3200));
+
+          viewModel.goToNextMonth();
+          await waitForLoad(viewModel);
+          expect(viewModel.currentMonth, equals(afterEndDate.month));
+          expect(viewModel.currentYear, equals(afterEndDate.year));
+          expect(viewModel.items, isEmpty);
+          expect(viewModel.totalExpenseCents, isZero);
+
+          viewModel.dispose();
+        },
+      );
+    });
+
+    group('Recurring exclusions', () {
+      test('should affect only the excluded selected month', () async {
+        final selectedDate = DateTime.now();
+        final nextDate = DateTime(selectedDate.year, selectedDate.month + 1);
+        final recurringExpense = Transaction(
+          id: 30,
+          amountCents: 6100,
+          type: TransactionType.expense,
+          description: 'Recurring expense with exclusion',
+          isRecurring: true,
+          targetMonth: selectedDate.month - 1 == 0
+              ? 12
+              : selectedDate.month - 1,
+          targetYear: selectedDate.month == 1
+              ? selectedDate.year - 1
+              : selectedDate.year,
+        );
+
+        final viewModel = createViewModel(
+          initialExclusions: [
+            RecurringExclusion(
+              transactionId: recurringExpense.id,
+              month: selectedDate.month,
+              year: selectedDate.year,
+            ),
+          ],
+          transactionsForMonth: (_, _) => [recurringExpense],
+        );
+        await waitForLoad(viewModel);
+
+        expect(viewModel.items, isEmpty);
+        expect(viewModel.totalExpenseCents, isZero);
+
+        viewModel.goToNextMonth();
+        await waitForLoad(viewModel);
+
+        expect(viewModel.items, hasLength(1));
+        expect(viewModel.totalExpenseCents, equals(6100));
+
+        expect(viewModel.currentMonth, equals(nextDate.month));
+        expect(viewModel.currentYear, equals(nextDate.year));
+        viewModel.dispose();
+      });
+    });
+
+    group('Navigation race', () {
+      test(
+        'should keep the final selected month after a delayed load',
+        () async {
+          final selectedDate = DateTime.now();
+          final nextDate = DateTime(selectedDate.year, selectedDate.month + 1);
+          final firstLoad = Completer<Result<List<Transaction>>>();
+          var isInitialRequest = true;
+
+          final viewModel = createViewModel(
+            transactionsLoader: (month, year) {
+              if (isInitialRequest &&
+                  month == selectedDate.month &&
+                  year == selectedDate.year) {
+                isInitialRequest = false;
+                return firstLoad.future;
+              }
+              final isFinalMonth =
+                  month == nextDate.month && year == nextDate.year;
+              return Future.value(
+                Result.ok([
+                  Transaction(
+                    id: isFinalMonth ? 32 : 31,
+                    amountCents: isFinalMonth ? 8200 : 1100,
+                    type: TransactionType.income,
+                    description: isFinalMonth
+                        ? 'Final month income'
+                        : 'Stale month income',
+                    targetMonth: month,
+                    targetYear: year,
+                  ),
+                ]),
+              );
+            },
+          );
+          expect(viewModel.load.running, isTrue);
+
+          viewModel.goToNextMonth();
+          expect(viewModel.totalIncomeCents, isZero);
+          expect(viewModel.totalExpenseCents, isZero);
+          expect(viewModel.totalIncomeText, equals('R\$ 0.00'));
+
+          firstLoad.complete(
+            Result.ok([
+              Transaction(
+                id: 31,
+                amountCents: 1100,
+                type: TransactionType.income,
+                description: 'Stale month income',
+                targetMonth: selectedDate.month,
+                targetYear: selectedDate.year,
+              ),
+            ]),
+          );
+          await waitForLoad(viewModel);
+
+          expect(viewModel.currentMonth, equals(nextDate.month));
+          expect(viewModel.currentYear, equals(nextDate.year));
+          expect(
+            viewModel.items.single.description,
+            equals('Final month income'),
+          );
+          expect(viewModel.totalIncomeCents, equals(8200));
+          expect(viewModel.totalExpenseCents, isZero);
+
+          viewModel.dispose();
+        },
+      );
     });
   });
 }

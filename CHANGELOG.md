@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.2] - 2026-07-29
+
+### Fixed
+- Income vs. expense bar now shows a fully red gauge when spending meets or exceeds income, instead of an incorrect split
+
 ## [2.1.1] - 2026-03-14
 
 ### Fixed

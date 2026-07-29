@@ -6,10 +6,14 @@ import '../../../config/database_config.dart';
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
   static Database? _database;
+  final Database? _injectedDatabase;
 
-  DatabaseHelper._init();
+  DatabaseHelper._init() : _injectedDatabase = null;
+
+  DatabaseHelper.forTesting(Database database) : _injectedDatabase = database;
 
   Future<Database> get database async {
+    if (_injectedDatabase != null) return _injectedDatabase;
     if (_database != null) return _database!;
     _database = await _initDB();
     return _database!;

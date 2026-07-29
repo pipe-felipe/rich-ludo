@@ -1,7 +1,7 @@
 # RichLudo
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.1.1-green" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-2.1.2-green" alt="Version"/>
   <img src="https://img.shields.io/badge/flutter-%E2%89%A53.10-blue" alt="Flutter"/>
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-GPL--3.0-orange" alt="License"/>
@@ -54,11 +54,12 @@ This project follows partially **Clean Architecture** with the following layers:
 ### Domain Layer (Pure in Dart, no framework dependencies)
 - **Models**: `Transaction`, `TransactionType`
 - **Repository Interfaces**: `TransactionRepository`
-- **Use Cases**: `GetTransactionsUseCase`, `MakeTransactionUseCase`, `DeleteTransactionUseCase`
+- **Use Cases**: monthly transaction loading, transaction creation/deletion, recurring exclusions, balance, and backup operations
 
 ### Data Layer
 - **Local Database**: SQLite via `sqflite`
-- **DAO**: `TransactionDao`
+- **Active data path**: `TransactionLocalService` → `TransactionRepositoryImpl`
+- **Legacy path**: `TransactionDao` exists but is not used by the application dependency graph
 - **Repository Implementation**: `TransactionRepositoryImpl`
 
 ### Presentation Layer
@@ -102,6 +103,13 @@ lib/
 - ✅ Localization in Portuguese
 - ✅ Export/import database
 - ✅ Income/expense proportional bar
+
+## Internal documentation
+
+- [Project map](docs/project-map.md)
+- [Monthly data flow](docs/monthly-data-flow.md)
+- [Test map](docs/test-map.md)
+- [Known issues and task boundaries](docs/known-issues.md)
 
 ## Compilation
 
