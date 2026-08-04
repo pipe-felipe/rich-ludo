@@ -96,7 +96,7 @@ TransactionLocalService (implements TransactionService)
     ↓
 TransactionRepositoryImpl (implements TransactionRepository)
     ↓
-UseCases (GetTransactionsUseCase, MakeTransactionUseCase, etc.)
+    UseCases (GetTransactionsByMonthYearUseCase, MakeTransactionUseCase, etc.)
     ↓
 ViewModels
 ```
@@ -108,7 +108,7 @@ All operations return `Result<T>` and wrap exceptions with try/catch.
 | Method                            | SQL equivalent                                                   |
 |-----------------------------------|------------------------------------------------------------------|
 | `getAllTransactions()`            | `SELECT * FROM transactions ORDER BY createdAt DESC`             |
-| `getTransactionsForMonth(s, e)`  | `WHERE isRecurring = 1 OR (createdAt >= s AND createdAt < e)`    |
+| `getTransactionsByMonthYear(month, year)` | `WHERE isRecurring = 1 OR (targetMonth = month AND targetYear = year)` |
 | `getTransactionById(id)`         | `WHERE id = ? LIMIT 1`                                          |
 | `insertTransaction(tx)`          | `INSERT INTO transactions ...`                                   |
 | `insertAll(txs)`                 | Batch `INSERT` inside a `db.transaction`                         |
@@ -139,9 +139,10 @@ All operations return `Result<T>` and wrap exceptions with try/catch.
 
 ### Loading
 
-1. `MainScreenViewModel` calls `GetTransactionsUseCase` + `GetExclusionsUseCase`
-2. **All** transactions and exclusions are loaded into memory
-3. When navigating between months, filtering happens **in memory** (no new query)
+1. `MainScreenViewModel` calls `GetTransactionsByMonthYearUseCase`, `GetExclusionsUseCase`, and `GetNonRecurringBalanceUseCase` for the selected month.
+2. The service returns all recurring rows plus one-time rows for the selected month.
+3. The ViewModel caches the raw result under `month-year` and filters recurring start/end dates and exclusions in memory.
+4. A later visit to a cached month reuses its transaction result but refreshes exclusions and accumulated balance.
 
 ### Recurring visibility rule
 

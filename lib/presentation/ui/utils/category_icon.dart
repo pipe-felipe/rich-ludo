@@ -49,4 +49,3 @@ IconData getCategoryIcon(String? category, {required bool isIncome}) {
 
 IconData _defaultIcon(bool isIncome) =>
     isIncome ? Icons.attach_money : Icons.money_off;
-
