@@ -59,3 +59,19 @@ class PiColors {
   static const golden = Color(0xFFE7C504);
   static const dockBackground = Color(0xAAFCEDDC);
 }
+
+/// Cores das fatias do gráfico de despesas por categoria.
+/// Tons médios do Material, legíveis sobre o fundo claro e o escuro,
+/// e escuros o bastante para o rótulo branco das fatias.
+class CategoryPiColors {
+  static const transport = Color(0xFF1E88E5);
+  static const gift = Color(0xFFD81B60);
+  static const recurring = Color(0xFF6D4C41);
+  static const food = Color(0xFFF4511E);
+  static const stuff = Color(0xFF8E24AA);
+  static const medicine = Color(0xFF00897B);
+  static const clothes = Color(0xFF3949AB);
+  static const hygiene = Color(0xFF00ACC1);
+  static const care = Color(0xFF7CB342);
+  static const uncategorized = Color(0xFF757575);
+}
