@@ -266,7 +266,7 @@ path of its file. Searching for it must land on the block.
 | 4 | Add category colors and their resolver | `PLAN/04-category-colors.md` | DONE |
 | 5 | Add the category label resolver | `PLAN/05-category-label-resolver.md` | DONE |
 | 6 | Extract `MonthSelector` and delete the chart button | `PLAN/06-month-selector-extraction.md` | DONE |
-| 7 | Make the pie chart data-driven | `PLAN/07-data-driven-pie-chart.md` | TODO |
+| 7 | Make the pie chart data-driven | `PLAN/07-data-driven-pie-chart.md` | BLOCKED |
 | 8 | Rewrite `ChartScreen` as the landscape content | `PLAN/08-chart-screen.md` | TODO |
 | 9 | Choose the content by orientation in `MainScreen` | `PLAN/09-main-screen-orientation.md` | TODO |
 | 10 | Verify everything and remove the plan | `PLAN/10-cleanup.md` | TODO |
@@ -325,3 +325,44 @@ The other three Verify commands passed exactly as expected:
 `flutter analyze` printed `No issues found!`. Per §11 R12 the block's changes
 (`lib/presentation/ui/widgets/month_selector.dart` new, `lib/presentation/ui/widgets/main_top_bar.dart`
 modified) are left uncommitted in the working tree.
+
+### Block 7
+
+Command (4th in Verify, run exactly as written):
+
+```
+flutter analyze
+```
+
+Exact output (from `Analyzing` onward):
+
+```
+Analyzing rich-ludo...                                          
+No issues found! (ran in 0.6s)
+```
+
+was expected, but the actual output was:
+
+```
+Analyzing rich-ludo...                                          
+
+  error • The named parameter 'categoryTotals' is required, but there's no corresponding argument. Try adding the required argument • lib/presentation/ui/screens/chart_screen.dart:9:12 • missing_required_argument
+  error • The named parameter 'totalExpenseCents' is required, but there's no corresponding argument. Try adding the required argument • lib/presentation/ui/screens/chart_screen.dart:9:12 • missing_required_argument
+
+2 issues found. (ran in 0.5s)
+```
+
+The errors are in `lib/presentation/ui/screens/chart_screen.dart`, the WIP `ChartScreen` that still
+calls `const PieChart()` (line 9). BLOCK 7's step 1 makes `categoryTotals` and `totalExpenseCents`
+required constructor parameters of `PieChart`, so the old caller cannot compile. That file belongs
+to BLOCK 8 ("Rewrite `ChartScreen` as the landscape content") and is not in BLOCK 7's **Touches**,
+and §11 R3 forbids editing files outside **Touches**. No change within BLOCK 7's own files can make
+`flutter analyze` pass; the block's Verify expectation of `No issues found!` is unachievable before
+BLOCK 8 runs. This is a plan sequencing flaw, not a code defect.
+
+The other three Verify commands passed exactly as expected:
+`flutter test test/presentation/ui/widgets/chart/pie_chart_test.dart` printed `+6: All tests passed!`;
+`grep -c "First\|Second\|Third\|Fourth\|Color(0xFF" ...` printed `0`;
+`tail -c 1 ... | xxd -p` printed `0a`. Per §11 R12 the block's changes
+(`lib/presentation/ui/widgets/chart/pie_chart.dart` rewritten,
+`test/presentation/ui/widgets/chart/pie_chart_test.dart` new) are left uncommitted in the working tree.
