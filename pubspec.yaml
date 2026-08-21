@@ -68,6 +68,10 @@ dev_dependencies:
   # SQLite FFI for database tests
   sqflite_common_ffi: ^2.3.4+4
 
+  # E2E tests on a device or emulator
+  integration_test:
+    sdk: flutter
+
   # App icon generator
   flutter_launcher_icons: ^0.14.3
 
