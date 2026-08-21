@@ -51,10 +51,10 @@ void main() {
         ],
         totalExpenseCents: 10000,
         totalExpenseText: 'R\$ 100.00',
-        currentMonthYear: 'Julho 2026',
+        currentMonthYear: 'July 2026',
       );
 
-      expect(find.text('Julho 2026'), findsOneWidget);
+      expect(find.text('July 2026'), findsOneWidget);
       expect(find.text('R\$ 100.00'), findsOneWidget);
       expect(find.text('Total de despesas'), findsOneWidget);
     });
@@ -68,7 +68,7 @@ void main() {
         ],
         totalExpenseCents: 10000,
         totalExpenseText: 'R\$ 100.00',
-        currentMonthYear: 'Julho 2026',
+        currentMonthYear: 'July 2026',
       );
 
       expect(find.text('Comida'), findsOneWidget);
@@ -87,7 +87,7 @@ void main() {
         ],
         totalExpenseCents: 10000,
         totalExpenseText: 'R\$ 100.00',
-        currentMonthYear: 'Julho 2026',
+        currentMonthYear: 'July 2026',
         onNextMonth: () => nextMonthCalled = true,
       );
 
@@ -109,7 +109,7 @@ void main() {
         ],
         totalExpenseCents: 10000,
         totalExpenseText: 'R\$ 100.00',
-        currentMonthYear: 'Julho 2026',
+        currentMonthYear: 'July 2026',
         onPreviousMonth: () => previousMonthCalled = true,
       );
 

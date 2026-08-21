@@ -110,7 +110,7 @@ void main() {
       test('should start with an empty list of items', () async {
         final viewModel = createViewModel();
 
-        // Aguardar o Command completar
+        // Wait for the Command to complete
         await viewModel.load.execute();
 
         expect(viewModel.items, isEmpty);
@@ -237,7 +237,7 @@ void main() {
         final viewModel = createViewModel();
         await viewModel.load.execute();
 
-        // Navegar até dezembro
+        // Navigate to December
         while (viewModel.currentMonth != 12) {
           viewModel.goToNextMonth();
         }
@@ -257,7 +257,7 @@ void main() {
           final viewModel = createViewModel();
           await viewModel.load.execute();
 
-          // Navegar até janeiro
+          // Navigate to January
           while (viewModel.currentMonth != 1) {
             viewModel.goToPreviousMonth();
           }
@@ -278,7 +278,7 @@ void main() {
 
         final now = DateTime.now();
 
-        // Navegar para longe
+        // Navigate away
         viewModel.goToNextMonth();
         viewModel.goToNextMonth();
         viewModel.goToNextMonth();
@@ -396,7 +396,7 @@ void main() {
             id: 1,
             amountCents: 1000,
             type: TransactionType.income,
-            description: 'Salário',
+            description: 'Salary',
             createdAt: DateTime(now.year, now.month, 1).millisecondsSinceEpoch,
             targetMonth: now.month,
             targetYear: now.year,
@@ -421,7 +421,7 @@ void main() {
             id: 1,
             amountCents: 10000, // R$ 100.00
             type: TransactionType.income,
-            description: 'Salário',
+            description: 'Salary',
             targetMonth: now.month,
             targetYear: now.year,
           ),
@@ -429,7 +429,7 @@ void main() {
             id: 2,
             amountCents: 5000, // R$ 50.00
             type: TransactionType.income,
-            description: 'Bônus',
+            description: 'Bonus',
             targetMonth: now.month,
             targetYear: now.year,
           ),
@@ -452,7 +452,7 @@ void main() {
             id: 1,
             amountCents: 3050, // R$ 30.50
             type: TransactionType.expense,
-            description: 'Almoço',
+            description: 'Lunch',
             targetMonth: now.month,
             targetYear: now.year,
           ),
@@ -606,7 +606,7 @@ void main() {
             id: 1,
             amountCents: 5000,
             type: TransactionType.expense,
-            description: 'Transação do mês atual',
+            description: 'Current month transaction',
             isRecurring: false,
             targetMonth: now.month,
             targetYear: now.year,
@@ -615,7 +615,7 @@ void main() {
             id: 2,
             amountCents: 3000,
             type: TransactionType.expense,
-            description: 'Transação do próximo mês',
+            description: 'Next month transaction',
             isRecurring: false,
             targetMonth: nextMonth,
             targetYear: nextMonthYear,
@@ -629,7 +629,7 @@ void main() {
         expect(viewModel.items.length, equals(1));
         expect(
           viewModel.items[0].description,
-          equals('Transação do mês atual'),
+          equals('Current month transaction'),
         );
 
         viewModel.dispose();

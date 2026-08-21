@@ -6,89 +6,88 @@
 -- ============================================
 
 -- ============================================
--- TABELA: transactions
--- Armazena todas as transações financeiras
+-- TABLE: transactions
+-- Stores every financial transaction
 -- ============================================
 CREATE TABLE transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    -- Valor em centavos (ex: R$ 10,50 = 1050)
+    -- Amount in cents (e.g. $10.50 = 1050)
     amountCents INTEGER NOT NULL,
 
-    -- Tipo da transação: 'income' ou 'expense'
+    -- Transaction type: 'income' or 'expense'
     type TEXT NOT NULL,
 
-    -- Categoria da transação (ex: 'alimentação', 'transporte')
+    -- Transaction category (e.g. 'food', 'transport')
     category TEXT,
 
-    -- Descrição livre da transação
+    -- Free-form transaction description
     description TEXT,
 
-    -- Data formatada para exibição humana
+    -- Date formatted for human display
     humanDate TEXT,
 
-    -- 1 = transação recorrente, 0 = transação única
+    -- 1 = recurring transaction, 0 = one-off transaction
     isRecurring INTEGER NOT NULL DEFAULT 0,
 
-    -- Timestamp de criação (milliseconds since epoch)
+    -- Creation timestamp (milliseconds since epoch)
     createdAt INTEGER NOT NULL DEFAULT 0,
 
-    -- Mês alvo da transação (1-12)
+    -- Target month of the transaction (1-12)
     targetMonth INTEGER NOT NULL DEFAULT 0,
 
-    -- Ano alvo da transação (ex: 2026)
+    -- Target year of the transaction (e.g. 2026)
     targetYear INTEGER NOT NULL DEFAULT 0,
 
-    -- Mês final para transações recorrentes (NULL = sem fim)
+    -- Final month for recurring transactions (NULL = no end)
     endMonth INTEGER,
 
-    -- Ano final para transações recorrentes (NULL = sem fim)
+    -- Final year for recurring transactions (NULL = no end)
     endYear INTEGER
 );
 
 -- ============================================
--- TABELA: recurring_exclusions
--- Armazena exclusões de transações recorrentes
--- em meses específicos.
+-- TABLE: recurring_exclusions
+-- Stores exclusions of recurring transactions
+-- in specific months.
 --
--- Exemplo: Se uma transação recorrente de "Aluguel"
--- não deve aparecer em Março/2026, cria-se um registro:
+-- Example: If a recurring "Rent" transaction
+-- should not appear in March/2026, a record is created:
 -- (transactionId=5, month=3, year=2026)
 -- ============================================
 CREATE TABLE recurring_exclusions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-    -- ID da transação recorrente
+    -- ID of the recurring transaction
     transactionId INTEGER NOT NULL,
 
-    -- Mês da exclusão (1-12)
+    -- Month of the exclusion (1-12)
     month INTEGER NOT NULL,
 
-    -- Ano da exclusão (ex: 2026)
+    -- Year of the exclusion (e.g. 2026)
     year INTEGER NOT NULL,
 
-    -- Chave estrangeira com deleção em cascata
+    -- Foreign key with cascading deletion
     FOREIGN KEY (transactionId)
         REFERENCES transactions (id)
         ON DELETE CASCADE
 );
 
 -- ============================================
--- NOTA SOBRE FOREIGN KEYS NO SQLITE
+-- NOTE ON FOREIGN KEYS IN SQLITE
 -- ============================================
--- Por padrão, o SQLite NÃO executa constraints de
--- Foreign Key. Para habilitar, execute:
+-- By default, SQLite does NOT enforce Foreign Key
+-- constraints. To enable them, run:
 --
 -- PRAGMA foreign_keys = ON;
 --
--- No código Dart/Flutter, isso deve ser feito
--- ao abrir a conexão com o banco.
+-- In the Dart/Flutter code, this must be done
+-- when opening the database connection.
 -- ============================================
 
 -- ============================================
--- HISTÓRICO DE MIGRATIONS
+-- MIGRATION HISTORY
 -- ============================================
--- Versão 1: Schema inicial (transactions)
--- Versão 2: Adicionado endMonth, endYear e tabela recurring_exclusions
+-- Version 1: Initial schema (transactions)
+-- Version 2: Added endMonth, endYear and the recurring_exclusions table
 -- ============================================
-

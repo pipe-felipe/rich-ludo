@@ -65,7 +65,7 @@ void main() {
 
       when(
         () => mockExportService.exportDatabase(testPath),
-      ).thenAnswer((_) async => Result.error(Exception('Erro ao exportar')));
+      ).thenAnswer((_) async => Result.error(Exception('Export failed')));
 
       final result = await mockExportService.exportDatabase(testPath);
 

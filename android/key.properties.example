@@ -1,10 +1,10 @@
-## Configuração da Keystore para assinatura de release
-## Copie este arquivo para key.properties e preencha com seus dados:
+## Keystore configuration for release signing
+## Copy this file to key.properties and fill in your data:
 ##   cp key.properties.example key.properties
 ##
-## NUNCA commite o key.properties real no repositório!
+## NEVER commit the real key.properties to the repository!
 
-storePassword=SUA_SENHA_AQUI
-keyPassword=SUA_SENHA_AQUI
+storePassword=YOUR_PASSWORD_HERE
+keyPassword=YOUR_PASSWORD_HERE
 keyAlias=ludo_maltes
 storeFile=../upload-keystore.jks

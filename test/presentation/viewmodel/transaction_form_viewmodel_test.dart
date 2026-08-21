@@ -115,9 +115,9 @@ void main() {
 
     group('onNotesChange', () {
       test('should change notes', () {
-        viewModel.onNotesChange('Almoço de negócios');
+        viewModel.onNotesChange('Business lunch');
 
-        expect(viewModel.uiState.notes, equals('Almoço de negócios'));
+        expect(viewModel.uiState.notes, equals('Business lunch'));
       });
     });
 
@@ -188,7 +188,7 @@ void main() {
 
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
         viewModel.onQuantityChange('50.50');
-        viewModel.onNotesChange('Almoço');
+        viewModel.onNotesChange('Lunch');
         viewModel.onRecurringChange(false);
 
         await viewModel.submitCommand.execute(2, 2026);
@@ -221,7 +221,7 @@ void main() {
 
         viewModel.onExpenseCategoryChange(ExpenseCategory.food);
         viewModel.onQuantityChange('50.50');
-        viewModel.onNotesChange('Almoço');
+        viewModel.onNotesChange('Lunch');
 
         await viewModel.submitCommand.execute(2, 2026);
 
@@ -255,7 +255,7 @@ void main() {
         viewModel.onTransactionTypeChange(TransactionType.income);
         viewModel.onIncomeCategoryChange(IncomeCategory.salary);
         viewModel.onQuantityChange('1000');
-        viewModel.onNotesChange('Salário');
+        viewModel.onNotesChange('Salary');
         viewModel.onRecurringChange(true);
         viewModel.onDateChange('2026-02-01');
 

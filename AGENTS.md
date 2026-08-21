@@ -4,56 +4,57 @@
 Clean Architecture + MVVM (Flutter recommended patterns):
 ```
 lib/
-├── data/           # Implementações concretas
-│   ├── local/      # DAO e DatabaseHelper (SQLite)
+├── data/           # Concrete implementations
+│   ├── local/      # DAO and DatabaseHelper (SQLite)
 │   ├── repository/ # *RepositoryImpl
 │   └── services/   # *Service (interface) + *LocalService (impl)
-├── domain/         # Regras de negócio puras
-│   ├── model/      # Entidades imutáveis com copyWith
-│   ├── repository/ # Interfaces abstratas
-│   └── usecase/    # Casos de uso (1 método call())
+├── domain/         # Pure business rules
+│   ├── model/      # Immutable entities with copyWith
+│   ├── repository/ # Abstract interfaces
+│   └── usecase/    # Use cases (1 call() method)
 ├── presentation/   # MVVM
 │   ├── ui/         # View: screens/, widgets/, theme/, utils/
 │   └── viewmodel/  # ViewModel: ChangeNotifier + Commands
 └── utils/          # Result<T>, Command<T>
 ```
-- **MVVM**: View (widgets) observa ViewModel via `Consumer`/`ListenableBuilder`
-- **DI**: Provider no `main.dart` (Service → Repository → UseCase → ViewModel)
-- **Result<T>**: Sealed class para error handling (`Ok<T>` | `Error<T>`)
-- **Command<T>**: Encapsula async ops com estados `running`, `completed`, `error`
+- **MVVM**: View (widgets) observes the ViewModel via `Consumer`/`ListenableBuilder`
+- **DI**: Provider in `main.dart` (Service → Repository → UseCase → ViewModel)
+- **Result<T>**: Sealed class for error handling (`Ok<T>` | `Error<T>`)
+- **Command<T>**: Wraps async ops with `running`, `completed`, `error` states
 
 ## Code Style
-- **Models**: Imutáveis, `copyWith()`, `==` e `hashCode` implementados
-- **Interfaces**: Classes abstratas em `domain/` (Repository, Service)
-- **Widgets privados**: `_NomeWidget` quando usados apenas no mesmo arquivo
-- **Documentação**: Apenas em classes/métodos públicos importantes (incluir link docs.flutter.dev quando relevante)
-- **Valores monetários**: `int amountCents` (centavos), formatar com `formatMoney()`
-- **Datas**: `targetMonth` (1-12), `targetYear`, `createdAt` (ms epoch)
-- **Enums**: Usar para tipos finitos (`TransactionType`, `ExpenseCategory`)
+- **Models**: Immutable, `copyWith()`, `==` and `hashCode` implemented
+- **Interfaces**: Abstract classes in `domain/` (Repository, Service)
+- **Private widgets**: `_NameWidget` when used only in the same file
+- **Documentation**: Only on important public classes/methods (include a docs.flutter.dev link when relevant)
+- **Money values**: `int amountCents` (cents), format with `formatMoney()`
+- **Dates**: `targetMonth` (1-12), `targetYear`, `createdAt` (ms epoch)
+- **Enums**: Use for finite types (`TransactionType`, `ExpenseCategory`)
+- **Language**: Code, comments and tests in English; user-facing strings only through `AppLocalizations` (`lib/l10n/*.arb`)
 
 OBS: Do not, ever, create a code duplication
 Make sure that there is no string or other kinda of variables that is created more than one time
 
 ## Testing
-Estrutura espelhada em `test/`:
+Structure mirrored in `test/`:
 ```
 test/
-├── data/repository/     # Testes de RepositoryImpl
-├── domain/usecase/      # Testes de UseCases
-├── presentation/viewmodel/ # Testes de ViewModels
+├── data/repository/     # RepositoryImpl tests
+├── domain/usecase/      # UseCase tests
+├── presentation/viewmodel/ # ViewModel tests
 └── fakes/               # FakeTransactionRepository, FakeTransactionService
 ```
 
-### Padrões:
+### Patterns:
 - **Mocking**: `mocktail` (Mock classes, `when()`, `verify()`)
-- **Fakes**: Classes em `test/fakes/` com `shouldReturnError` flag
-- **Nomes**: Em inglês: `test('should return X when Y', ...)`
-- **Setup**: `setUp()` para criar mocks, `setUpAll()` para `registerFallbackValue`
-- **ViewModels**: Sempre chamar `dispose()` no final do teste
-- **Commands**: Testar estados `running`, `completed`, `error`
-- **Groups**: Agrupar por funcionalidade: `group('NomeUseCase', () { ... })`
+- **Fakes**: Classes in `test/fakes/` with a `shouldReturnError` flag
+- **Names**: In English: `test('should return X when Y', ...)`
+- **Setup**: `setUp()` to create mocks, `setUpAll()` for `registerFallbackValue`
+- **ViewModels**: Always call `dispose()` at the end of the test
+- **Commands**: Test the `running`, `completed`, `error` states
+- **Groups**: Group by functionality: `group('SomeUseCase', () { ... })`
 
-### Exemplo de teste:
+### Test example:
 ```dart
 class MockTransactionRepository extends Mock implements TransactionRepository {}
 
@@ -66,12 +67,12 @@ void main() {
     useCase = GetTransactionsUseCase(mockRepository);
   });
 
-  test('deve retornar Result.ok com transações', () async {
+  test('should return Result.ok with transactions', () async {
     when(() => mockRepository.getTransactions())
         .thenAnswer((_) async => Result.ok([/* transactions */]));
-    
+
     final result = await useCase();
-    
+
     expect(result.isOk, isTrue);
     verify(() => mockRepository.getTransactions()).called(1);
   });
@@ -79,18 +80,17 @@ void main() {
 ```
 
 ## Quick Reference
-| Camada | Sufixo | Teste com |
+| Layer | Suffix | Tested with |
 |--------|--------|-----------|
-| Model | - | Direto (sem mock) |
-| UseCase | UseCase | Mock do Repository |
-| Repository | RepositoryImpl | Mock do Service |
-| Service | Service/LocalService | Fake ou integração |
-| ViewModel | ViewModel | Mock dos UseCases |
+| Model | - | Directly (no mock) |
+| UseCase | UseCase | Mock of the Repository |
+| Repository | RepositoryImpl | Mock of the Service |
+| Service | Service/LocalService | Fake or integration |
+| ViewModel | ViewModel | Mock of the UseCases |
 
 ## Commands
 ```bash
-flutter test                    # Rodar testes
-flutter test --coverage         # Com cobertura
+flutter test                    # Run tests
+flutter test --coverage         # With coverage
 flutter analyze                 # Lint
 ```
-

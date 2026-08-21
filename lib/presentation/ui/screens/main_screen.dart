@@ -152,9 +152,9 @@ class MainScreen extends StatelessWidget {
           type: NotificationType.success,
         );
       case Error<String>(:final error):
-        // Não mostrar erro se o usuário apenas cancelou
+        // Do not show an error if the user simply cancelled
         final errorMsg = error.toString();
-        if (!errorMsg.contains('cancelada')) {
+        if (!errorMsg.contains('cancelled')) {
           showFloatingNotification(
             context: context,
             message: '${l10n.exportError}: $errorMsg',
@@ -185,12 +185,12 @@ class MainScreen extends StatelessWidget {
           message: l10n.importSuccess,
           type: NotificationType.success,
         );
-        // Recarregar dados após importar
+        // Reload data after importing
         viewModel.invalidateAndReload();
       case Error<void>(:final error):
-        // Não mostrar erro se o usuário apenas cancelou
+        // Do not show an error if the user simply cancelled
         final errorMsg = error.toString();
-        if (!errorMsg.contains('cancelada')) {
+        if (!errorMsg.contains('cancelled')) {
           showFloatingNotification(
             context: context,
             message: '${l10n.importError}: $errorMsg',

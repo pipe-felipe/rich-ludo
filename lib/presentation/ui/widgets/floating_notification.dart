@@ -46,7 +46,7 @@ class _FloatingNotificationState extends State<FloatingNotification>
 
     _controller.forward();
 
-    // Auto dismiss após a duração
+    // Auto dismiss after the duration
     Future.delayed(widget.duration, () {
       if (mounted) {
         _dismiss();
@@ -140,8 +140,8 @@ class _FloatingNotificationState extends State<FloatingNotification>
   }
 }
 
-/// Helper para mostrar notificações flutuantes em uma tela
-/// Retorna uma função para remover a notificação
+/// Helper to show floating notifications on a screen
+/// Returns a function to remove the notification
 OverlayEntry showFloatingNotification({
   required BuildContext context,
   required String message,

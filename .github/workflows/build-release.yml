@@ -3,11 +3,11 @@ name: Build and Release APK
 on:
   push:
     branches:
-      - main  # Dispara apenas em push/merge na main
-  workflow_dispatch:  # Permite execução manual
+      - main  # Only triggers on push/merge to main
+  workflow_dispatch:  # Allows manual execution
     inputs:
       version:
-        description: 'Versão da release (ex: v1.0.0) - deixe vazio para usar pubspec.yaml'
+        description: 'Release version (e.g. v1.0.0) - leave empty to use pubspec.yaml'
         required: false
         default: ''
 
@@ -133,14 +133,14 @@ jobs:
           name: Release ${{ steps.version.outputs.version }}
           body: |
             ## Rich Ludo ${{ steps.version.outputs.version }}
-            
+
             ### Download
-            Baixe o APK abaixo e instale no seu dispositivo Android.
-            
-            ### Instalação
-            1. Baixe o arquivo `.apk`
-            2. No Android, habilite "Fontes desconhecidas" nas configurações
-            3. Abra o arquivo APK para instalar
+            Download the APK below and install it on your Android device.
+
+            ### Installation
+            1. Download the `.apk` file
+            2. On Android, enable "Unknown sources" in settings
+            3. Open the APK file to install it
           files: ./apk/*.apk
           draft: false
           prerelease: false

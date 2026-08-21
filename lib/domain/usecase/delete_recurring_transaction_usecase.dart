@@ -46,7 +46,7 @@ class DeleteRecurringTransactionUseCase {
     int month,
     int year,
   ) async {
-    // Se é o único mês, deletar tudo
+    // If it is the only month, delete everything
     if (_isSingleMonth(transaction, month, year)) {
       return _deleteAll(transaction.id);
     }

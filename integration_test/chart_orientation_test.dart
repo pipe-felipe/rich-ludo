@@ -30,7 +30,7 @@ void main() {
         amountCents: 100000,
         type: TransactionType.income,
         category: 'salary',
-        description: 'Salário',
+        description: 'Salary',
         humanDate: '2026-08-01',
         targetMonth: now.month,
         targetYear: now.year,
@@ -39,7 +39,7 @@ void main() {
         amountCents: 50000,
         type: TransactionType.expense,
         category: 'food',
-        description: 'Mercado',
+        description: 'Groceries',
         humanDate: '2026-08-02',
         targetMonth: now.month,
         targetYear: now.year,
@@ -48,7 +48,7 @@ void main() {
         amountCents: 30000,
         type: TransactionType.expense,
         category: 'transport',
-        description: 'Ônibus',
+        description: 'Bus',
         humanDate: '2026-08-03',
         targetMonth: now.month,
         targetYear: now.year,
@@ -56,7 +56,7 @@ void main() {
       Transaction(
         amountCents: 20000,
         type: TransactionType.expense,
-        description: 'Livro',
+        description: 'Book',
         humanDate: '2026-08-04',
         targetMonth: now.month,
         targetYear: now.year,
@@ -65,7 +65,7 @@ void main() {
         amountCents: 70000,
         type: TransactionType.expense,
         category: 'gift',
-        description: 'Aniversário',
+        description: 'Birthday',
         humanDate: '2026-09-01',
         targetMonth: nextMonth.month,
         targetYear: nextMonth.year,
@@ -95,9 +95,9 @@ void main() {
       expect(find.byType(MainTopBar), findsOneWidget);
       expect(find.byType(MainBottomBar), findsOneWidget);
 
-      expect(find.text('Salário'), findsOneWidget);
-      expect(find.text('Mercado'), findsOneWidget);
-      expect(find.text('Ônibus'), findsOneWidget);
+      expect(find.text('Salary'), findsOneWidget);
+      expect(find.text('Groceries'), findsOneWidget);
+      expect(find.text('Bus'), findsOneWidget);
       expect(find.text('-R\$500.00'), findsOneWidget);
       expect(find.text('R\$1000.00'), findsOneWidget);
     });

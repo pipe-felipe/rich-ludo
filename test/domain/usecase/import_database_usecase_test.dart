@@ -18,9 +18,9 @@ void main() {
   });
 
   group('ImportDatabaseUseCase', () {
-    // Nota: Os testes de integração com FilePicker.platform.pickFiles()
-    // requerem testes de widget/integração devido à natureza da plataforma.
-    // Aqui testamos os comportamentos que não dependem do FilePicker.
+    // Note: integration tests using FilePicker.platform.pickFiles()
+    // require widget/integration tests due to the platform nature.
+    // Here we test the behaviors that do not depend on FilePicker.
 
     test('should have an ExportService instance', () {
       expect(useCase, isNotNull);

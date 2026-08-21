@@ -2,24 +2,24 @@ import 'dart:typed_data';
 
 import '../../utils/result.dart';
 
-/// Interface abstrata para o serviço de exportação/importação do banco de dados
-/// Seguindo: https://docs.flutter.dev/app-architecture/guide#services
+/// Abstract interface for the database export/import service
+/// Following: https://docs.flutter.dev/app-architecture/guide#services
 abstract class ExportService {
-  /// Retorna o caminho do arquivo do banco de dados atual
+  /// Returns the path of the current database file
   Future<Result<String>> getDatabasePath();
 
-  /// Exporta o banco de dados para o caminho especificado
-  /// Retorna o caminho final do arquivo exportado
+  /// Exports the database to the specified path
+  /// Returns the final exported file path
   Future<Result<String>> exportDatabase(String destinationPath);
 
-  /// Importa o banco de dados a partir dos bytes do arquivo de backup
-  /// Substitui o banco atual pelo backup
+  /// Imports the database from the backup file bytes
+  /// Replaces the current database with the backup
   Future<Result<void>> importDatabase(Uint8List backupBytes);
 
-  /// Fecha a conexão atual com o banco de dados
-  /// Necessário antes de substituir o arquivo
+  /// Closes the current database connection
+  /// Required before replacing the file
   Future<void> closeDatabase();
 
-  /// Reabre a conexão com o banco de dados após importação
+  /// Reopens the database connection after an import
   Future<void> reopenDatabase();
 }

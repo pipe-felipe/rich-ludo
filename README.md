@@ -20,7 +20,7 @@ Personal finance control app, converted from the RichPipi project (Kotlin Multip
 </p>
 
 <p align="center">
-  <sub>Tela principal · Formulário de transação · Deleção de recorrente</sub>
+  <sub>Main screen · Transaction form · Recurring delete</sub>
 </p>
 
 ## Description - pt-br

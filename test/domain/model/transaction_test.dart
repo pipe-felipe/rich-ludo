@@ -28,7 +28,7 @@ void main() {
         amountCents: 5000,
         type: TransactionType.expense,
         category: 'food',
-        description: 'Almoço',
+        description: 'Lunch',
         humanDate: '2026-02-03',
         isRecurring: true,
         createdAt: 1738540800000,
@@ -40,7 +40,7 @@ void main() {
       expect(transaction.amountCents, equals(5000));
       expect(transaction.type, equals(TransactionType.expense));
       expect(transaction.category, equals('food'));
-      expect(transaction.description, equals('Almoço'));
+      expect(transaction.description, equals('Lunch'));
       expect(transaction.humanDate, equals('2026-02-03'));
       expect(transaction.isRecurring, isTrue);
       expect(transaction.createdAt, equals(1738540800000));
@@ -54,7 +54,7 @@ void main() {
         amountCents: 1000,
         type: TransactionType.income,
         category: 'salary',
-        description: 'Salário',
+        description: 'Salary',
         humanDate: '2026-02-01',
         isRecurring: false,
         createdAt: 1738368000000,
@@ -62,13 +62,13 @@ void main() {
         targetYear: 2026,
       );
 
-      final copy = original.copyWith(amountCents: 2000, description: 'Bônus');
+      final copy = original.copyWith(amountCents: 2000, description: 'Bonus');
 
       expect(copy.id, equals(1));
       expect(copy.amountCents, equals(2000));
       expect(copy.type, equals(TransactionType.income));
       expect(copy.category, equals('salary'));
-      expect(copy.description, equals('Bônus'));
+      expect(copy.description, equals('Bonus'));
       expect(copy.humanDate, equals('2026-02-01'));
       expect(copy.isRecurring, isFalse);
       expect(copy.createdAt, equals(1738368000000));
