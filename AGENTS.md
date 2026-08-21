@@ -47,7 +47,7 @@ test/
 ### Padrões:
 - **Mocking**: `mocktail` (Mock classes, `when()`, `verify()`)
 - **Fakes**: Classes em `test/fakes/` com `shouldReturnError` flag
-- **Nomes**: Em português: `test('deve retornar X quando Y', ...)`
+- **Nomes**: Em inglês: `test('should return X when Y', ...)`
 - **Setup**: `setUp()` para criar mocks, `setUpAll()` para `registerFallbackValue`
 - **ViewModels**: Sempre chamar `dispose()` no final do teste
 - **Commands**: Testar estados `running`, `completed`, `error`

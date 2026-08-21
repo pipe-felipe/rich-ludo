@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rich_ludo/domain/model/recurring_exclusion.dart';
 import 'package:rich_ludo/domain/model/transaction.dart';
+import 'package:rich_ludo/domain/model/category_total.dart';
 import 'package:rich_ludo/domain/model/transaction_type.dart';
 import 'package:rich_ludo/domain/usecase/delete_recurring_transaction_usecase.dart';
 import 'package:rich_ludo/domain/usecase/delete_transaction_usecase.dart';
@@ -876,6 +877,206 @@ void main() {
         expect(viewModel.currentYear, equals(nextDate.year));
         viewModel.dispose();
       });
+    });
+
+    group('Expenses by category', () {
+      test(
+        'should group expenses by category for the selected month',
+        () async {
+          final selectedDate = DateTime.now();
+          final transactions = [
+            Transaction(
+              id: 1,
+              amountCents: 1000,
+              type: TransactionType.expense,
+              category: 'food',
+              targetMonth: selectedDate.month,
+              targetYear: selectedDate.year,
+            ),
+            Transaction(
+              id: 2,
+              amountCents: 500,
+              type: TransactionType.expense,
+              category: 'food',
+              targetMonth: selectedDate.month,
+              targetYear: selectedDate.year,
+            ),
+            Transaction(
+              id: 3,
+              amountCents: 700,
+              type: TransactionType.expense,
+              category: 'transport',
+              targetMonth: selectedDate.month,
+              targetYear: selectedDate.year,
+            ),
+          ];
+
+          final viewModel = createViewModel(initialTransactions: transactions);
+          await waitForLoad(viewModel);
+
+          expect(viewModel.expenseByCategory, hasLength(2));
+          expect(
+            viewModel.expenseByCategory,
+            contains(const CategoryTotal(category: 'food', amountCents: 1500)),
+          );
+
+          viewModel.dispose();
+        },
+      );
+
+      test('should ignore income when grouping', () async {
+        final selectedDate = DateTime.now();
+        final transactions = [
+          Transaction(
+            id: 1,
+            amountCents: 9000,
+            type: TransactionType.income,
+            category: 'salary',
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+          ),
+          Transaction(
+            id: 2,
+            amountCents: 300,
+            type: TransactionType.expense,
+            category: 'food',
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+          ),
+        ];
+
+        final viewModel = createViewModel(initialTransactions: transactions);
+        await waitForLoad(viewModel);
+
+        expect(
+          viewModel.expenseByCategory.single,
+          equals(const CategoryTotal(category: 'food', amountCents: 300)),
+        );
+
+        viewModel.dispose();
+      });
+
+      test(
+        'should group expenses without a category under a null key',
+        () async {
+          final selectedDate = DateTime.now();
+          final transactions = [
+            Transaction(
+              id: 1,
+              amountCents: 100,
+              type: TransactionType.expense,
+              targetMonth: selectedDate.month,
+              targetYear: selectedDate.year,
+            ),
+            Transaction(
+              id: 2,
+              amountCents: 250,
+              type: TransactionType.expense,
+              targetMonth: selectedDate.month,
+              targetYear: selectedDate.year,
+            ),
+          ];
+
+          final viewModel = createViewModel(initialTransactions: transactions);
+          await waitForLoad(viewModel);
+
+          expect(
+            viewModel.expenseByCategory.single,
+            equals(const CategoryTotal(category: null, amountCents: 350)),
+          );
+
+          viewModel.dispose();
+        },
+      );
+
+      test('should sort categories by amount descending', () async {
+        final selectedDate = DateTime.now();
+        final transactions = [
+          Transaction(
+            id: 1,
+            amountCents: 100,
+            type: TransactionType.expense,
+            category: 'food',
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+          ),
+          Transaction(
+            id: 2,
+            amountCents: 900,
+            type: TransactionType.expense,
+            category: 'transport',
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+          ),
+          Transaction(
+            id: 3,
+            amountCents: 400,
+            type: TransactionType.expense,
+            category: 'gift',
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+          ),
+        ];
+
+        final viewModel = createViewModel(initialTransactions: transactions);
+        await waitForLoad(viewModel);
+
+        expect(
+          viewModel.expenseByCategory.map((total) => total.category).toList(),
+          equals(['transport', 'gift', 'food']),
+        );
+
+        viewModel.dispose();
+      });
+
+      test('should be empty when the month has no expenses', () async {
+        final selectedDate = DateTime.now();
+        final transactions = [
+          Transaction(
+            id: 1,
+            amountCents: 5000,
+            type: TransactionType.income,
+            category: 'salary',
+            targetMonth: selectedDate.month,
+            targetYear: selectedDate.year,
+          ),
+        ];
+
+        final viewModel = createViewModel(initialTransactions: transactions);
+        await waitForLoad(viewModel);
+
+        expect(viewModel.expenseByCategory, isEmpty);
+
+        viewModel.dispose();
+      });
+
+      test(
+        'should clear the grouping when navigating to another month',
+        () async {
+          final selectedDate = DateTime.now();
+          final transactions = [
+            Transaction(
+              id: 1,
+              amountCents: 800,
+              type: TransactionType.expense,
+              category: 'food',
+              targetMonth: selectedDate.month,
+              targetYear: selectedDate.year,
+            ),
+          ];
+
+          final viewModel = createViewModel(initialTransactions: transactions);
+          await waitForLoad(viewModel);
+
+          expect(viewModel.expenseByCategory, isNotEmpty);
+
+          viewModel.goToNextMonth();
+
+          expect(viewModel.expenseByCategory, isEmpty);
+
+          viewModel.dispose();
+        },
+      );
     });
 
     group('Navigation race', () {
