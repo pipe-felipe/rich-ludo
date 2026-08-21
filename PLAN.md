@@ -264,7 +264,7 @@ path of its file. Searching for it must land on the block.
 | 2 | Add the `CategoryTotal` value object | `PLAN/02-category-total-model.md` | DONE |
 | 3 | Aggregate expenses by category in the ViewModel | `PLAN/03-viewmodel-aggregation.md` | DONE |
 | 4 | Add category colors and their resolver | `PLAN/04-category-colors.md` | DONE |
-| 5 | Add the category label resolver | `PLAN/05-category-label-resolver.md` | TODO |
+| 5 | Add the category label resolver | `PLAN/05-category-label-resolver.md` | DONE |
 | 6 | Extract `MonthSelector` and delete the chart button | `PLAN/06-month-selector-extraction.md` | TODO |
 | 7 | Make the pie chart data-driven | `PLAN/07-data-driven-pie-chart.md` | TODO |
 | 8 | Rewrite `ChartScreen` as the landscape content | `PLAN/08-chart-screen.md` | TODO |

@@ -53,4 +53,27 @@ void main() {
       });
     }
   });
+
+  group('getExpenseCategoryLabel', () {
+    test('should return the localized name for a known category', () {
+      expect(
+        getExpenseCategoryLabel('food', l10n),
+        equals(mapExpenseCategory(ExpenseCategory.food, l10n)),
+      );
+    });
+
+    test('should return the uncategorized label when the category is null', () {
+      expect(
+        getExpenseCategoryLabel(null, l10n),
+        equals(l10n.categoryUncategorized),
+      );
+    });
+
+    test('should return the uncategorized label for an unknown string', () {
+      expect(
+        getExpenseCategoryLabel('not-a-category', l10n),
+        equals(l10n.categoryUncategorized),
+      );
+    });
+  });
 }
