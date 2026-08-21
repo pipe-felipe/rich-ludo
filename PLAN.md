@@ -267,7 +267,7 @@ path of its file. Searching for it must land on the block.
 | 5 | Add the category label resolver | `PLAN/05-category-label-resolver.md` | DONE |
 | 6 | Extract `MonthSelector` and delete the chart button | `PLAN/06-month-selector-extraction.md` | DONE |
 | 7 | Make the pie chart data-driven and rewrite `ChartScreen` | `PLAN/07-data-driven-pie-chart.md` | DONE |
-| 8 | Choose the content by orientation in `MainScreen` | `PLAN/08-main-screen-orientation.md` | TODO |
+| 8 | Choose the content by orientation in `MainScreen` | `PLAN/08-main-screen-orientation.md` | DONE |
 | 9 | Verify everything and remove the plan | `PLAN/09-cleanup.md` | TODO |
 
 Statuses: `TODO` → `DONE`, or `BLOCKED` (see §11 R12).

@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../utils/result.dart';
 import '../../viewmodel/main_screen_viewmodel.dart';
 import '../../viewmodel/transaction_form_viewmodel.dart';
+import 'chart_screen.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/error_state.dart';
 import '../widgets/floating_notification.dart';
@@ -22,6 +23,13 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<MainScreenViewModel>(
       builder: (context, viewModel, child) {
+        final isPortrait =
+            MediaQuery.orientationOf(context) == Orientation.portrait;
+        final currentMonthYear = _formatMonthYear(
+          context,
+          viewModel.currentMonth,
+          viewModel.currentYear,
+        );
         return Scaffold(
           body: SafeArea(
             child: Stack(
@@ -38,41 +46,44 @@ class MainScreen extends StatelessWidget {
                   behavior: HitTestBehavior.translucent,
                   child: Column(
                     children: [
-                      MainTopBar(
-                        totalIncomeText: viewModel.totalIncomeText,
-                        totalExpenseText: viewModel.totalExpenseText,
-                        totalSavingText: viewModel.totalSavingText,
-                        totalIncomeCents: viewModel.totalIncomeCents,
-                        totalExpenseCents: viewModel.totalExpenseCents,
-                        currentMonthYear: _formatMonthYear(
-                          context,
-                          viewModel.currentMonth,
-                          viewModel.currentYear,
+                      if (isPortrait)
+                        MainTopBar(
+                          totalIncomeText: viewModel.totalIncomeText,
+                          totalExpenseText: viewModel.totalExpenseText,
+                          totalSavingText: viewModel.totalSavingText,
+                          totalIncomeCents: viewModel.totalIncomeCents,
+                          totalExpenseCents: viewModel.totalExpenseCents,
+                          currentMonthYear: currentMonthYear,
+                          onPreviousMonth: viewModel.goToPreviousMonth,
+                          onNextMonth: viewModel.goToNextMonth,
+                          onCurrentMonthClick: viewModel.goToCurrentMonth,
                         ),
-                        onPreviousMonth: viewModel.goToPreviousMonth,
-                        onNextMonth: viewModel.goToNextMonth,
-                        onCurrentMonthClick: viewModel.goToCurrentMonth,
-                      ),
                       Expanded(
-                        child: _TransactionContent(viewModel: viewModel),
+                        child: isPortrait
+                            ? _TransactionContent(viewModel: viewModel)
+                            : _ChartContent(
+                                viewModel: viewModel,
+                                currentMonthYear: currentMonthYear,
+                              ),
                       ),
                     ],
                   ),
                 ),
-                Positioned(
-                  bottom: 8,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: MainBottomBar(
-                      onAddButtonClick: () =>
-                          _showTransactionDialog(context, viewModel),
-                      onRecoveryClick: () =>
-                          _importDatabase(context, viewModel),
-                      onSaveClick: () => _exportDatabase(context, viewModel),
+                if (isPortrait)
+                  Positioned(
+                    bottom: 8,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: MainBottomBar(
+                        onAddButtonClick: () =>
+                            _showTransactionDialog(context, viewModel),
+                        onRecoveryClick: () =>
+                            _importDatabase(context, viewModel),
+                        onSaveClick: () => _exportDatabase(context, viewModel),
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -233,5 +244,45 @@ class _TransactionContent extends StatelessWidget {
     } else {
       viewModel.deleteItem(transaction.id);
     }
+  }
+}
+
+class _ChartContent extends StatelessWidget {
+  final MainScreenViewModel viewModel;
+  final String currentMonthYear;
+
+  const _ChartContent({
+    required this.viewModel,
+    required this.currentMonthYear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: viewModel.load,
+      builder: (context, _) {
+        if (viewModel.load.running) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (viewModel.load.error) {
+          return ErrorState(onRetry: viewModel.load.execute);
+        }
+
+        if (viewModel.expenseByCategory.isEmpty) {
+          return const EmptyState();
+        }
+
+        return ChartScreen(
+          categoryTotals: viewModel.expenseByCategory,
+          totalExpenseCents: viewModel.totalExpenseCents,
+          totalExpenseText: viewModel.totalExpenseText,
+          currentMonthYear: currentMonthYear,
+          onPreviousMonth: viewModel.goToPreviousMonth,
+          onNextMonth: viewModel.goToNextMonth,
+          onCurrentMonthClick: viewModel.goToCurrentMonth,
+        );
+      },
+    );
   }
 }
