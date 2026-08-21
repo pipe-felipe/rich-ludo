@@ -20,7 +20,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<List<Transaction>>> getTransactions() async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     return Result.ok(List.unmodifiable(_transactions));
   }
@@ -31,7 +31,7 @@ class FakeTransactionRepository implements TransactionRepository {
     int year,
   ) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final filtered = _transactions.where((tx) {
       return tx.isRecurring ||
@@ -44,7 +44,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<int>> getNonRecurringBalance(int upToMonth, int upToYear) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     return const Result.ok(0);
   }
@@ -52,7 +52,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<int>> makeTransaction(Transaction transaction) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final newId = _transactions.length + 1;
     _transactions.add(transaction.copyWith(id: newId));
@@ -62,7 +62,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<int>> updateTransaction(Transaction transaction) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final index = _transactions.indexWhere((tx) => tx.id == transaction.id);
     if (index != -1) {
@@ -74,7 +74,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<int>> deleteTransaction(int id) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final initialLength = _transactions.length;
     _transactions.removeWhere((tx) => tx.id == id);
@@ -84,7 +84,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<int>> deleteAllTransactions() async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final count = _transactions.length;
     _transactions.clear();
@@ -96,7 +96,7 @@ class FakeTransactionRepository implements TransactionRepository {
     List<Transaction> transactions,
   ) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final ids = <int>[];
     for (final tx in transactions) {
@@ -110,7 +110,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<List<RecurringExclusion>>> getExclusions() async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     return Result.ok(List.unmodifiable(_exclusions));
   }
@@ -118,7 +118,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<int>> addExclusion(RecurringExclusion exclusion) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final newId = _exclusions.length + 1;
     _exclusions.add(
@@ -135,7 +135,7 @@ class FakeTransactionRepository implements TransactionRepository {
   @override
   Future<Result<int>> deleteExclusionsForTransaction(int transactionId) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final initialLength = _exclusions.length;
     _exclusions.removeWhere((ex) => ex.transactionId == transactionId);
@@ -149,7 +149,7 @@ class FakeTransactionRepository implements TransactionRepository {
     int year,
   ) async {
     if (shouldReturnError) {
-      return Result.error(Exception('Erro simulado'));
+      return Result.error(Exception('Simulated error'));
     }
     final initialLength = _exclusions.length;
     _exclusions.removeWhere(

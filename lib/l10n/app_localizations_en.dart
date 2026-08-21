@@ -163,4 +163,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get december => 'December';
+
+  @override
+  String get chartTitle => 'Expenses by category';
+
+  @override
+  String get categoryUncategorized => 'Uncategorized';
+
+  @override
+  String get chartTotalExpense => 'Total expenses';
 }

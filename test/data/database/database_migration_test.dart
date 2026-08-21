@@ -108,8 +108,8 @@ void main() {
       await db.insert(DatabaseConfig.tableName, {
         'amountCents': 10000,
         'type': 'income',
-        'category': 'Salário',
-        'description': 'Teste',
+        'category': 'Salary',
+        'description': 'Test',
         'humanDate': '01/01/2026',
         'isRecurring': 0,
         'createdAt': DateTime(2026, 1, 1).millisecondsSinceEpoch,
@@ -123,7 +123,7 @@ void main() {
 
       expect(transactions, hasLength(1));
       expect(transactions.first['amountCents'], equals(10000));
-      expect(transactions.first['category'], equals('Salário'));
+      expect(transactions.first['category'], equals('Salary'));
       expect(transactions.first['endMonth'], isNull);
       expect(transactions.first['endYear'], isNull);
     });

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
+import 'month_selector.dart';
 
 class MainTopBar extends StatelessWidget {
   final String totalIncomeText;
@@ -39,7 +40,7 @@ class MainTopBar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _MonthSelector(
+          MonthSelector(
             currentMonthYear: currentMonthYear,
             onPreviousMonth: onPreviousMonth,
             onNextMonth: onNextMonth,
@@ -50,58 +51,12 @@ class MainTopBar extends StatelessWidget {
             totalExpenseText: totalExpenseText,
             totalSavingText: totalSavingText,
           ),
-          _IncomeExpenseBar(
+          _IncomeExpenseColorBar(
             incomeCents: totalIncomeCents,
             expenseCents: totalExpenseCents,
           ),
         ],
       ),
-    );
-  }
-}
-
-class _MonthSelector extends StatelessWidget {
-  final String currentMonthYear;
-  final VoidCallback onPreviousMonth;
-  final VoidCallback onNextMonth;
-  final VoidCallback onCurrentMonthClick;
-
-  const _MonthSelector({
-    required this.currentMonthYear,
-    required this.onPreviousMonth,
-    required this.onNextMonth,
-    required this.onCurrentMonthClick,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          onPressed: onPreviousMonth,
-          icon: Icon(
-            Icons.keyboard_arrow_left,
-            color: Theme.of(context).colorScheme.tertiary,
-          ),
-        ),
-        TextButton(
-          onPressed: onCurrentMonthClick,
-          child: Text(
-            currentMonthYear,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-          ),
-        ),
-        IconButton(
-          onPressed: onNextMonth,
-          icon: Icon(
-            Icons.keyboard_arrow_right,
-            color: Theme.of(context).colorScheme.tertiary,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -206,11 +161,11 @@ class _SummaryItem extends StatelessWidget {
   }
 }
 
-class _IncomeExpenseBar extends StatelessWidget {
+class _IncomeExpenseColorBar extends StatelessWidget {
   final int incomeCents;
   final int expenseCents;
 
-  const _IncomeExpenseBar({
+  const _IncomeExpenseColorBar({
     required this.incomeCents,
     required this.expenseCents,
   });

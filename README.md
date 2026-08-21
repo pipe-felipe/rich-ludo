@@ -1,7 +1,7 @@
 # RichLudo
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.1.2-green" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-2.2.0-green" alt="Version"/>
   <img src="https://img.shields.io/badge/flutter-%E2%89%A53.10-blue" alt="Flutter"/>
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-GPL--3.0-orange" alt="License"/>
@@ -20,7 +20,7 @@ Personal finance control app, converted from the RichPipi project (Kotlin Multip
 </p>
 
 <p align="center">
-  <sub>Tela principal · Formulário de transação · Deleção de recorrente</sub>
+  <sub>Main screen · Transaction form · Recurring delete</sub>
 </p>
 
 ## Description - pt-br
@@ -167,11 +167,27 @@ flutter build ios
 
 ## Dependencies
 
-- `provider`: State management
-- `sqflite`: SQLite database
-- `flutter_localizations`: Internationalization
-- `file_picker`: Data export/import
-- `intl`: Internationalization utilities
+### Runtime
+
+| Package | Description | License |
+|---------|-------------|---------|
+| [provider](https://pub.dev/packages/provider) | State management | MIT |
+| [sqflite](https://pub.dev/packages/sqflite) | SQLite database | BSD-2-Clause |
+| [path](https://pub.dev/packages/path) | Path manipulation utilities | BSD-3-Clause |
+| [file_picker](https://pub.dev/packages/file_picker) | Data export/import | MIT |
+| [cupertino_icons](https://pub.dev/packages/cupertino_icons) | iOS style icons | MIT |
+| [intl](https://pub.dev/packages/intl) | Internationalization utilities | BSD-3-Clause |
+| [fl_chart](https://pub.dev/packages/fl_chart) | Highly customizable chart library | MIT |
+| flutter_localizations | Flutter SDK internationalization | BSD-3-Clause |
+
+### Dev
+
+| Package | Description | License |
+|---------|-------------|---------|
+| [flutter_lints](https://pub.dev/packages/flutter_lints) | Recommended lint rules | BSD-3-Clause |
+| [mocktail](https://pub.dev/packages/mocktail) | Mocking library for tests | MIT |
+| [sqflite_common_ffi](https://pub.dev/packages/sqflite_common_ffi) | SQLite FFI for database tests | BSD-2-Clause |
+| [flutter_launcher_icons](https://pub.dev/packages/flutter_launcher_icons) | App icon generator | MIT |
 
 ## License
 

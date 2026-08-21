@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Cores inspiradas em Maltese Dog - Modo Escuro
+/// Colors inspired by Maltese Dog - Dark Mode
 class DarkPiColors {
   static const primary = Color(0xFFF0F0F0);
   static const onPrimary = Color(0xFF1A1A1A);
@@ -27,7 +27,7 @@ class DarkPiColors {
   static const thrashCan = Color.fromARGB(255, 199, 201, 95);
 }
 
-/// Cores inspiradas em Maltese Dog - Modo Claro
+/// Colors inspired by Maltese Dog - Light Mode
 class LightPiColors {
   static const primary = Color(0xFF2B2B2B);
   static const onPrimary = Color(0xFFFFFFFF);
@@ -54,8 +54,24 @@ class LightPiColors {
   static const thrashCan = Color.fromARGB(255, 87, 87, 42);
 }
 
-/// Cores compartilhadas
+/// Shared colors
 class PiColors {
   static const golden = Color(0xFFE7C504);
   static const dockBackground = Color(0xAAFCEDDC);
+}
+
+/// Slice colors of the expenses-by-category chart.
+/// Material medium tones, readable on both the light and the dark
+/// background, and dark enough for the white slice labels.
+class CategoryPiColors {
+  static const transport = Color(0xFF1E88E5);
+  static const gift = Color(0xFFD81B60);
+  static const recurring = Color(0xFF6D4C41);
+  static const food = Color(0xFFF4511E);
+  static const stuff = Color(0xFF8E24AA);
+  static const medicine = Color(0xFF00897B);
+  static const clothes = Color(0xFF3949AB);
+  static const hygiene = Color(0xFF00ACC1);
+  static const care = Color(0xFF7CB342);
+  static const uncategorized = Color(0xFF757575);
 }

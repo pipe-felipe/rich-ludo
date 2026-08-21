@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../domain/model/category_total.dart';
 import '../../domain/model/recurring_exclusion.dart';
 import '../../domain/model/transaction.dart';
 import '../../domain/model/transaction_type.dart';
@@ -31,6 +32,7 @@ class MainScreenViewModel extends ChangeNotifier {
   String _totalSavingText = 'R\$ 0.00';
   int _totalIncomeCents = 0;
   int _totalExpenseCents = 0;
+  List<CategoryTotal> _expenseByCategory = [];
   int _currentMonth = DateTime.now().month;
   int _currentYear = DateTime.now().year;
   bool _needsReload = false;
@@ -80,6 +82,7 @@ class MainScreenViewModel extends ChangeNotifier {
   String get totalSavingText => _totalSavingText;
   int get totalIncomeCents => _totalIncomeCents;
   int get totalExpenseCents => _totalExpenseCents;
+  List<CategoryTotal> get expenseByCategory => _expenseByCategory;
   int get currentMonth => _currentMonth;
   int get currentYear => _currentYear;
 
@@ -188,6 +191,7 @@ class MainScreenViewModel extends ChangeNotifier {
     _items = _visibleItemsForMonth(_currentMonth, _currentYear);
     _totalIncomeCents = _sumByType(_items, TransactionType.income);
     _totalExpenseCents = _sumByType(_items, TransactionType.expense);
+    _expenseByCategory = _groupExpensesByCategory(_items);
     _totalIncomeText = _formatCurrency(_totalIncomeCents);
     _totalExpenseText = _formatCurrency(_totalExpenseCents);
     _totalSavingText = _formatCurrency(_computeSavingsCents());
@@ -232,6 +236,25 @@ class MainScreenViewModel extends ChangeNotifier {
     return items
         .where((tx) => tx.type == type)
         .fold(0, (sum, tx) => sum + tx.amountCents);
+  }
+
+  List<CategoryTotal> _groupExpensesByCategory(List<Transaction> items) {
+    final totalsByCategory = <String?, int>{};
+
+    for (final tx in items) {
+      if (tx.type != TransactionType.expense) continue;
+      totalsByCategory[tx.category] =
+          (totalsByCategory[tx.category] ?? 0) + tx.amountCents;
+    }
+
+    final totals = totalsByCategory.entries
+        .map(
+          (entry) =>
+              CategoryTotal(category: entry.key, amountCents: entry.value),
+        )
+        .toList();
+    totals.sort((a, b) => b.amountCents.compareTo(a.amountCents));
+    return totals;
   }
 
   String _formatCurrency(int cents) {
@@ -313,6 +336,7 @@ class MainScreenViewModel extends ChangeNotifier {
     _items = [];
     _totalIncomeCents = 0;
     _totalExpenseCents = 0;
+    _expenseByCategory = [];
     _totalIncomeText = _formatCurrency(0);
     _totalExpenseText = _formatCurrency(0);
     _totalSavingText = _formatCurrency(0);

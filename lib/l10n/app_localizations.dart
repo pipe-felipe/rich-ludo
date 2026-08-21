@@ -411,6 +411,24 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Dezembro'**
   String get december;
+
+  /// No description provided for @chartTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Despesas por categoria'**
+  String get chartTitle;
+
+  /// No description provided for @categoryUncategorized.
+  ///
+  /// In pt, this message translates to:
+  /// **'Sem categoria'**
+  String get categoryUncategorized;
+
+  /// No description provided for @chartTotalExpense.
+  ///
+  /// In pt, this message translates to:
+  /// **'Total de despesas'**
+  String get chartTotalExpense;
 }
 
 class _AppLocalizationsDelegate

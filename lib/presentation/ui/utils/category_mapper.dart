@@ -36,3 +36,19 @@ String mapIncomeCategory(IncomeCategory category, AppLocalizations l10n) {
       return l10n.incomeCategoryOther;
   }
 }
+
+/// Resolves the localized expense category name from a [String] category
+/// (used by the `Transaction` model). Delegates to [mapExpenseCategory].
+/// A null or unknown value falls back to the "no category" label.
+String getExpenseCategoryLabel(String? category, AppLocalizations l10n) {
+  if (category == null) {
+    return l10n.categoryUncategorized;
+  }
+
+  final parsed = ExpenseCategory.values
+      .where((e) => e.name == category)
+      .firstOrNull;
+  return parsed == null
+      ? l10n.categoryUncategorized
+      : mapExpenseCategory(parsed, l10n);
+}

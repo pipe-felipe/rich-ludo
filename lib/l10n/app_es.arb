@@ -51,5 +51,8 @@
   "september": "Septiembre",
   "october": "Octubre",
   "november": "Noviembre",
-  "december": "Diciembre"
+  "december": "Diciembre",
+  "chartTitle": "Gastos por categoría",
+  "categoryUncategorized": "Sin categoría",
+  "chartTotalExpense": "Total de gastos"
 }
