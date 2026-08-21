@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rich_ludo/presentation/ui/screens/chart_screen.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
+import 'month_selector.dart';
 
 class MainTopBar extends StatelessWidget {
   final String totalIncomeText;
@@ -40,7 +40,7 @@ class MainTopBar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _MonthSelector(
+          MonthSelector(
             currentMonthYear: currentMonthYear,
             onPreviousMonth: onPreviousMonth,
             onNextMonth: onNextMonth,
@@ -55,55 +55,8 @@ class MainTopBar extends StatelessWidget {
             incomeCents: totalIncomeCents,
             expenseCents: totalExpenseCents,
           ),
-          _ChartNavigatorButton(),
         ],
       ),
-    );
-  }
-}
-
-class _MonthSelector extends StatelessWidget {
-  final String currentMonthYear;
-  final VoidCallback onPreviousMonth;
-  final VoidCallback onNextMonth;
-  final VoidCallback onCurrentMonthClick;
-
-  const _MonthSelector({
-    required this.currentMonthYear,
-    required this.onPreviousMonth,
-    required this.onNextMonth,
-    required this.onCurrentMonthClick,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        IconButton(
-          onPressed: onPreviousMonth,
-          icon: Icon(
-            Icons.keyboard_arrow_left,
-            color: Theme.of(context).colorScheme.tertiary,
-          ),
-        ),
-        TextButton(
-          onPressed: onCurrentMonthClick,
-          child: Text(
-            currentMonthYear,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-          ),
-        ),
-        IconButton(
-          onPressed: onNextMonth,
-          icon: Icon(
-            Icons.keyboard_arrow_right,
-            color: Theme.of(context).colorScheme.tertiary,
-          ),
-        ),
-      ],
     );
   }
 }
@@ -250,23 +203,6 @@ class _IncomeExpenseColorBar extends StatelessWidget {
             ),
         ],
       ),
-    );
-  }
-}
-
-class _ChartNavigatorButton extends StatelessWidget {
-  const _ChartNavigatorButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      icon: Icon(Icons.pie_chart_outline),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ChartScreen()),
-        );
-      },
     );
   }
 }
