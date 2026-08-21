@@ -266,12 +266,16 @@ path of its file. Searching for it must land on the block.
 | 4 | Add category colors and their resolver | `PLAN/04-category-colors.md` | DONE |
 | 5 | Add the category label resolver | `PLAN/05-category-label-resolver.md` | DONE |
 | 6 | Extract `MonthSelector` and delete the chart button | `PLAN/06-month-selector-extraction.md` | DONE |
-| 7 | Make the pie chart data-driven | `PLAN/07-data-driven-pie-chart.md` | BLOCKED |
-| 8 | Rewrite `ChartScreen` as the landscape content | `PLAN/08-chart-screen.md` | TODO |
-| 9 | Choose the content by orientation in `MainScreen` | `PLAN/09-main-screen-orientation.md` | TODO |
-| 10 | Verify everything and remove the plan | `PLAN/10-cleanup.md` | TODO |
+| 7 | Make the pie chart data-driven and rewrite `ChartScreen` | `PLAN/07-data-driven-pie-chart.md` | TODO |
+| 8 | Choose the content by orientation in `MainScreen` | `PLAN/08-main-screen-orientation.md` | TODO |
+| 9 | Verify everything and remove the plan | `PLAN/09-cleanup.md` | TODO |
 
 Statuses: `TODO` → `DONE`, or `BLOCKED` (see §11 R12).
+
+History note: the original Blocks 7 (data-driven pie chart) and 8 (ChartScreen rewrite) were merged
+into the current Block 7 by human decision after the original split was unorderable (the new
+`ChartScreen` needs the new `PieChart` API and the old `ChartScreen` breaks under it — see
+`## Blocked` / Block 7 below). The original Blocks 9 and 10 are now Blocks 8 and 9.
 
 ## 13. Blocks
 
@@ -282,9 +286,8 @@ Statuses: `TODO` → `DONE`, or `BLOCKED` (see §11 R12).
 - `PLAN/05-category-label-resolver.md`
 - `PLAN/06-month-selector-extraction.md`
 - `PLAN/07-data-driven-pie-chart.md`
-- `PLAN/08-chart-screen.md`
-- `PLAN/09-main-screen-orientation.md`
-- `PLAN/10-cleanup.md`
+- `PLAN/08-main-screen-orientation.md`
+- `PLAN/09-cleanup.md`
 
 ## Blocked
 

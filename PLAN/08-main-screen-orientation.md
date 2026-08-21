@@ -1,6 +1,6 @@
-## BLOCK 9 — Choose the content by orientation in `MainScreen`
+## BLOCK 8 — Choose the content by orientation in `MainScreen`
 
-**Depends on:** BLOCK 8 committed
+**Depends on:** BLOCK 7 committed
 **Touches:** `lib/presentation/ui/screens/main_screen.dart` (MODIFY)
 
 ### Goal
@@ -142,7 +142,7 @@ exits 0 printing `✓ Built build/app/outputs/flutter-apk/app-debug.apk` after r
 4. After 2 failed attempts, follow §11 R12: mark this block `BLOCKED` in §12, append the exact failing output under `## Blocked` in `PLAN.md`, commit only `PLAN.md`, and stop.
 
 ### Commit
-1. Set BLOCK 9's row in §12 Status to `DONE`.
+1. Set BLOCK 8's row in §12 Status to `DONE`.
 2. Run:
    ```
    git add lib/presentation/ui/screens/main_screen.dart PLAN.md

@@ -1,6 +1,6 @@
-## BLOCK 10 — Verify the whole task and remove the plan
+## BLOCK 9 — Verify the whole task and remove the plan
 
-**Depends on:** BLOCK 9 committed
+**Depends on:** BLOCK 8 committed
 **Touches:** `PLAN.md` (deleted), `PLAN/` (deleted)
 
 ### Goal
