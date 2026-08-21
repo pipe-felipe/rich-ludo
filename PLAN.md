@@ -265,7 +265,7 @@ path of its file. Searching for it must land on the block.
 | 3 | Aggregate expenses by category in the ViewModel | `PLAN/03-viewmodel-aggregation.md` | DONE |
 | 4 | Add category colors and their resolver | `PLAN/04-category-colors.md` | DONE |
 | 5 | Add the category label resolver | `PLAN/05-category-label-resolver.md` | DONE |
-| 6 | Extract `MonthSelector` and delete the chart button | `PLAN/06-month-selector-extraction.md` | TODO |
+| 6 | Extract `MonthSelector` and delete the chart button | `PLAN/06-month-selector-extraction.md` | BLOCKED |
 | 7 | Make the pie chart data-driven | `PLAN/07-data-driven-pie-chart.md` | TODO |
 | 8 | Rewrite `ChartScreen` as the landscape content | `PLAN/08-chart-screen.md` | TODO |
 | 9 | Choose the content by orientation in `MainScreen` | `PLAN/09-main-screen-orientation.md` | TODO |
@@ -287,3 +287,41 @@ Statuses: `TODO` → `DONE`, or `BLOCKED` (see §11 R12).
 - `PLAN/10-cleanup.md`
 
 ## Blocked
+
+### Block 6
+
+Command (2nd in Verify, run exactly as written):
+
+```
+grep -c "_IncomeExpenseColorBar" lib/presentation/ui/widgets/main_top_bar.dart
+```
+
+Exact output:
+
+```
+3
+```
+
+The plan expected `2` (PLAN/06-month-selector-extraction.md, Verify). The count is a miscount in
+the plan, not a code defect: `_IncomeExpenseColorBar` appears on 3 lines — the usage in
+`MainTopBar.build`, the class declaration, and the constructor — and all 3 already existed before
+this block:
+
+```
+$ git show HEAD:lib/presentation/ui/widgets/main_top_bar.dart | grep -n "_IncomeExpenseColorBar"
+54:          _IncomeExpenseColorBar(
+211:class _IncomeExpenseColorBar extends StatelessWidget {
+215:  const _IncomeExpenseColorBar({
+```
+
+No edit within the block's **Touches** can make the count `2` without renaming the class or
+constructor, which the block's own **Do not** forbids ("Do not rename `_IncomeExpenseColorBar`")
+and which would also break §2's gate ("at least 2 lines"). Note that §2 line 33 requires only *at
+least* 2 lines, which 3 satisfies; only Block 6's prose expectation of exactly `2` is wrong.
+
+The other three Verify commands passed exactly as expected:
+`grep -n "_ChartNavigatorButton\|_MonthSelector\|chart_screen" ...` printed nothing (exit 1);
+`flutter test test/presentation/ui/widgets/main_top_bar_test.dart` printed `+6: All tests passed!`;
+`flutter analyze` printed `No issues found!`. Per §11 R12 the block's changes
+(`lib/presentation/ui/widgets/month_selector.dart` new, `lib/presentation/ui/widgets/main_top_bar.dart`
+modified) are left uncommitted in the working tree.
