@@ -64,7 +64,8 @@ grep -c "_IncomeExpenseColorBar" lib/presentation/ui/widgets/main_top_bar.dart
 flutter test test/presentation/ui/widgets/main_top_bar_test.dart
 flutter analyze
 ```
-Expected: the first command prints nothing and exits 1; the second prints `2`; the third exits 0
+Expected: the first command prints nothing and exits 1; the second prints `3` (the usage in
+`MainTopBar.build`, the class declaration and the constructor); the third exits 0
 and prints `+6: All tests passed!`; `flutter analyze` exits 0 printing `No issues found!`.
 
 ### If verification fails
