@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-08-21
+
+### Added
+- Landscape orientation now shows a pie chart of the selected month's expenses by category
+- `CategoryTotal` domain model and ViewModel aggregation of expenses grouped by category
+- Category chart colors and label resolution for the expense categories
+- Chart localization keys
+- E2E test covering the orientation-triggered chart
+
+### Changed
+- `MonthSelector` extracted from the main top bar, removing the old chart navigation button
+
 ## [2.1.2] - 2026-07-29
 
 ### Fixed
