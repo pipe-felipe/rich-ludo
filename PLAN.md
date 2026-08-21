@@ -19,9 +19,9 @@ constants in `lib/presentation/ui/theme/app_colors.dart`, resolved by
 
 Decided during planning, both by the user: (1) new test names are written in **English**
 (`test('should ...')`) to match the 172 existing tests and `docs/test-map.md:24`, and
-`AGENTS.md:50` is corrected to stop contradicting the codebase; (2) the local build gate is
-`flutter build bundle`, because `flutter build apk --debug` fails on this machine before any
-change — see §6.
+`AGENTS.md:50` is corrected to stop contradicting the codebase; (2) the build gate is
+`flutter build apk --debug`, the same command `docs/project-map.md:44` names — it was failing on
+this machine before planning and a Temurin JDK 17 was installed to unblock it, see §6.
 
 ## 2. Definition of done
 
@@ -45,7 +45,7 @@ Every item is checkable by running a named command or reading a named file.
 - An income pie chart, month-over-month comparison, time series, or category filters.
 - Any change to recurring visibility rules, exclusion rules, or `_computeSavingsCents()` in `lib/presentation/viewmodel/main_screen_viewmodel.dart`.
 - Any change under `android/` or `ios/`: orientation is already unlocked (`android/app/src/main/AndroidManifest.xml:17` declares `orientation` in `configChanges`; `ios/Runner/Info.plist` already lists both landscape orientations).
-- Installing a JDK, changing the Gradle wrapper, or fixing the pre-existing `flutter build apk` failure recorded in §6.
+- Changing the Gradle wrapper, the JDK setting, or anything else about the toolchain. The JDK was already fixed during planning (§6).
 - Updating `docs/project-map.md`, `docs/test-map.md`, `README.md`, `CHANGELOG.md`, or `pubspec.yaml`. The only documentation edit in this plan is the one-line `AGENTS.md:50` correction in BLOCK 3.
 - Adding colors for `IncomeCategory` — the chart shows expenses only.
 
@@ -74,8 +74,7 @@ list and never in the final block's gate list.
 | Format check | NONE FOUND | — |
 | Format write (`write-only`) | `dart format <paths>` | `docs/test-map.md:31` |
 | Localization codegen (`write-only`) | `flutter gen-l10n` | `l10n.yaml:1-3` |
-| Build (Dart compile, Gradle-free) | `flutter build bundle` | chosen in §1; verified passing in §6 |
-| Build (APK) | `flutter build apk --debug` — pre-existing failure, see §6 | `docs/project-map.md:44` |
+| Build | `flutter build apk --debug` | `docs/project-map.md:44` |
 | E2E | NONE FOUND | — |
 | Run the app | NONE FOUND (no emulator or device configured in this environment) | — |
 | CI gates, in order | `flutter pub get`, `flutter test`, `flutter build apk --release` | `.github/workflows/build-release.yml:97-115` |
@@ -90,19 +89,23 @@ list and never in the final block's gate list.
 | Analyze | `flutter analyze` | `No issues found!` |
 | Unit tests | `flutter test` | `172` passed, 0 failed |
 | Unit tests (ViewModel file) | `flutter test test/presentation/viewmodel/main_screen_viewmodel_test.dart` | `+27: All tests passed!` |
-| Build (bundle) | `flutter build bundle` | exits 0 |
-| Build (APK) | `flutter build apk --debug` | **FAILS** — see below |
+| Build | `flutter build apk --debug` | exits 0, `✓ Built build/app/outputs/flutter-apk/app-debug.apk` in ~60s |
 | L10n codegen | `flutter gen-l10n` | exits 0 and produces no diff; generated files are in sync with the `.arb` files |
+
+Environment note: `flutter build apk --debug` failed during planning with
+`java.lang.IllegalArgumentException: 25.0.2` from
+`org.jetbrains.kotlin.com.intellij.util.lang.JavaVersion.parse`, because the only JDK on this
+machine was OpenJDK 25.0.2 and Gradle 8.14's bundled Kotlin compiler cannot parse that version
+string. This was fixed **before** the plan was committed: Temurin JDK 17.0.20+8 was unpacked
+into `~/.jdks/jdk-17.0.20+8` and Flutter was pointed at it with `flutter config --jdk-dir`. The
+baseline above was recorded after that fix, and the build now matches CI, which uses Java 17
+(`.github/workflows/build-release.yml:86`). Do not change the JDK setting and do not reinstall
+anything; if `flutter build apk --debug` ever reports `IllegalArgumentException: 25.0.2` again,
+the JDK setting was lost — that is a stop condition (§11 R12), not something to work around.
 
 Known pre-existing failures:
 
-1. `flutter build apk --debug` fails with `java.lang.IllegalArgumentException: 25.0.2` thrown by
-   `org.jetbrains.kotlin.com.intellij.util.lang.JavaVersion.parse` during Kotlin DSL script
-   compilation. The only JDK on this machine is OpenJDK 25.0.2 and the bundled Kotlin compiler
-   cannot parse that version string. CI uses Java 17
-   (`.github/workflows/build-release.yml:86`) and is unaffected. **Do not attempt to fix this
-   and do not run this command**; `flutter build bundle` is the build gate instead.
-2. `dart format --output=none --set-exit-if-changed lib test` reports 8 already-unformatted
+1. `dart format --output=none --set-exit-if-changed lib test` reports 8 already-unformatted
    files: `lib/data/services/transaction_local_service.dart`,
    `lib/domain/usecase/get_non_recurring_balance_usecase.dart`, `lib/main.dart`,
    `lib/presentation/ui/widgets/chart/pie_chart.dart`,

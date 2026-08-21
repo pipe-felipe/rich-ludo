@@ -16,12 +16,13 @@ Prove the task is complete against §2, then remove the plan from the repository
    flutter pub get
    flutter analyze
    flutter test
-   flutter build bundle
+   flutter build apk --debug
    ```
    `flutter analyze` must print `No issues found!`. `flutter test` must print
-   `All tests passed!` with a count of at least `183`. `flutter build bundle` must exit 0.
-   Do **not** run `flutter build apk --debug`: §6 records it as failing on this machine before
-   any change in this plan, for a JDK reason this task cannot affect.
+   `All tests passed!` with a count of at least `183`. `flutter build apk --debug` must exit 0
+   and print `✓ Built build/app/outputs/flutter-apk/app-debug.apk`; it takes roughly 60 seconds.
+   If it instead fails with `IllegalArgumentException: 25.0.2`, the JDK 17 setting recorded in
+   §6 was lost: that is a stop condition (§11 R12), not something to work around.
 2. Confirm the localization sources are still in sync with the `.arb` files:
    ```
    flutter gen-l10n
@@ -39,7 +40,7 @@ Prove the task is complete against §2, then remove the plan from the repository
 
 ### Do not
 - Do not delete the plan if any check failed — that is a stop condition (§11 R12).
-- Do not fix a failure that §6 Baseline already recorded, including the `flutter build apk` JDK failure and the 8 pre-existing unformatted files.
+- Do not fix a failure that §6 Baseline already recorded, namely the 8 pre-existing unformatted files.
 - Do not run `dart format` across the repository in this block.
 - Do not push, tag, or open a pull request.
 
@@ -70,5 +71,4 @@ Nothing. The plan is finished. Report to the human:
 
 1. The branch name and the commit list from `git log --oneline a5c0c91..HEAD`.
 2. Every gate result from step 1.
-3. That `flutter build apk --debug` was deliberately not run, and why (§6 pre-existing failure 1); CI builds the APK with Java 17.
-4. That two manual checks remain and cannot be automated here: rotating a real device or emulator between portrait and landscape in **both** the light and the dark theme, and swiping to change the month **while in landscape**.
+3. That two manual checks remain and cannot be automated here: rotating a real device or emulator between portrait and landscape in **both** the light and the dark theme, and swiping to change the month **while in landscape**.

@@ -127,12 +127,13 @@ Run from the repository root, in this order:
 grep -n "MediaQuery.orientationOf\|if (isPortrait)" lib/presentation/ui/screens/main_screen.dart
 flutter test
 flutter analyze
-flutter build bundle
+flutter build apk --debug
 ```
 Expected: the first command prints exactly 3 lines — one `MediaQuery.orientationOf` assignment,
 one `if (isPortrait)` before `MainTopBar`, one `if (isPortrait)` before `Positioned`;
 `flutter test` exits 0 and prints `All tests passed!` with a count no lower than the previous
-block's; `flutter analyze` exits 0 printing `No issues found!`; `flutter build bundle` exits 0.
+block's; `flutter analyze` exits 0 printing `No issues found!`; `flutter build apk --debug`
+exits 0 printing `✓ Built build/app/outputs/flutter-apk/app-debug.apk` after roughly 60 seconds.
 
 ### If verification fails
 1. Read the failing output in full.
