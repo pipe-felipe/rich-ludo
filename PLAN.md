@@ -261,7 +261,7 @@ path of its file. Searching for it must land on the block.
 | # | Block | Where | Status |
 |---|---|---|---|
 | 1 | Add the three chart localization keys | `PLAN/01-l10n-keys.md` | DONE |
-| 2 | Add the `CategoryTotal` value object | `PLAN/02-category-total-model.md` | TODO |
+| 2 | Add the `CategoryTotal` value object | `PLAN/02-category-total-model.md` | DONE |
 | 3 | Aggregate expenses by category in the ViewModel | `PLAN/03-viewmodel-aggregation.md` | TODO |
 | 4 | Add category colors and their resolver | `PLAN/04-category-colors.md` | TODO |
 | 5 | Add the category label resolver | `PLAN/05-category-label-resolver.md` | TODO |
