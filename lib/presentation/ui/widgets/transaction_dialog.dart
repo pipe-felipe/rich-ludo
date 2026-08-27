@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../../domain/model/custom_category.dart';
 import '../../../domain/model/transaction_type.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../viewmodel/category_viewmodel.dart';
 import '../../viewmodel/transaction_form_viewmodel.dart';
 import '../utils/category_icon.dart';
 import '../utils/category_mapper.dart';
+import 'category_manager_dialog.dart';
+
+/// Value of the dropdown entry that opens [CategoryManagerDialog]. It is never
+/// stored: `_CategoryDropdown` turns it into a dialog instead of a selection.
+const String _newCategoryOptionValue = '__new_category__';
 
 class TransactionDialog extends StatelessWidget {
   final int selectedMonth;
@@ -22,6 +29,9 @@ class TransactionDialog extends StatelessWidget {
     return Consumer<TransactionFormViewModel>(
       builder: (context, viewModel, child) {
         final uiState = viewModel.uiState;
+        final customCategories = context
+            .watch<CategoryViewModel>()
+            .categoriesFor(uiState.transactionType);
 
         return Dialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 25),
@@ -65,6 +75,7 @@ class TransactionDialog extends StatelessWidget {
                 ),
                 _CategoryAndQuantityInput(
                   uiState: uiState,
+                  customCategories: customCategories,
                   onCategoryChange: viewModel.onCategoryChange,
                   onQuantityChange: viewModel.onQuantityChange,
                 ),
@@ -159,11 +170,13 @@ class _RadioOption extends StatelessWidget {
 
 class _CategoryAndQuantityInput extends StatelessWidget {
   final FormUiState uiState;
+  final List<CustomCategory> customCategories;
   final void Function(String) onCategoryChange;
   final void Function(String) onQuantityChange;
 
   const _CategoryAndQuantityInput({
     required this.uiState,
+    required this.customCategories,
     required this.onCategoryChange,
     required this.onQuantityChange,
   });
@@ -178,6 +191,7 @@ class _CategoryAndQuantityInput extends StatelessWidget {
         Expanded(
           child: _CategoryDropdown(
             transactionType: uiState.transactionType,
+            customCategories: customCategories,
             categorySlug: uiState.categorySlug,
             onCategoryChange: onCategoryChange,
           ),
@@ -245,28 +259,64 @@ List<_CategoryOption> _builtInOptions(
       .toList();
 }
 
-class _CategoryDropdown extends StatelessWidget {
+List<_CategoryOption> _customOptions(List<CustomCategory> categories) {
+  return categories
+      .map(
+        (category) => _CategoryOption(
+          slug: category.slug,
+          label: category.name,
+          icon: resolveCustomCategoryIcon(category.iconCodePoint),
+        ),
+      )
+      .toList();
+}
+
+class _CategoryDropdown extends StatefulWidget {
   final TransactionType transactionType;
+  final List<CustomCategory> customCategories;
   final String? categorySlug;
   final void Function(String) onCategoryChange;
 
   const _CategoryDropdown({
     required this.transactionType,
+    required this.customCategories,
     required this.categorySlug,
     required this.onCategoryChange,
   });
 
   @override
+  State<_CategoryDropdown> createState() => _CategoryDropdownState();
+}
+
+class _CategoryDropdownState extends State<_CategoryDropdown> {
+  // Picking the "new category" entry leaves that entry showing inside the
+  // form field, because DropdownButtonFormField keeps its own selection.
+  // Bumping this token changes the field's key, which rebuilds it from
+  // `initialValue` and drops the entry that was never a real choice.
+  int _resetToken = 0;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final options = _builtInOptions(transactionType, l10n);
+    final options = [
+      ..._builtInOptions(widget.transactionType, l10n),
+      ..._customOptions(widget.customCategories),
+      _CategoryOption(
+        slug: _newCategoryOptionValue,
+        label: l10n.categoryCreateNew,
+        icon: Icons.add,
+      ),
+    ];
     // A slug that is not among the options would trip the dropdown's own
-    // assertion, so an unknown one shows as nothing chosen.
-    final selected = options.any((option) => option.slug == categorySlug)
-        ? categorySlug
+    // assertion, so an unknown or deleted one shows as nothing chosen.
+    final selected =
+        widget.categorySlug != _newCategoryOptionValue &&
+            options.any((option) => option.slug == widget.categorySlug)
+        ? widget.categorySlug
         : null;
 
     return DropdownButtonFormField<String>(
+      key: ValueKey('$selected-$_resetToken'),
       initialValue: selected,
       isExpanded: true,
       decoration: InputDecoration(
@@ -298,8 +348,25 @@ class _CategoryDropdown extends StatelessWidget {
           ),
         );
       }).toList(),
-      onChanged: (value) {
-        if (value != null) onCategoryChange(value);
+      onChanged: (value) async {
+        if (value == null) return;
+
+        if (value != _newCategoryOptionValue) {
+          widget.onCategoryChange(value);
+          return;
+        }
+
+        final createdSlug = await CategoryManagerDialog.show(
+          context,
+          widget.transactionType,
+        );
+
+        if (createdSlug != null) {
+          widget.onCategoryChange(createdSlug);
+        }
+        if (mounted) {
+          setState(() => _resetToken++);
+        }
       },
     );
   }
