@@ -12,6 +12,22 @@ class DatabaseHelper {
 
   DatabaseHelper.forTesting(Database database) : _injectedDatabase = database;
 
+  /// DDL of the `categories` table introduced in database version 3.
+  /// `IF NOT EXISTS` is what makes the v3 migration idempotent.
+  static const String _createCategoriesTable =
+      '''
+      CREATE TABLE IF NOT EXISTS ${DatabaseConfig.categoriesTableName} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT NOT NULL,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL,
+        iconCodePoint INTEGER NOT NULL,
+        colorValue INTEGER NOT NULL,
+        createdAt INTEGER NOT NULL DEFAULT 0,
+        UNIQUE (slug, type)
+      )
+      ''';
+
   Future<Database> get database async {
     if (_injectedDatabase != null) return _injectedDatabase;
     if (_database != null) return _database!;
@@ -61,11 +77,15 @@ class DatabaseHelper {
         FOREIGN KEY (transactionId) REFERENCES ${DatabaseConfig.tableName} (id) ON DELETE CASCADE
       )
     ''');
+    await db.execute(_createCategoriesTable);
   }
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await _migrateToV2(db);
+    }
+    if (oldVersion < 3) {
+      await _migrateToV3(db);
     }
   }
 
@@ -104,6 +124,14 @@ class DatabaseHelper {
     }
   }
 
+  /// Adds the `categories` table. This migration only creates a table: it never
+  /// reads, writes or deletes a row of `${DatabaseConfig.tableName}` or of
+  /// `${DatabaseConfig.exclusionsTableName}`, so an existing database keeps
+  /// every transaction the user already saved.
+  Future<void> _migrateToV3(Database db) async {
+    await db.execute(_createCategoriesTable);
+  }
+
   Future<void> validateAndMigrateIfNeeded() async {
     final db = await database;
 
@@ -113,6 +141,9 @@ class DatabaseHelper {
     if (currentVersion < DatabaseConfig.databaseVersion) {
       if (currentVersion < 2) {
         await _migrateToV2(db);
+      }
+      if (currentVersion < 3) {
+        await _migrateToV3(db);
       }
 
       await db.execute(

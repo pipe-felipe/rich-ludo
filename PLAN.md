@@ -265,7 +265,7 @@ path of its file. Searching for it must land on the block.
 
 | # | Block | Where | Status |
 |---|---|---|---|
-| 1 | Add the `categories` table and the v3 migration | `PLAN/01-schema-v3.md` | TODO |
+| 1 | Add the `categories` table and the v3 migration | `PLAN/01-schema-v3.md` | DONE |
 | 2 | Add the `CustomCategory` model and its mapper | `PLAN/02-model.md` | TODO |
 | 3 | Add `CategoryService` and `CategoryLocalService` | `PLAN/03-service.md` | TODO |
 | 4 | Add `CategoryRepository` and `CategoryRepositoryImpl` | `PLAN/04-repository.md` | TODO |
