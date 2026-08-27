@@ -269,7 +269,7 @@ path of its file. Searching for it must land on the block.
 | 2 | Add the `CustomCategory` model and its mapper | `PLAN/02-model.md` | DONE |
 | 3 | Add `CategoryService` and `CategoryLocalService` | `PLAN/03-service.md` | DONE |
 | 4 | Add `CategoryRepository` and `CategoryRepositoryImpl` | `PLAN/04-repository.md` | DONE |
-| 5 | Add the three category use cases | `PLAN/05-usecases.md` | TODO |
+| 5 | Add the three category use cases | `PLAN/05-usecases.md` | DONE |
 | 6 | Add `CategoryViewModel` and wire it in `main.dart` | `PLAN/06-viewmodel-di.md` | TODO |
 | 7 | Add the category localization keys | `PLAN/07-l10n.md` | TODO |
 | 8 | Resolve icon, color and label for user-created slugs | `PLAN/08-resolution.md` | TODO |
