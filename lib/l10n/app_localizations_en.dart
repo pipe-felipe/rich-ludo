@@ -172,4 +172,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chartTotalExpense => 'Total expenses';
+
+  @override
+  String get categoryCreateNew => 'New category';
+
+  @override
+  String get categoryManagerTitle => 'Categories';
+
+  @override
+  String get categoryNameLabel => 'Name';
+
+  @override
+  String get categoryIconLabel => 'Icon';
+
+  @override
+  String get categoryColorLabel => 'Color';
+
+  @override
+  String get categorySave => 'Save';
+
+  @override
+  String get categoryMineTitle => 'Your categories';
+
+  @override
+  String get categoryEmpty => 'You have not created any category yet';
+
+  @override
+  String get categoryDeleteTooltip => 'Delete category';
+
+  @override
+  String get categoryErrorEmptyName => 'Enter a name';
+
+  @override
+  String get categoryErrorNameTooLong => 'Name too long (30 characters max)';
+
+  @override
+  String get categoryErrorDuplicateName =>
+      'A category with this name already exists';
+
+  @override
+  String get categoryErrorSaveFailed => 'Could not save the category';
+
+  @override
+  String categoryDeleteInUse(int count) {
+    return '$count transactions use this category. It cannot be deleted.';
+  }
 }

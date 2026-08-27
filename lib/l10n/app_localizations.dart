@@ -429,6 +429,90 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Total de despesas'**
   String get chartTotalExpense;
+
+  /// No description provided for @categoryCreateNew.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nova categoria'**
+  String get categoryCreateNew;
+
+  /// No description provided for @categoryManagerTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Categorias'**
+  String get categoryManagerTitle;
+
+  /// No description provided for @categoryNameLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome'**
+  String get categoryNameLabel;
+
+  /// No description provided for @categoryIconLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Ícone'**
+  String get categoryIconLabel;
+
+  /// No description provided for @categoryColorLabel.
+  ///
+  /// In pt, this message translates to:
+  /// **'Cor'**
+  String get categoryColorLabel;
+
+  /// No description provided for @categorySave.
+  ///
+  /// In pt, this message translates to:
+  /// **'Salvar'**
+  String get categorySave;
+
+  /// No description provided for @categoryMineTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Suas categorias'**
+  String get categoryMineTitle;
+
+  /// No description provided for @categoryEmpty.
+  ///
+  /// In pt, this message translates to:
+  /// **'Você ainda não criou nenhuma categoria'**
+  String get categoryEmpty;
+
+  /// No description provided for @categoryDeleteTooltip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Excluir categoria'**
+  String get categoryDeleteTooltip;
+
+  /// No description provided for @categoryErrorEmptyName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Informe um nome'**
+  String get categoryErrorEmptyName;
+
+  /// No description provided for @categoryErrorNameTooLong.
+  ///
+  /// In pt, this message translates to:
+  /// **'Nome muito longo (máximo 30 caracteres)'**
+  String get categoryErrorNameTooLong;
+
+  /// No description provided for @categoryErrorDuplicateName.
+  ///
+  /// In pt, this message translates to:
+  /// **'Já existe uma categoria com esse nome'**
+  String get categoryErrorDuplicateName;
+
+  /// No description provided for @categoryErrorSaveFailed.
+  ///
+  /// In pt, this message translates to:
+  /// **'Não foi possível salvar a categoria'**
+  String get categoryErrorSaveFailed;
+
+  /// No description provided for @categoryDeleteInUse.
+  ///
+  /// In pt, this message translates to:
+  /// **'{count} transações usam esta categoria. Não é possível excluir.'**
+  String categoryDeleteInUse(int count);
 }
 
 class _AppLocalizationsDelegate
