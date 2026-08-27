@@ -74,4 +74,22 @@ class CategoryPiColors {
   static const hygiene = Color(0xFF00ACC1);
   static const care = Color(0xFF7CB342);
   static const uncategorized = Color(0xFF757575);
+
+  /// Colors offered when the user creates a category. Material 800 tones,
+  /// distinct from the nine built-in slice colors above and dark enough for
+  /// the white slice labels.
+  static const List<Color> customPalette = [
+    Color(0xFFC62828),
+    Color(0xFFAD1457),
+    Color(0xFF6A1B9A),
+    Color(0xFF4527A0),
+    Color(0xFF283593),
+    Color(0xFF1565C0),
+    Color(0xFF00838F),
+    Color(0xFF00695C),
+    Color(0xFF2E7D32),
+    Color(0xFF558B2F),
+    Color(0xFFEF6C00),
+    Color(0xFF4E342E),
+  ];
 }

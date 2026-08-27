@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rich_ludo/domain/model/custom_category.dart';
+import 'package:rich_ludo/domain/model/transaction_type.dart';
 import 'package:rich_ludo/presentation/ui/theme/app_colors.dart';
 import 'package:rich_ludo/presentation/ui/utils/category_color.dart';
 import 'package:rich_ludo/presentation/viewmodel/transaction_form_viewmodel.dart';
@@ -54,5 +56,46 @@ void main() {
         equals(CategoryPiColors.uncategorized),
       );
     });
+  });
+
+  group('CategoryPiColors.customPalette', () {
+    test('should offer 12 colors', () {
+      expect(CategoryPiColors.customPalette, hasLength(12));
+    });
+
+    test('should give every entry a distinct value', () {
+      expect(CategoryPiColors.customPalette.toSet(), hasLength(12));
+    });
+  });
+
+  group('getExpenseCategoryColor with user-created categories', () {
+    const custom = CustomCategory(
+      id: 1,
+      slug: 'custom_mercado',
+      name: 'Mercado',
+      type: TransactionType.expense,
+      iconCodePoint: 0xe59c,
+      colorValue: 0xFFC62828,
+    );
+
+    test('should return the stored color for a user-created slug', () {
+      expect(
+        getExpenseCategoryColor(
+          'custom_mercado',
+          customCategories: const [custom],
+        ),
+        equals(const Color(0xFFC62828)),
+      );
+    });
+
+    test(
+      'should still resolve a built-in name when a custom list is given',
+      () {
+        expect(
+          getExpenseCategoryColor('food', customCategories: const [custom]),
+          equals(ExpenseCategory.food.color),
+        );
+      },
+    );
   });
 }
