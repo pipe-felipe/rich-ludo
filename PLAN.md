@@ -277,7 +277,7 @@ path of its file. Searching for it must land on the block.
 | 10 | Add `CategoryManagerDialog` | `PLAN/10-manager-dialog.md` | DONE |
 | 11 | Offer user-created categories in the transaction dropdown | `PLAN/11-dropdown-wiring.md` | DONE |
 | 12 | Pass the user-created categories to the list and the chart | `PLAN/12-widget-threading.md` | DONE |
-| 13 | Update the documentation and the changelog | `PLAN/13-docs.md` | TODO |
+| 13 | Update the documentation and the changelog | `PLAN/13-docs.md` | DONE |
 | 14 | Verify everything and remove the plan | `PLAN/14-cleanup.md` | TODO |
 
 Statuses: `TODO` → `DONE`, or `BLOCKED` (see §11 R12).

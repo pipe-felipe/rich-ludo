@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Custom categories: create a category with its own name, icon and color from the `Nova categoria` entry of the transaction dialog
+- Delete a custom category from the same dialog; the deletion is refused while any transaction still uses it, and the dialog reports how many
+- `categories` table in database version 3, with a v2 to v3 migration that creates the table and touches no existing row
+- `CustomCategory` model, `CategoryLocalService`, `CategoryRepositoryImpl`, three category use cases and `CategoryViewModel`
+- Localization keys for the category manager in Portuguese, English and Spanish
+
+### Changed
+- The transaction category dropdown is now a single slug-based dropdown listing the built-in categories, the user's categories and the `Nova categoria` entry
+- `FormUiState` holds one `categorySlug` instead of separate `expenseCategory` and `incomeCategory` fields, and clears it when the transaction type changes
+- The transaction list and the expenses-by-category chart resolve a user-created slug to its stored icon, color and name
+
 ## [2.2.0] - 2026-08-21
 
 ### Added

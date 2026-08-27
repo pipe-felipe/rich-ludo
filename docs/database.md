@@ -4,7 +4,7 @@
 
 - **Engine:** SQLite via `sqflite` package
 - **File:** `rich_ludo.db`
-- **Current version:** 2
+- **Current version:** 3
 - **Config centralized in:** `lib/config/database_config.dart`
 
 ---
@@ -38,6 +38,27 @@ Stores specific months that were removed from a recurring transaction (without d
 | `transactionId` | INTEGER | NOT NULL, FK → `transactions(id)` ON DELETE CASCADE              | Affected recurring transaction |
 | `month`         | INTEGER | NOT NULL                                                         | Excluded month (1-12)          |
 | `year`          | INTEGER | NOT NULL                                                         | Excluded year                  |
+
+### `categories`
+
+Stores only the categories the user created. The 13 built-in categories stay as the
+`ExpenseCategory` and `IncomeCategory` enums in
+`lib/presentation/viewmodel/transaction_form_viewmodel.dart` and are never rows here.
+
+| Column          | Type    | Constraint                | Description                                              |
+|-----------------|---------|---------------------------|----------------------------------------------------------|
+| `id`            | INTEGER | PRIMARY KEY AUTOINCREMENT | Unique identifier                                        |
+| `slug`          | TEXT    | NOT NULL                  | Value written to `transactions.category`, always prefixed `custom_` |
+| `name`          | TEXT    | NOT NULL                  | Display name typed by the user, up to 30 characters      |
+| `type`          | TEXT    | NOT NULL                  | `'income'` or `'expense'`                                |
+| `iconCodePoint` | INTEGER | NOT NULL                  | Code point of an entry of `customCategoryIcons`          |
+| `colorValue`    | INTEGER | NOT NULL                  | ARGB value of an entry of `CategoryPiColors.customPalette` |
+| `createdAt`     | INTEGER | NOT NULL DEFAULT 0        | Epoch millis, 0 for a row inserted from the dialog       |
+|                 |         | UNIQUE (`slug`, `type`)   | One name per type; the same name may exist for both types |
+
+The `custom_` prefix is what keeps a user-created slug out of the built-in namespace: a
+database written before version 3 keeps resolving `'food'` or `'salary'` to its built-in
+category, and no existing row is rewritten.
 
 ---
 
@@ -73,6 +94,26 @@ CREATE TABLE recurring_exclusions (
 );
 ```
 
+### Migration (v2 → v3 on update)
+
+`_migrateToV3` creates one table and nothing else. It never reads, writes or deletes a row
+of `transactions` or `recurring_exclusions`, which is why an update cannot lose data.
+`CREATE TABLE IF NOT EXISTS` is what makes it idempotent.
+
+```sql
+-- Added in v3
+CREATE TABLE IF NOT EXISTS categories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  slug TEXT NOT NULL,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL,
+  iconCodePoint INTEGER NOT NULL,
+  colorValue INTEGER NOT NULL,
+  createdAt INTEGER NOT NULL DEFAULT 0,
+  UNIQUE (slug, type)
+);
+```
+
 ### Backup Import Compatibility
 
 When importing a backup from an older version (v1), the `reopenDatabase()` method automatically calls `validateAndMigrateIfNeeded()` which:
@@ -100,6 +141,24 @@ TransactionRepositoryImpl (implements TransactionRepository)
     ↓
 ViewModels
 ```
+
+### Category path
+
+```
+DatabaseHelper (singleton, manages connection)
+    ↓
+CategoryLocalService (implements CategoryService)
+    ↓
+CategoryRepositoryImpl (implements CategoryRepository)
+    ↓
+    GetCustomCategoriesUseCase, CreateCustomCategoryUseCase, DeleteCustomCategoryUseCase
+    ↓
+CategoryViewModel
+```
+
+`DeleteCustomCategoryUseCase` also reads `TransactionRepository.getTransactions()` to count
+the transactions that carry the category. It refuses the deletion while that count is above
+zero, so a stored transaction can never point at a category the user can no longer see.
 
 ### `TransactionLocalService` (`lib/data/services/transaction_local_service.dart`)
 

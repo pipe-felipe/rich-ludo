@@ -98,6 +98,7 @@ lib/
 - ✅ Calculate totals for income, expenses, and savings
 - ✅ Support for recurring transactions
 - ✅ Expense and income categories
+- ✅ Custom categories created by the user, with their own name, icon and color
 - ✅ Local persistence with SQLite
 - ✅ Automatic light/dark theme
 - ✅ Localization in Portuguese

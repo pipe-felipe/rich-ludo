@@ -5,15 +5,16 @@
 `lib/main.dart` creates the dependency graph with `Provider`:
 
 ```text
-TransactionLocalService
-        ↓
-TransactionRepositoryImpl
-        ↓
-Use cases
-        ↓
-MainScreenViewModel / TransactionFormViewModel
-        ↓
-MainScreen
+TransactionLocalService          CategoryLocalService
+        ↓                                ↓
+TransactionRepositoryImpl        CategoryRepositoryImpl
+        ↓                                ↓
+     Use cases                        Use cases
+        ↓                                ↓
+MainScreenViewModel /              CategoryViewModel
+TransactionFormViewModel                 ↓
+        ↓                                ↓
+                    MainScreen
 ```
 
 The app starts at `MainScreen` and uses a singleton `DatabaseHelper` for SQLite.
@@ -28,8 +29,12 @@ The app starts at `MainScreen` and uses a singleton `DatabaseHelper` for SQLite.
 | Repository | `lib/data/repository/transaction_repository_impl.dart` | Delegates domain operations to services |
 | Main state | `lib/presentation/viewmodel/main_screen_viewmodel.dart` | Monthly cache, filtering, totals, navigation |
 | Form state | `lib/presentation/viewmodel/transaction_form_viewmodel.dart` | Form validation and transaction creation |
+| Category data | `lib/data/services/category_local_service.dart` | SQLite reads and writes of the `categories` table |
+| Category rules | `lib/domain/usecase/create_custom_category_usecase.dart`, `lib/domain/usecase/delete_custom_category_usecase.dart` | Name validation and the refusal to delete a category still in use |
+| Category state | `lib/presentation/viewmodel/category_viewmodel.dart` | The user-created categories, and creating and deleting them |
 | Main UI | `lib/presentation/ui/screens/main_screen.dart` | Binds ViewModels to widgets |
 | Top bar | `lib/presentation/ui/widgets/main_top_bar.dart` | Renders month selector, summaries, and ratio bar |
+| Category UI | `lib/presentation/ui/widgets/category_manager_dialog.dart` | Creating and deleting the user's categories |
 
 ## Important non-authoritative path
 
