@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../domain/model/custom_category.dart';
 import '../../../domain/model/transaction.dart';
 import '../../../domain/model/transaction_type.dart';
 import '../theme/app_theme.dart';
@@ -8,11 +9,13 @@ import '../utils/money_formatter.dart';
 
 class TransactionCard extends StatelessWidget {
   final Transaction item;
+  final List<CustomCategory> customCategories;
   final VoidCallback onDelete;
 
   const TransactionCard({
     super.key,
     required this.item,
+    this.customCategories = const [],
     required this.onDelete,
   });
 
@@ -36,6 +39,7 @@ class TransactionCard extends StatelessWidget {
           children: [
             _CategoryIcon(
               category: item.category,
+              customCategories: customCategories,
               isIncome: _isIncome,
               iconColor: iconColor,
             ),
@@ -58,11 +62,13 @@ class TransactionCard extends StatelessWidget {
 
 class _CategoryIcon extends StatelessWidget {
   final String? category;
+  final List<CustomCategory> customCategories;
   final bool isIncome;
   final Color iconColor;
 
   const _CategoryIcon({
     required this.category,
+    required this.customCategories,
     required this.isIncome,
     required this.iconColor,
   });
@@ -76,7 +82,11 @@ class _CategoryIcon extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Icon(
-        getCategoryIcon(category, isIncome: isIncome),
+        getCategoryIcon(
+          category,
+          isIncome: isIncome,
+          customCategories: customCategories,
+        ),
         size: 24,
         color: iconColor,
       ),

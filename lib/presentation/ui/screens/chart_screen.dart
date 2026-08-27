@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../domain/model/category_total.dart';
+import '../../../domain/model/custom_category.dart';
 import '../../../l10n/app_localizations.dart';
 import '../widgets/chart/pie_chart.dart';
 import '../widgets/month_selector.dart';
@@ -10,6 +11,7 @@ import '../widgets/month_selector.dart';
 class ChartScreen extends StatelessWidget {
   final List<CategoryTotal> categoryTotals;
   final int totalExpenseCents;
+  final List<CustomCategory> customCategories;
   final String totalExpenseText;
   final String currentMonthYear;
   final VoidCallback onPreviousMonth;
@@ -20,6 +22,7 @@ class ChartScreen extends StatelessWidget {
     super.key,
     required this.categoryTotals,
     required this.totalExpenseCents,
+    this.customCategories = const [],
     required this.totalExpenseText,
     required this.currentMonthYear,
     required this.onPreviousMonth,
@@ -49,6 +52,7 @@ class ChartScreen extends StatelessWidget {
                   child: PieChart(
                     categoryTotals: categoryTotals,
                     totalExpenseCents: totalExpenseCents,
+                    customCategories: customCategories,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -67,6 +71,7 @@ class ChartScreen extends StatelessWidget {
                         child: CategoryLegend(
                           categoryTotals: categoryTotals,
                           totalExpenseCents: totalExpenseCents,
+                          customCategories: customCategories,
                         ),
                       ),
                     ],

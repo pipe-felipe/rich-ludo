@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rich_ludo/domain/model/category_total.dart';
+import 'package:rich_ludo/domain/model/custom_category.dart';
+import 'package:rich_ludo/domain/model/transaction_type.dart';
 import 'package:rich_ludo/l10n/app_localizations.dart';
 import 'package:rich_ludo/presentation/ui/screens/chart_screen.dart';
 import 'package:rich_ludo/presentation/ui/theme/app_theme.dart';
@@ -12,6 +14,7 @@ void main() {
     required int totalExpenseCents,
     required String totalExpenseText,
     required String currentMonthYear,
+    List<CustomCategory> customCategories = const [],
     VoidCallback onPreviousMonth = _noop,
     VoidCallback onNextMonth = _noop,
     VoidCallback onCurrentMonthClick = _noop,
@@ -33,6 +36,7 @@ void main() {
             totalExpenseCents: totalExpenseCents,
             totalExpenseText: totalExpenseText,
             currentMonthYear: currentMonthYear,
+            customCategories: customCategories,
             onPreviousMonth: onPreviousMonth,
             onNextMonth: onNextMonth,
             onCurrentMonthClick: onCurrentMonthClick,
@@ -117,6 +121,34 @@ void main() {
       await tester.pump();
 
       expect(previousMonthCalled, isTrue);
+    });
+  });
+
+  group('ChartScreen with user-created categories', () {
+    testWidgets('should forward the list so the legend shows the stored name', (
+      tester,
+    ) async {
+      await pumpChartScreen(
+        tester,
+        categoryTotals: const [
+          CategoryTotal(category: 'custom_mercado', amountCents: 5000),
+        ],
+        totalExpenseCents: 5000,
+        totalExpenseText: 'R\$ 50.00',
+        currentMonthYear: 'Agosto 2026',
+        customCategories: const [
+          CustomCategory(
+            id: 1,
+            slug: 'custom_mercado',
+            name: 'Mercado',
+            type: TransactionType.expense,
+            iconCodePoint: 0xe59c,
+            colorValue: 0xFFC62828,
+          ),
+        ],
+      );
+
+      expect(find.text('Mercado'), findsOneWidget);
     });
   });
 }

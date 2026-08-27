@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../domain/model/custom_category.dart';
 import '../../../domain/model/transaction.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/result.dart';
+import '../../viewmodel/category_viewmodel.dart';
 import '../../viewmodel/main_screen_viewmodel.dart';
 import '../../viewmodel/transaction_form_viewmodel.dart';
 import 'chart_screen.dart';
@@ -30,6 +32,7 @@ class MainScreen extends StatelessWidget {
           viewModel.currentMonth,
           viewModel.currentYear,
         );
+        final customCategories = context.watch<CategoryViewModel>().categories;
         return Scaffold(
           body: SafeArea(
             child: Stack(
@@ -60,10 +63,14 @@ class MainScreen extends StatelessWidget {
                         ),
                       Expanded(
                         child: isPortrait
-                            ? _TransactionContent(viewModel: viewModel)
+                            ? _TransactionContent(
+                                viewModel: viewModel,
+                                customCategories: customCategories,
+                              )
                             : _ChartContent(
                                 viewModel: viewModel,
                                 currentMonthYear: currentMonthYear,
+                                customCategories: customCategories,
                               ),
                       ),
                     ],
@@ -204,8 +211,12 @@ class MainScreen extends StatelessWidget {
 
 class _TransactionContent extends StatelessWidget {
   final MainScreenViewModel viewModel;
+  final List<CustomCategory> customCategories;
 
-  const _TransactionContent({required this.viewModel});
+  const _TransactionContent({
+    required this.viewModel,
+    required this.customCategories,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -226,6 +237,7 @@ class _TransactionContent extends StatelessWidget {
 
         return TransactionList(
           items: viewModel.items,
+          customCategories: customCategories,
           onDelete: (transaction) => _handleDelete(context, transaction),
         );
       },
@@ -250,10 +262,12 @@ class _TransactionContent extends StatelessWidget {
 class _ChartContent extends StatelessWidget {
   final MainScreenViewModel viewModel;
   final String currentMonthYear;
+  final List<CustomCategory> customCategories;
 
   const _ChartContent({
     required this.viewModel,
     required this.currentMonthYear,
+    required this.customCategories,
   });
 
   @override
@@ -276,6 +290,7 @@ class _ChartContent extends StatelessWidget {
         return ChartScreen(
           categoryTotals: viewModel.expenseByCategory,
           totalExpenseCents: viewModel.totalExpenseCents,
+          customCategories: customCategories,
           totalExpenseText: viewModel.totalExpenseText,
           currentMonthYear: currentMonthYear,
           onPreviousMonth: viewModel.goToPreviousMonth,
