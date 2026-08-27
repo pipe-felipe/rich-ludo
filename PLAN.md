@@ -273,7 +273,7 @@ path of its file. Searching for it must land on the block.
 | 6 | Add `CategoryViewModel` and wire it in `main.dart` | `PLAN/06-viewmodel-di.md` | DONE |
 | 7 | Add the category localization keys | `PLAN/07-l10n.md` | DONE |
 | 8 | Resolve icon, color and label for user-created slugs | `PLAN/08-resolution.md` | DONE |
-| 9 | Replace the two form category fields with one slug | `PLAN/09-form-slug.md` | TODO |
+| 9 | Replace the two form category fields with one slug | `PLAN/09-form-slug.md` | DONE |
 | 10 | Add `CategoryManagerDialog` | `PLAN/10-manager-dialog.md` | TODO |
 | 11 | Offer user-created categories in the transaction dropdown | `PLAN/11-dropdown-wiring.md` | TODO |
 | 12 | Pass the user-created categories to the list and the chart | `PLAN/12-widget-threading.md` | TODO |

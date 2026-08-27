@@ -65,8 +65,7 @@ class TransactionDialog extends StatelessWidget {
                 ),
                 _CategoryAndQuantityInput(
                   uiState: uiState,
-                  onExpenseCategoryChange: viewModel.onExpenseCategoryChange,
-                  onIncomeCategoryChange: viewModel.onIncomeCategoryChange,
+                  onCategoryChange: viewModel.onCategoryChange,
                   onQuantityChange: viewModel.onQuantityChange,
                 ),
                 const SizedBox(height: 8),
@@ -160,14 +159,12 @@ class _RadioOption extends StatelessWidget {
 
 class _CategoryAndQuantityInput extends StatelessWidget {
   final FormUiState uiState;
-  final void Function(ExpenseCategory) onExpenseCategoryChange;
-  final void Function(IncomeCategory) onIncomeCategoryChange;
+  final void Function(String) onCategoryChange;
   final void Function(String) onQuantityChange;
 
   const _CategoryAndQuantityInput({
     required this.uiState,
-    required this.onExpenseCategoryChange,
-    required this.onIncomeCategoryChange,
+    required this.onCategoryChange,
     required this.onQuantityChange,
   });
 
@@ -181,10 +178,8 @@ class _CategoryAndQuantityInput extends StatelessWidget {
         Expanded(
           child: _CategoryDropdown(
             transactionType: uiState.transactionType,
-            expenseCategory: uiState.expenseCategory,
-            incomeCategory: uiState.incomeCategory,
-            onExpenseCategoryChange: onExpenseCategoryChange,
-            onIncomeCategoryChange: onIncomeCategoryChange,
+            categorySlug: uiState.categorySlug,
+            onCategoryChange: onCategoryChange,
           ),
         ),
         const SizedBox(width: 8),
@@ -209,106 +204,104 @@ class _CategoryAndQuantityInput extends StatelessWidget {
   }
 }
 
+/// One entry of the category dropdown: the value stored in
+/// `transactions.category`, the text shown, and the icon shown beside it.
+class _CategoryOption {
+  final String slug;
+  final String label;
+  final IconData icon;
+
+  const _CategoryOption({
+    required this.slug,
+    required this.label,
+    required this.icon,
+  });
+}
+
+List<_CategoryOption> _builtInOptions(
+  TransactionType type,
+  AppLocalizations l10n,
+) {
+  if (type == TransactionType.expense) {
+    return ExpenseCategory.values
+        .map(
+          (category) => _CategoryOption(
+            slug: category.name,
+            label: mapExpenseCategory(category, l10n),
+            icon: category.icon,
+          ),
+        )
+        .toList();
+  }
+
+  return IncomeCategory.values
+      .map(
+        (category) => _CategoryOption(
+          slug: category.name,
+          label: mapIncomeCategory(category, l10n),
+          icon: category.icon,
+        ),
+      )
+      .toList();
+}
+
 class _CategoryDropdown extends StatelessWidget {
   final TransactionType transactionType;
-  final ExpenseCategory? expenseCategory;
-  final IncomeCategory? incomeCategory;
-  final void Function(ExpenseCategory) onExpenseCategoryChange;
-  final void Function(IncomeCategory) onIncomeCategoryChange;
+  final String? categorySlug;
+  final void Function(String) onCategoryChange;
 
   const _CategoryDropdown({
     required this.transactionType,
-    required this.expenseCategory,
-    required this.incomeCategory,
-    required this.onExpenseCategoryChange,
-    required this.onIncomeCategoryChange,
+    required this.categorySlug,
+    required this.onCategoryChange,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final options = _builtInOptions(transactionType, l10n);
+    // A slug that is not among the options would trip the dropdown's own
+    // assertion, so an unknown one shows as nothing chosen.
+    final selected = options.any((option) => option.slug == categorySlug)
+        ? categorySlug
+        : null;
 
-    if (transactionType == TransactionType.expense) {
-      return DropdownButtonFormField<ExpenseCategory>(
-        initialValue: expenseCategory,
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: l10n.formCategoryLabel,
-          border: const OutlineInputBorder(),
-        ),
-        selectedItemBuilder: (context) {
-          return ExpenseCategory.values.map((category) {
-            return Row(
-              children: [
-                Icon(category.icon, size: 18),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    mapExpenseCategory(category, l10n),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            );
-          }).toList();
-        },
-        items: ExpenseCategory.values.map((category) {
-          return DropdownMenuItem(
-            value: category,
-            child: Row(
-              children: [
-                Icon(category.icon, size: 18),
-                const SizedBox(width: 6),
-                Text(mapExpenseCategory(category, l10n)),
-              ],
-            ),
+    return DropdownButtonFormField<String>(
+      initialValue: selected,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: l10n.formCategoryLabel,
+        border: const OutlineInputBorder(),
+      ),
+      selectedItemBuilder: (context) {
+        return options.map((option) {
+          return Row(
+            children: [
+              Icon(option.icon, size: 18),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(option.label, overflow: TextOverflow.ellipsis),
+              ),
+            ],
           );
-        }).toList(),
-        onChanged: (value) {
-          if (value != null) onExpenseCategoryChange(value);
-        },
-      );
-    } else {
-      return DropdownButtonFormField<IncomeCategory>(
-        initialValue: incomeCategory,
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: l10n.formCategoryLabel,
-          border: const OutlineInputBorder(),
-        ),
-        selectedItemBuilder: (context) {
-          return IncomeCategory.values.map((category) {
-            return Row(
-              children: [
-                Icon(category.icon, size: 18),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    mapIncomeCategory(category, l10n),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            );
-          }).toList();
-        },
-        items: IncomeCategory.values.map((category) {
-          return DropdownMenuItem(
-            value: category,
-            child: Row(
-              children: [
-                Icon(category.icon, size: 18),
-                const SizedBox(width: 6),
-                Text(mapIncomeCategory(category, l10n)),
-              ],
-            ),
-          );
-        }).toList(),
-        onChanged: (value) {
-          if (value != null) onIncomeCategoryChange(value);
-        },
-      );
-    }
+        }).toList();
+      },
+      items: options.map((option) {
+        return DropdownMenuItem(
+          value: option.slug,
+          child: Row(
+            children: [
+              Icon(option.icon, size: 18),
+              const SizedBox(width: 6),
+              Text(option.label),
+            ],
+          ),
+        );
+      }).toList(),
+      onChanged: (value) {
+        if (value != null) onCategoryChange(value);
+      },
+    );
   }
 }
 
