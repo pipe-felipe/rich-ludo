@@ -268,7 +268,7 @@ path of its file. Searching for it must land on the block.
 | 1 | Add the `categories` table and the v3 migration | `PLAN/01-schema-v3.md` | DONE |
 | 2 | Add the `CustomCategory` model and its mapper | `PLAN/02-model.md` | DONE |
 | 3 | Add `CategoryService` and `CategoryLocalService` | `PLAN/03-service.md` | DONE |
-| 4 | Add `CategoryRepository` and `CategoryRepositoryImpl` | `PLAN/04-repository.md` | TODO |
+| 4 | Add `CategoryRepository` and `CategoryRepositoryImpl` | `PLAN/04-repository.md` | DONE |
 | 5 | Add the three category use cases | `PLAN/05-usecases.md` | TODO |
 | 6 | Add `CategoryViewModel` and wire it in `main.dart` | `PLAN/06-viewmodel-di.md` | TODO |
 | 7 | Add the category localization keys | `PLAN/07-l10n.md` | TODO |
