@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-08-27
+
 ### Added
 - Custom categories: create a category with its own name, icon and color from the `Nova categoria` entry of the transaction dialog
 - Delete a custom category from the same dialog; the deletion is refused while any transaction still uses it, and the dialog reports how many
