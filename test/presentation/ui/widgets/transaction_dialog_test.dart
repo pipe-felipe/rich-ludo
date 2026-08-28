@@ -113,6 +113,68 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Future<void> pumpEditDialog(
+    WidgetTester tester, {
+    required Transaction editing,
+    required Future<bool> Function(Transaction) onSubmitEdit,
+  }) async {
+    final mockGet = MockGetCustomCategoriesUseCase();
+    when(() => mockGet()).thenAnswer((_) async => Result.ok(const []));
+
+    categoryViewModel = CategoryViewModel(
+      getCustomCategoriesUseCase: mockGet,
+      createCustomCategoryUseCase: MockCreateCustomCategoryUseCase(),
+      deleteCustomCategoryUseCase: MockDeleteCustomCategoryUseCase(),
+    );
+    formViewModel = TransactionFormViewModel(
+      makeTransactionUseCase: MockMakeTransactionUseCase(),
+    );
+    formViewModel.startEditing(editing);
+
+    tester.view.physicalSize = const Size(1200, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<CategoryViewModel>.value(
+            value: categoryViewModel,
+          ),
+          ChangeNotifierProvider<TransactionFormViewModel>.value(
+            value: formViewModel,
+          ),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.lightTheme(),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('pt'),
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => showDialog<void>(
+                  context: context,
+                  builder: (_) => TransactionDialog(
+                    selectedMonth: 8,
+                    selectedYear: 2026,
+                    onSubmitEdit: onSubmitEdit,
+                  ),
+                ),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+  }
+
   group('TransactionDialog category dropdown', () {
     testWidgets('should list a user-created expense category', (tester) async {
       await openTransactionDialog(tester, const [expenseCategory]);
@@ -152,6 +214,74 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(CategoryManagerDialog), findsOneWidget);
+    });
+  });
+
+  group('TransactionDialog edit mode', () {
+    Transaction editingTransaction() {
+      return Transaction(
+        id: 42,
+        amountCents: 5000,
+        type: TransactionType.expense,
+        category: 'food',
+        description: 'Lunch',
+        humanDate: '2026-08-04',
+        targetMonth: 8,
+        targetYear: 2026,
+      );
+    }
+
+    testWidgets('should show the stored amount and notes', (tester) async {
+      await pumpEditDialog(
+        tester,
+        editing: editingTransaction(),
+        onSubmitEdit: (_) async => true,
+      );
+
+      expect(find.widgetWithText(TextField, '50.00'), findsOneWidget);
+      expect(find.widgetWithText(TextField, 'Lunch'), findsOneWidget);
+    });
+
+    testWidgets(
+      'should call onSubmitEdit with the edited transaction instead of creating one',
+      (tester) async {
+        Transaction? recorded;
+        await pumpEditDialog(
+          tester,
+          editing: editingTransaction(),
+          onSubmitEdit: (edited) async {
+            recorded = edited;
+            return true;
+          },
+        );
+
+        await tester.enterText(
+          find.widgetWithText(TextField, 'R\$ Valor'),
+          '75',
+        );
+        await tester.pump();
+        await tester.tap(find.text('Enviar'));
+        await tester.pumpAndSettle();
+
+        expect(recorded!.id, equals(42));
+        expect(recorded!.amountCents, equals(7500));
+        expect(find.byType(TransactionDialog), findsNothing);
+      },
+    );
+
+    testWidgets('should stay open when onSubmitEdit returns false', (
+      tester,
+    ) async {
+      await pumpEditDialog(
+        tester,
+        editing: editingTransaction(),
+        onSubmitEdit: (_) async => false,
+      );
+
+      await tester.tap(find.text('Enviar'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TransactionDialog), findsOneWidget);
     });
   });
 }

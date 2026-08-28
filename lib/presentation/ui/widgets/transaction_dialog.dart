@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../domain/model/custom_category.dart';
+import '../../../domain/model/transaction.dart';
 import '../../../domain/model/transaction_type.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../viewmodel/category_viewmodel.dart';
@@ -18,10 +19,16 @@ class TransactionDialog extends StatelessWidget {
   final int selectedMonth;
   final int selectedYear;
 
+  /// Called instead of the create path when the form is editing a stored
+  /// transaction. Returns true when the edit was applied and the dialog may
+  /// close, false when the user backed out of the scope dialog.
+  final Future<bool> Function(Transaction edited)? onSubmitEdit;
+
   const TransactionDialog({
     super.key,
     required this.selectedMonth,
     required this.selectedYear,
+    this.onSubmitEdit,
   });
 
   @override
@@ -81,7 +88,7 @@ class TransactionDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 _NotesInput(
-                  notes: uiState.notes,
+                  initialNotes: uiState.notes,
                   onNotesChange: viewModel.onNotesChange,
                 ),
                 const SizedBox(height: 6),
@@ -90,7 +97,14 @@ class TransactionDialog extends StatelessWidget {
                   onRecurringChange: viewModel.onRecurringChange,
                   isSubmitEnabled: viewModel.isSubmitEnabled,
                   onSubmit: () async {
-                    await viewModel.submit(selectedMonth, selectedYear);
+                    if (viewModel.isEditing) {
+                      final edited = viewModel.buildEditedTransaction();
+                      if (edited == null) return;
+                      final applied = await onSubmitEdit?.call(edited) ?? false;
+                      if (!applied) return;
+                    } else {
+                      await viewModel.submit(selectedMonth, selectedYear);
+                    }
                     if (context.mounted) {
                       Navigator.of(context).pop();
                     }
@@ -183,8 +197,6 @@ class _CategoryAndQuantityInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -198,22 +210,57 @@ class _CategoryAndQuantityInput extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: TextField(
-            decoration: InputDecoration(
-              labelText: l10n.formQuantityLabel,
-              border: const OutlineInputBorder(),
-              errorText: uiState.isQuantityError
-                  ? l10n.labelInvalidNumber
-                  : null,
-            ),
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[\d.,]')),
-            ],
-            onChanged: onQuantityChange,
+          child: _QuantityInput(
+            initialQuantity: uiState.quantity,
+            isQuantityError: uiState.isQuantityError,
+            onQuantityChange: onQuantityChange,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _QuantityInput extends StatefulWidget {
+  final String initialQuantity;
+  final bool isQuantityError;
+  final void Function(String) onQuantityChange;
+
+  const _QuantityInput({
+    required this.initialQuantity,
+    required this.isQuantityError,
+    required this.onQuantityChange,
+  });
+
+  @override
+  State<_QuantityInput> createState() => _QuantityInputState();
+}
+
+class _QuantityInputState extends State<_QuantityInput> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialQuantity,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return TextField(
+      controller: _controller,
+      decoration: InputDecoration(
+        labelText: l10n.formQuantityLabel,
+        border: const OutlineInputBorder(),
+        errorText: widget.isQuantityError ? l10n.labelInvalidNumber : null,
+      ),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))],
+      onChanged: widget.onQuantityChange,
     );
   }
 }
@@ -372,22 +419,38 @@ class _CategoryDropdownState extends State<_CategoryDropdown> {
   }
 }
 
-class _NotesInput extends StatelessWidget {
-  final String notes;
+class _NotesInput extends StatefulWidget {
+  final String initialNotes;
   final void Function(String) onNotesChange;
 
-  const _NotesInput({required this.notes, required this.onNotesChange});
+  const _NotesInput({required this.initialNotes, required this.onNotesChange});
+
+  @override
+  State<_NotesInput> createState() => _NotesInputState();
+}
+
+class _NotesInputState extends State<_NotesInput> {
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialNotes,
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return TextField(
+      controller: _controller,
       decoration: InputDecoration(
         labelText: l10n.formNotesLabel,
         border: const OutlineInputBorder(),
       ),
-      onChanged: onNotesChange,
+      onChanged: widget.onNotesChange,
     );
   }
 }

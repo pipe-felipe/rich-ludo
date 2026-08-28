@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rich_ludo/domain/model/transaction.dart';
 import 'package:rich_ludo/domain/model/transaction_type.dart';
+import 'package:rich_ludo/domain/model/recurring_scope.dart';
 import 'package:rich_ludo/domain/usecase/delete_recurring_transaction_usecase.dart';
 import '../../fakes/fake_transaction_repository.dart';
 
@@ -40,7 +41,7 @@ void main() {
 
         final result = await useCase(
           transaction: tx,
-          mode: RecurringDeleteMode.allMonths,
+          mode: RecurringScope.allMonths,
           currentMonth: 5,
           currentYear: 2026,
         );
@@ -58,7 +59,7 @@ void main() {
 
         final result = await useCase(
           transaction: tx,
-          mode: RecurringDeleteMode.thisMonth,
+          mode: RecurringScope.thisMonth,
           currentMonth: 5,
           currentYear: 2026,
         );
@@ -85,7 +86,7 @@ void main() {
 
           final result = await useCase(
             transaction: tx,
-            mode: RecurringDeleteMode.thisMonth,
+            mode: RecurringScope.thisMonth,
             currentMonth: 5,
             currentYear: 2026,
           );
@@ -104,7 +105,7 @@ void main() {
 
         final result = await useCase(
           transaction: tx,
-          mode: RecurringDeleteMode.thisAndPreviousMonths,
+          mode: RecurringScope.thisAndPreviousMonths,
           currentMonth: 5,
           currentYear: 2026,
         );
@@ -124,7 +125,7 @@ void main() {
 
           final result = await useCase(
             transaction: tx,
-            mode: RecurringDeleteMode.thisAndPreviousMonths,
+            mode: RecurringScope.thisAndPreviousMonths,
             currentMonth: 12,
             currentYear: 2026,
           );
@@ -148,7 +149,7 @@ void main() {
 
         final result = await useCase(
           transaction: tx,
-          mode: RecurringDeleteMode.thisAndPreviousMonths,
+          mode: RecurringScope.thisAndPreviousMonths,
           currentMonth: 5,
           currentYear: 2026,
         );
@@ -166,7 +167,7 @@ void main() {
 
         final result = await useCase(
           transaction: tx,
-          mode: RecurringDeleteMode.thisAndFutureMonths,
+          mode: RecurringScope.thisAndFutureMonths,
           currentMonth: 7,
           currentYear: 2026,
         );
@@ -184,7 +185,7 @@ void main() {
 
         final result = await useCase(
           transaction: tx,
-          mode: RecurringDeleteMode.thisAndFutureMonths,
+          mode: RecurringScope.thisAndFutureMonths,
           currentMonth: 1,
           currentYear: 2026,
         );
@@ -204,7 +205,7 @@ void main() {
 
           final result = await useCase(
             transaction: tx,
-            mode: RecurringDeleteMode.thisAndFutureMonths,
+            mode: RecurringScope.thisAndFutureMonths,
             currentMonth: 5,
             currentYear: 2026,
           );

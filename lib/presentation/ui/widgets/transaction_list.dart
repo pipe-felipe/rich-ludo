@@ -8,12 +8,14 @@ class TransactionList extends StatelessWidget {
   final List<Transaction> items;
   final List<CustomCategory> customCategories;
   final void Function(Transaction) onDelete;
+  final void Function(Transaction) onEdit;
 
   const TransactionList({
     super.key,
     required this.items,
     this.customCategories = const [],
     required this.onDelete,
+    required this.onEdit,
   });
 
   @override
@@ -27,6 +29,7 @@ class TransactionList extends StatelessWidget {
           item: item,
           customCategories: customCategories,
           onDelete: () => onDelete(item),
+          onEdit: () => onEdit(item),
         );
       },
     );

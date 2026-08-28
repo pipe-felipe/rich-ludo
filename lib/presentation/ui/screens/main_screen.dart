@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../domain/model/custom_category.dart';
+import '../../../domain/model/recurring_scope.dart';
 import '../../../domain/model/transaction.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../utils/result.dart';
@@ -14,7 +15,7 @@ import '../widgets/error_state.dart';
 import '../widgets/floating_notification.dart';
 import '../widgets/main_bottom_bar.dart';
 import '../widgets/main_top_bar.dart';
-import '../widgets/recurring_delete_dialog.dart';
+import '../widgets/recurring_scope_dialog.dart';
 import '../widgets/transaction_dialog.dart';
 import '../widgets/transaction_list.dart';
 
@@ -66,6 +67,11 @@ class MainScreen extends StatelessWidget {
                             ? _TransactionContent(
                                 viewModel: viewModel,
                                 customCategories: customCategories,
+                                onEdit: (transaction) => _showTransactionDialog(
+                                  context,
+                                  viewModel,
+                                  editing: transaction,
+                                ),
                               )
                             : _ChartContent(
                                 viewModel: viewModel,
@@ -120,10 +126,15 @@ class MainScreen extends StatelessWidget {
 
   Future<void> _showTransactionDialog(
     BuildContext context,
-    MainScreenViewModel viewModel,
-  ) async {
+    MainScreenViewModel viewModel, {
+    Transaction? editing,
+  }) async {
     final formViewModel = context.read<TransactionFormViewModel>();
-    formViewModel.resetForm();
+    if (editing == null) {
+      formViewModel.resetForm();
+    } else {
+      formViewModel.startEditing(editing);
+    }
 
     await showDialog(
       context: context,
@@ -132,10 +143,42 @@ class MainScreen extends StatelessWidget {
         child: TransactionDialog(
           selectedMonth: viewModel.currentMonth,
           selectedYear: viewModel.currentYear,
+          onSubmitEdit: editing == null
+              ? null
+              : (edited) =>
+                    _applyEdit(dialogContext, viewModel, editing, edited),
         ),
       ),
     );
+    formViewModel.resetForm();
     viewModel.invalidateAndReload();
+  }
+
+  Future<bool> _applyEdit(
+    BuildContext context,
+    MainScreenViewModel viewModel,
+    Transaction original,
+    Transaction edited,
+  ) async {
+    if (!original.isRecurring) {
+      await viewModel.updateItem(edited);
+      return true;
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    // A one-off row cannot cover past months, so turning the Repete switch
+    // off leaves "this month and previous" unreachable.
+    final scope = await RecurringScopeDialog.show(
+      context,
+      title: l10n.recurringEditTitle,
+      disabledScopes: edited.isRecurring
+          ? const <RecurringScope>{}
+          : const {RecurringScope.thisAndPreviousMonths},
+    );
+    if (scope == null) return false;
+
+    await viewModel.updateRecurringItem(original, edited, scope);
+    return true;
   }
 
   Future<void> _exportDatabase(
@@ -212,10 +255,12 @@ class MainScreen extends StatelessWidget {
 class _TransactionContent extends StatelessWidget {
   final MainScreenViewModel viewModel;
   final List<CustomCategory> customCategories;
+  final Future<void> Function(Transaction) onEdit;
 
   const _TransactionContent({
     required this.viewModel,
     required this.customCategories,
+    required this.onEdit,
   });
 
   @override
@@ -239,6 +284,7 @@ class _TransactionContent extends StatelessWidget {
           items: viewModel.items,
           customCategories: customCategories,
           onDelete: (transaction) => _handleDelete(context, transaction),
+          onEdit: onEdit,
         );
       },
     );
@@ -249,7 +295,10 @@ class _TransactionContent extends StatelessWidget {
     Transaction transaction,
   ) async {
     if (transaction.isRecurring) {
-      final mode = await RecurringDeleteDialog.show(context);
+      final mode = await RecurringScopeDialog.show(
+        context,
+        title: AppLocalizations.of(context)!.recurringDeleteTitle,
+      );
       if (mode != null) {
         await viewModel.deleteRecurringItem(transaction, mode);
       }

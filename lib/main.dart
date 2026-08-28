@@ -26,6 +26,8 @@ import 'domain/usecase/get_transactions_by_month_year_usecase.dart';
 import 'domain/usecase/get_non_recurring_balance_usecase.dart';
 import 'domain/usecase/import_database_usecase.dart';
 import 'domain/usecase/make_transaction_usecase.dart';
+import 'domain/usecase/update_recurring_transaction_usecase.dart';
+import 'domain/usecase/update_transaction_usecase.dart';
 import 'presentation/ui/theme/app_theme.dart';
 import 'presentation/ui/screens/main_screen.dart';
 import 'presentation/viewmodel/category_viewmodel.dart';
@@ -82,6 +84,15 @@ class RichLudoApp extends StatelessWidget {
             context.read<TransactionRepository>(),
           ),
         ),
+        Provider<UpdateTransactionUseCase>(
+          create: (context) =>
+              UpdateTransactionUseCase(context.read<TransactionRepository>()),
+        ),
+        Provider<UpdateRecurringTransactionUseCase>(
+          create: (context) => UpdateRecurringTransactionUseCase(
+            context.read<TransactionRepository>(),
+          ),
+        ),
         Provider<GetExclusionsUseCase>(
           create: (context) =>
               GetExclusionsUseCase(context.read<TransactionRepository>()),
@@ -118,6 +129,9 @@ class RichLudoApp extends StatelessWidget {
             deleteTransactionUseCase: context.read<DeleteTransactionUseCase>(),
             deleteRecurringTransactionUseCase: context
                 .read<DeleteRecurringTransactionUseCase>(),
+            updateTransactionUseCase: context.read<UpdateTransactionUseCase>(),
+            updateRecurringTransactionUseCase: context
+                .read<UpdateRecurringTransactionUseCase>(),
             getExclusionsUseCase: context.read<GetExclusionsUseCase>(),
             exportDatabaseUseCase: context.read<ExportDatabaseUseCase>(),
             importDatabaseUseCase: context.read<ImportDatabaseUseCase>(),

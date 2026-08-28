@@ -1,7 +1,7 @@
 # RichLudo
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.3.0-green" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-3.0.0-green" alt="Version"/>
   <img src="https://img.shields.io/badge/flutter-%E2%89%A53.10-blue" alt="Flutter"/>
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-GPL--3.0-orange" alt="License"/>
@@ -93,6 +93,7 @@ lib/
 ## Features
 
 - ✅ Add transactions (income and expenses)
+- ✅ Edit a transaction, choosing which months the change applies to when it repeats
 - ✅ List transactions by month
 - ✅ Navigate between months
 - ✅ Calculate totals for income, expenses, and savings

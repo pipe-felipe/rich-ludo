@@ -328,6 +328,18 @@ abstract class AppLocalizations {
   /// **'Todos os meses'**
   String get recurringDeleteAll;
 
+  /// No description provided for @recurringEditTitle.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar recorrente'**
+  String get recurringEditTitle;
+
+  /// No description provided for @transactionEditTooltip.
+  ///
+  /// In pt, this message translates to:
+  /// **'Editar transação'**
+  String get transactionEditTooltip;
+
   /// No description provided for @january.
   ///
   /// In pt, this message translates to:

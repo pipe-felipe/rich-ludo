@@ -1,14 +1,9 @@
+import '../model/month_year.dart';
 import '../model/recurring_exclusion.dart';
+import '../model/recurring_scope.dart';
 import '../model/transaction.dart';
 import '../repository/transaction_repository.dart';
 import '../../utils/result.dart';
-
-enum RecurringDeleteMode {
-  thisMonth,
-  allMonths,
-  thisAndPreviousMonths,
-  thisAndFutureMonths,
-}
 
 class DeleteRecurringTransactionUseCase {
   final TransactionRepository _repository;
@@ -17,21 +12,21 @@ class DeleteRecurringTransactionUseCase {
 
   Future<Result<int>> call({
     required Transaction transaction,
-    required RecurringDeleteMode mode,
+    required RecurringScope mode,
     required int currentMonth,
     required int currentYear,
   }) async {
     switch (mode) {
-      case RecurringDeleteMode.allMonths:
+      case RecurringScope.allMonths:
         return _deleteAll(transaction.id);
 
-      case RecurringDeleteMode.thisMonth:
+      case RecurringScope.thisMonth:
         return _deleteThisMonth(transaction, currentMonth, currentYear);
 
-      case RecurringDeleteMode.thisAndPreviousMonths:
+      case RecurringScope.thisAndPreviousMonths:
         return _deleteBackwards(transaction, currentMonth, currentYear);
 
-      case RecurringDeleteMode.thisAndFutureMonths:
+      case RecurringScope.thisAndFutureMonths:
         return _deleteForwards(transaction, currentMonth, currentYear);
     }
   }
@@ -68,22 +63,16 @@ class DeleteRecurringTransactionUseCase {
     int month,
     int year,
   ) async {
-    final (nextMonth, nextYear) = _nextMonth(month, year);
+    final next = MonthYear(month, year).next;
+    final end = _endOf(transaction);
 
-    if (transaction.endMonth != null && transaction.endYear != null) {
-      if (_isAfter(
-        nextMonth,
-        nextYear,
-        transaction.endMonth!,
-        transaction.endYear!,
-      )) {
-        return _deleteAll(transaction.id);
-      }
+    if (end != null && next.isAfter(end)) {
+      return _deleteAll(transaction.id);
     }
 
     final updated = transaction.copyWith(
-      targetMonth: nextMonth,
-      targetYear: nextYear,
+      targetMonth: next.month,
+      targetYear: next.year,
     );
     return _repository.updateTransaction(updated);
   }
@@ -93,45 +82,28 @@ class DeleteRecurringTransactionUseCase {
     int month,
     int year,
   ) async {
-    final (prevMonth, prevYear) = _previousMonth(month, year);
+    final previous = MonthYear(month, year).previous;
 
-    if (_isBefore(
-      prevMonth,
-      prevYear,
-      transaction.targetMonth,
-      transaction.targetYear,
-    )) {
+    if (previous.isBefore(_startOf(transaction))) {
       return _deleteAll(transaction.id);
     }
 
     final updated = transaction.copyWith(
-      endMonth: () => prevMonth,
-      endYear: () => prevYear,
+      endMonth: () => previous.month,
+      endYear: () => previous.year,
     );
     return _repository.updateTransaction(updated);
   }
 
   bool _isSingleMonth(Transaction tx, int month, int year) {
-    final isStart = tx.targetMonth == month && tx.targetYear == year;
-    final isEnd = tx.endMonth == month && tx.endYear == year;
-    return isStart && isEnd;
+    final current = MonthYear(month, year);
+    return _startOf(tx) == current && _endOf(tx) == current;
   }
 
-  bool _isAfter(int m1, int y1, int m2, int y2) {
-    return y1 > y2 || (y1 == y2 && m1 > m2);
-  }
+  MonthYear _startOf(Transaction tx) =>
+      MonthYear(tx.targetMonth, tx.targetYear);
 
-  bool _isBefore(int m1, int y1, int m2, int y2) {
-    return y1 < y2 || (y1 == y2 && m1 < m2);
-  }
-
-  (int month, int year) _nextMonth(int month, int year) {
-    if (month == 12) return (1, year + 1);
-    return (month + 1, year);
-  }
-
-  (int month, int year) _previousMonth(int month, int year) {
-    if (month == 1) return (12, year - 1);
-    return (month - 1, year);
-  }
+  MonthYear? _endOf(Transaction tx) => tx.endMonth == null || tx.endYear == null
+      ? null
+      : MonthYear(tx.endMonth!, tx.endYear!);
 }
