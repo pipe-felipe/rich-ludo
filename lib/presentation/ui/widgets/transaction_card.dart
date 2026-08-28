@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../domain/model/custom_category.dart';
 import '../../../domain/model/transaction.dart';
 import '../../../domain/model/transaction_type.dart';
+import '../../../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../utils/category_icon.dart';
 import '../utils/money_formatter.dart';
@@ -10,12 +11,14 @@ import '../utils/money_formatter.dart';
 class TransactionCard extends StatelessWidget {
   final Transaction item;
   final List<CustomCategory> customCategories;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   const TransactionCard({
     super.key,
     required this.item,
     this.customCategories = const [],
+    required this.onEdit,
     required this.onDelete,
   });
 
@@ -36,6 +39,7 @@ class TransactionCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _CategoryIcon(
               category: item.category,
@@ -48,9 +52,27 @@ class TransactionCard extends StatelessWidget {
               description: item.description,
               humanDate: item.humanDate,
             ),
-            _AmountText(amountCents: item.amountCents, isIncome: _isIncome),
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: _AmountText(
+                  amountCents: item.amountCents,
+                  isIncome: _isIncome,
+                ),
+              ),
+            ),
+            IconButton(
+              onPressed: onEdit,
+              visualDensity: VisualDensity.compact,
+              tooltip: AppLocalizations.of(context)!.transactionEditTooltip,
+              icon: Icon(
+                Icons.edit,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
             IconButton(
               onPressed: onDelete,
+              visualDensity: VisualDensity.compact,
               icon: Icon(Icons.delete, color: AppTheme.thrashCan(context)),
             ),
           ],
