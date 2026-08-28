@@ -38,6 +38,8 @@
   "recurringDeleteBackwards": "Este mês e anteriores",
   "recurringDeleteForwards": "Este mês e futuros",
   "recurringDeleteAll": "Todos os meses",
+  "recurringEditTitle": "Editar recorrente",
+  "transactionEditTooltip": "Editar transação",
   "january": "Janeiro",
   "february": "Fevereiro",
   "march": "Março",

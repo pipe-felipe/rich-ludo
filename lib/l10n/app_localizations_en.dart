@@ -123,6 +123,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recurringDeleteAll => 'All months';
 
   @override
+  String get recurringEditTitle => 'Edit recurring';
+
+  @override
+  String get transactionEditTooltip => 'Edit transaction';
+
+  @override
   String get january => 'January';
 
   @override
