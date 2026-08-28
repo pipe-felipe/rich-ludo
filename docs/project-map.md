@@ -35,6 +35,9 @@ The app starts at `MainScreen` and uses a singleton `DatabaseHelper` for SQLite.
 | Main UI | `lib/presentation/ui/screens/main_screen.dart` | Binds ViewModels to widgets |
 | Top bar | `lib/presentation/ui/widgets/main_top_bar.dart` | Renders month selector, summaries, and ratio bar |
 | Category UI | `lib/presentation/ui/widgets/category_manager_dialog.dart` | Creating and deleting the user's categories |
+| Transaction edit rules | `lib/domain/usecase/update_transaction_usecase.dart`, `lib/domain/usecase/update_recurring_transaction_usecase.dart` | Writing an edit, and the four spans it can apply to on a recurring row |
+| Month arithmetic | `lib/domain/model/month_year.dart` | Stepping and ordering a (month, year) pair for the recurring rules |
+| Recurring scope UI | `lib/presentation/ui/widgets/recurring_scope_dialog.dart` | The four-option picker shared by the delete flow and the edit flow |
 
 ## Important non-authoritative path
 

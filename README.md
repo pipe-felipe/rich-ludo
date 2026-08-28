@@ -93,6 +93,7 @@ lib/
 ## Features
 
 - ✅ Add transactions (income and expenses)
+- ✅ Edit a transaction, choosing which months the change applies to when it repeats
 - ✅ List transactions by month
 - ✅ Navigate between months
 - ✅ Calculate totals for income, expenses, and savings

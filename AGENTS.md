@@ -32,8 +32,24 @@ lib/
 - **Enums**: Use for finite types (`TransactionType`, `ExpenseCategory`)
 - **Language**: Code, comments and tests in English; user-facing strings only through `AppLocalizations` (`lib/l10n/*.arb`)
 
-OBS: Do not, ever, create a code duplication
-Make sure that there is no string or other kinda of variables that is created more than one time
+## Reuse
+
+Nothing in this repository exists twice. Before adding a constant, a widget, an enum, a helper
+or a localization key, find the one that already exists and use it.
+
+- **Search first**: run `grep -rn "<name>" lib/` before creating anything named after a concept
+  the project already has.
+- **Shared behaviour**: when two flows need the same widget, enum or rule, they share one
+  implementation. Do not copy a widget to change its title — pass the difference in as a
+  parameter.
+- **Neutral names**: a type used by more than one flow is named for what it is, not for the flow
+  that needed it first (`RecurringScope`, not `RecurringDeleteMode`), and lives in the layer both
+  flows already depend on — `lib/domain/model/` for a shared domain type.
+- **Strings**: every user-facing string is one key present in all three of `lib/l10n/app_pt.arb`,
+  `lib/l10n/app_en.arb` and `lib/l10n/app_es.arb`, read through `AppLocalizations`. Never write a
+  user-facing literal in Dart, and never add a second key for text that already has one.
+- **Extract on the third**: two occurrences of a short rule may stay where they are; the third
+  moves into a shared function. Do not build an abstraction for a single caller.
 
 ## Testing
 Structure mirrored in `test/`:
