@@ -277,7 +277,7 @@ path of its file. Searching for it must land on the block.
 | 4 | Add the edit localization keys | `PLAN/04-l10n-edit-keys.md` | DONE |
 | 5 | Let the scope dialog disable one option | `PLAN/05-scope-dialog-disabled.md` | DONE |
 | 6 | Add UpdateTransactionUseCase | `PLAN/06-update-transaction-usecase.md` | DONE |
-| 7 | Add UpdateRecurringTransactionUseCase | `PLAN/07-update-recurring-usecase.md` | TODO |
+| 7 | Add UpdateRecurringTransactionUseCase | `PLAN/07-update-recurring-usecase.md` | DONE |
 | 8 | Give the form ViewModel an edit mode | `PLAN/08-form-viewmodel-edit.md` | TODO |
 | 9 | Pre-fill the transaction dialog and route its edit submit | `PLAN/09-dialog-prefill.md` | TODO |
 | 10 | Add the update commands to the main ViewModel and provide the use cases | `PLAN/10-main-viewmodel-update.md` | TODO |
