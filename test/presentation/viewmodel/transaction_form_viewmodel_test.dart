@@ -26,6 +26,24 @@ void main() {
     );
   });
 
+  Transaction storedTransaction({
+    int amountCents = 5000,
+    bool isRecurring = false,
+  }) {
+    return Transaction(
+      id: 42,
+      amountCents: amountCents,
+      type: TransactionType.expense,
+      category: 'food',
+      description: 'Lunch',
+      humanDate: '2026-08-04',
+      isRecurring: isRecurring,
+      createdAt: 1754006400000,
+      targetMonth: 8,
+      targetYear: 2026,
+    );
+  }
+
   group('TransactionFormViewModel', () {
     group('Initial State', () {
       test('should start with an empty list of items', () async {
@@ -279,6 +297,83 @@ void main() {
       });
     });
 
+    group('startEditing', () {
+      test('should fill the form from the stored transaction', () {
+        viewModel.startEditing(storedTransaction());
+
+        final state = viewModel.uiState;
+        expect(state.transactionType, equals(TransactionType.expense));
+        expect(state.categorySlug, equals('food'));
+        expect(state.quantity, equals('50.00'));
+        expect(state.notes, equals('Lunch'));
+        expect(state.date, equals('2026-08-04'));
+        expect(state.isRecurring, isFalse);
+      });
+
+      test('should report isEditing and expose the stored transaction', () {
+        viewModel.startEditing(storedTransaction());
+
+        expect(viewModel.isEditing, isTrue);
+        expect(viewModel.editingTransaction!.id, equals(42));
+      });
+
+      test('should enable submit right away', () {
+        viewModel.startEditing(storedTransaction());
+
+        expect(viewModel.isSubmitEnabled, isTrue);
+      });
+    });
+
+    group('buildEditedTransaction', () {
+      test('should return null when the form is not editing', () {
+        expect(viewModel.buildEditedTransaction(), isNull);
+      });
+
+      test(
+        'should keep the id, createdAt, humanDate, month and year of the stored row',
+        () {
+          viewModel.startEditing(storedTransaction());
+          viewModel.onQuantityChange('99');
+
+          final edited = viewModel.buildEditedTransaction()!;
+
+          expect(edited.id, equals(42));
+          expect(edited.createdAt, equals(1754006400000));
+          expect(edited.humanDate, equals('2026-08-04'));
+          expect(edited.targetMonth, equals(8));
+          expect(edited.targetYear, equals(2026));
+        },
+      );
+
+      test(
+        'should carry the edited amount, type, category, notes and recurring flag',
+        () {
+          viewModel.startEditing(storedTransaction());
+          viewModel.onQuantityChange('12,50');
+          viewModel.onNotesChange('Dinner');
+          viewModel.onRecurringChange(true);
+
+          final edited = viewModel.buildEditedTransaction()!;
+
+          expect(edited.amountCents, equals(1250));
+          expect(edited.category, equals('food'));
+          expect(edited.description, equals('Dinner'));
+          expect(edited.isRecurring, isTrue);
+        },
+      );
+
+      test('should carry the category chosen after a type change', () {
+        viewModel.startEditing(storedTransaction());
+        viewModel.onTransactionTypeChange(TransactionType.income);
+        viewModel.onCategoryChange('salary');
+
+        final edited = viewModel.buildEditedTransaction()!;
+
+        expect(edited.type, equals(TransactionType.income));
+        expect(edited.category, equals('salary'));
+      });
+    });
+
     group('resetForm', () {
       test('should reset all fields', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
@@ -297,6 +392,15 @@ void main() {
         expect(state.quantity, equals(''));
         expect(state.notes, equals(''));
         expect(state.isRecurring, isFalse);
+      });
+
+      test('should leave edit mode', () {
+        viewModel.startEditing(storedTransaction());
+
+        viewModel.resetForm();
+
+        expect(viewModel.isEditing, isFalse);
+        expect(viewModel.buildEditedTransaction(), isNull);
       });
     });
   });
