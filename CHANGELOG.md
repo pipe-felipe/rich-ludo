@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-08-27
+
+### Added
+- Edit a transaction from the pencil button on its card: the dialog opens pre-filled with the stored type, category, amount, notes and `Repete` switch
+- Editing a recurring transaction asks which months the change covers — `Apenas este mês`, `Este mês e anteriores`, `Este mês e futuros`, `Todos os meses` — through the four-option dialog the delete flow already used
+- Turning the `Repete` switch off while editing a recurring transaction leaves `Este mês e anteriores` disabled, because a one-off row cannot cover past months
+- `UpdateTransactionUseCase` and `UpdateRecurringTransactionUseCase`, with `updateItem` and `updateRecurringItem` on `MainScreenViewModel`
+- `MonthYear` domain model carrying the month arithmetic the recurring rules need
+- Localization keys `recurringEditTitle` and `transactionEditTooltip` in Portuguese, English and Spanish
+- E2E test covering the four edit paths
+
+### Changed
+- **Breaking**: `RecurringDeleteMode` is now `RecurringScope` in `lib/domain/model/recurring_scope.dart`, and `RecurringDeleteDialog` is now `RecurringScopeDialog`, taking its heading as a `title` parameter and an optional `disabledScopes` set
+- **Breaking**: `TransactionCard` and `TransactionList` require an `onEdit` callback, and `MainScreenViewModel` requires the two update use cases
+- `DeleteRecurringTransactionUseCase` uses `MonthYear` instead of its own private month helpers
+- `TransactionFormViewModel` holds the transaction being edited and exposes `startEditing`, `isEditing` and `buildEditedTransaction`
+- `AGENTS.md` states the no-duplication rule as a `## Reuse` section
+
 ## [2.3.0] - 2026-08-27
 
 ### Added
