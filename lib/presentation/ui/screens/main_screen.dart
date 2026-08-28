@@ -14,7 +14,7 @@ import '../widgets/error_state.dart';
 import '../widgets/floating_notification.dart';
 import '../widgets/main_bottom_bar.dart';
 import '../widgets/main_top_bar.dart';
-import '../widgets/recurring_delete_dialog.dart';
+import '../widgets/recurring_scope_dialog.dart';
 import '../widgets/transaction_dialog.dart';
 import '../widgets/transaction_list.dart';
 
@@ -249,7 +249,10 @@ class _TransactionContent extends StatelessWidget {
     Transaction transaction,
   ) async {
     if (transaction.isRecurring) {
-      final mode = await RecurringDeleteDialog.show(context);
+      final mode = await RecurringScopeDialog.show(
+        context,
+        title: AppLocalizations.of(context)!.recurringDeleteTitle,
+      );
       if (mode != null) {
         await viewModel.deleteRecurringItem(transaction, mode);
       }

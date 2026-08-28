@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../domain/model/category_total.dart';
 import '../../domain/model/recurring_exclusion.dart';
+import '../../domain/model/recurring_scope.dart';
 import '../../domain/model/transaction.dart';
 import '../../domain/model/transaction_type.dart';
 import '../../domain/usecase/delete_recurring_transaction_usecase.dart';
@@ -351,7 +352,7 @@ class MainScreenViewModel extends ChangeNotifier {
 
   Future<void> deleteRecurringItem(
     Transaction transaction,
-    RecurringDeleteMode mode,
+    RecurringScope mode,
   ) async {
     final result = await _deleteRecurringTransactionUseCase(
       transaction: transaction,

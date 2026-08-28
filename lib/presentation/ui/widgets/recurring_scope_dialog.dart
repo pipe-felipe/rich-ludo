@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import '../../../domain/usecase/delete_recurring_transaction_usecase.dart';
+import '../../../domain/model/recurring_scope.dart';
 import '../../../l10n/app_localizations.dart';
 
-class RecurringDeleteDialog extends StatelessWidget {
-  const RecurringDeleteDialog({super.key});
+class RecurringScopeDialog extends StatelessWidget {
+  final String title;
 
-  static Future<RecurringDeleteMode?> show(BuildContext context) {
-    return showDialog<RecurringDeleteMode>(
+  const RecurringScopeDialog({super.key, required this.title});
+
+  static Future<RecurringScope?> show(
+    BuildContext context, {
+    required String title,
+  }) {
+    return showDialog<RecurringScope>(
       context: context,
-      builder: (_) => const RecurringDeleteDialog(),
+      builder: (_) => RecurringScopeDialog(title: title),
     );
   }
 
@@ -26,7 +31,7 @@ class RecurringDeleteDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              l10n.recurringDeleteTitle,
+              title,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -35,8 +40,7 @@ class RecurringDeleteDialog extends StatelessWidget {
             _DialogPillOption(
               icon: Icons.today,
               label: l10n.recurringDeleteThisMonth,
-              onTap: () =>
-                  Navigator.of(context).pop(RecurringDeleteMode.thisMonth),
+              onTap: () => Navigator.of(context).pop(RecurringScope.thisMonth),
             ),
             const SizedBox(height: 10),
             _DialogPillOption(
@@ -44,22 +48,20 @@ class RecurringDeleteDialog extends StatelessWidget {
               label: l10n.recurringDeleteBackwards,
               onTap: () => Navigator.of(
                 context,
-              ).pop(RecurringDeleteMode.thisAndPreviousMonths),
+              ).pop(RecurringScope.thisAndPreviousMonths),
             ),
             const SizedBox(height: 10),
             _DialogPillOption(
               icon: Icons.arrow_forward,
               label: l10n.recurringDeleteForwards,
-              onTap: () => Navigator.of(
-                context,
-              ).pop(RecurringDeleteMode.thisAndFutureMonths),
+              onTap: () =>
+                  Navigator.of(context).pop(RecurringScope.thisAndFutureMonths),
             ),
             const SizedBox(height: 10),
             _DialogPillOption(
               icon: Icons.delete_forever,
               label: l10n.recurringDeleteAll,
-              onTap: () =>
-                  Navigator.of(context).pop(RecurringDeleteMode.allMonths),
+              onTap: () => Navigator.of(context).pop(RecurringScope.allMonths),
               isDestructive: true,
             ),
             const SizedBox(height: 16),

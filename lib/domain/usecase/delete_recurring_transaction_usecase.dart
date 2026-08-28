@@ -1,14 +1,8 @@
 import '../model/recurring_exclusion.dart';
+import '../model/recurring_scope.dart';
 import '../model/transaction.dart';
 import '../repository/transaction_repository.dart';
 import '../../utils/result.dart';
-
-enum RecurringDeleteMode {
-  thisMonth,
-  allMonths,
-  thisAndPreviousMonths,
-  thisAndFutureMonths,
-}
 
 class DeleteRecurringTransactionUseCase {
   final TransactionRepository _repository;
@@ -17,21 +11,21 @@ class DeleteRecurringTransactionUseCase {
 
   Future<Result<int>> call({
     required Transaction transaction,
-    required RecurringDeleteMode mode,
+    required RecurringScope mode,
     required int currentMonth,
     required int currentYear,
   }) async {
     switch (mode) {
-      case RecurringDeleteMode.allMonths:
+      case RecurringScope.allMonths:
         return _deleteAll(transaction.id);
 
-      case RecurringDeleteMode.thisMonth:
+      case RecurringScope.thisMonth:
         return _deleteThisMonth(transaction, currentMonth, currentYear);
 
-      case RecurringDeleteMode.thisAndPreviousMonths:
+      case RecurringScope.thisAndPreviousMonths:
         return _deleteBackwards(transaction, currentMonth, currentYear);
 
-      case RecurringDeleteMode.thisAndFutureMonths:
+      case RecurringScope.thisAndFutureMonths:
         return _deleteForwards(transaction, currentMonth, currentYear);
     }
   }
