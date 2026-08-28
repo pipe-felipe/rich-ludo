@@ -54,9 +54,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get expenseCategoryFood => 'Comida';
 
   @override
-  String get expenseCategoryStuff => 'Coisas';
-
-  @override
   String get expenseCategoryMedicine => 'Remédio';
 
   @override
@@ -64,9 +61,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get expenseCategoryHygiene => 'Higiene';
-
-  @override
-  String get expenseCategoryCare => 'Cuidados';
 
   @override
   String get income => 'Renda';

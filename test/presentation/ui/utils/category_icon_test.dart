@@ -12,11 +12,9 @@ void main() {
       ExpenseCategory.gift: Icons.card_giftcard,
       ExpenseCategory.recurring: Icons.repeat,
       ExpenseCategory.food: Icons.restaurant,
-      ExpenseCategory.stuff: Icons.shopping_bag,
       ExpenseCategory.medicine: Icons.medical_services,
       ExpenseCategory.clothes: Icons.checkroom,
       ExpenseCategory.hygiene: Icons.clean_hands,
-      ExpenseCategory.care: Icons.favorite,
     };
 
     test('should map all enum values', () {

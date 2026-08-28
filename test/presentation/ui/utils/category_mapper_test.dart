@@ -19,11 +19,9 @@ void main() {
       ExpenseCategory.gift: 'Gift',
       ExpenseCategory.recurring: 'Recurring',
       ExpenseCategory.food: 'Food',
-      ExpenseCategory.stuff: 'Stuff',
       ExpenseCategory.medicine: 'Medicine',
       ExpenseCategory.clothes: 'Clothes',
       ExpenseCategory.hygiene: 'Hygiene',
-      ExpenseCategory.care: 'Care',
     };
 
     test('should map all enum values', () {

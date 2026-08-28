@@ -10,11 +10,9 @@ enum ExpenseCategory {
   gift,
   recurring,
   food,
-  stuff,
   medicine,
   clothes,
   hygiene,
-  care,
 }
 
 enum IncomeCategory { salary, gift, investment, other }

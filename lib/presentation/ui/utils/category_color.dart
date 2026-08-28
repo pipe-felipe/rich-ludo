@@ -11,11 +11,9 @@ extension ExpenseCategoryColor on ExpenseCategory {
     ExpenseCategory.gift => CategoryPiColors.gift,
     ExpenseCategory.recurring => CategoryPiColors.recurring,
     ExpenseCategory.food => CategoryPiColors.food,
-    ExpenseCategory.stuff => CategoryPiColors.stuff,
     ExpenseCategory.medicine => CategoryPiColors.medicine,
     ExpenseCategory.clothes => CategoryPiColors.clothes,
     ExpenseCategory.hygiene => CategoryPiColors.hygiene,
-    ExpenseCategory.care => CategoryPiColors.care,
   };
 }
 

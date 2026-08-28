@@ -190,12 +190,6 @@ abstract class AppLocalizations {
   /// **'Comida'**
   String get expenseCategoryFood;
 
-  /// No description provided for @expenseCategoryStuff.
-  ///
-  /// In pt, this message translates to:
-  /// **'Coisas'**
-  String get expenseCategoryStuff;
-
   /// No description provided for @expenseCategoryMedicine.
   ///
   /// In pt, this message translates to:
@@ -213,12 +207,6 @@ abstract class AppLocalizations {
   /// In pt, this message translates to:
   /// **'Higiene'**
   String get expenseCategoryHygiene;
-
-  /// No description provided for @expenseCategoryCare.
-  ///
-  /// In pt, this message translates to:
-  /// **'Cuidados'**
-  String get expenseCategoryCare;
 
   /// No description provided for @income.
   ///

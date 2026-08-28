@@ -12,16 +12,12 @@ String mapExpenseCategory(ExpenseCategory category, AppLocalizations l10n) {
       return l10n.expenseCategoryRecurring;
     case ExpenseCategory.food:
       return l10n.expenseCategoryFood;
-    case ExpenseCategory.stuff:
-      return l10n.expenseCategoryStuff;
     case ExpenseCategory.medicine:
       return l10n.expenseCategoryMedicine;
     case ExpenseCategory.clothes:
       return l10n.expenseCategoryClothes;
     case ExpenseCategory.hygiene:
       return l10n.expenseCategoryHygiene;
-    case ExpenseCategory.care:
-      return l10n.expenseCategoryCare;
   }
 }
 

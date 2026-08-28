@@ -13,11 +13,9 @@ void main() {
       ExpenseCategory.gift: CategoryPiColors.gift,
       ExpenseCategory.recurring: CategoryPiColors.recurring,
       ExpenseCategory.food: CategoryPiColors.food,
-      ExpenseCategory.stuff: CategoryPiColors.stuff,
       ExpenseCategory.medicine: CategoryPiColors.medicine,
       ExpenseCategory.clothes: CategoryPiColors.clothes,
       ExpenseCategory.hygiene: CategoryPiColors.hygiene,
-      ExpenseCategory.care: CategoryPiColors.care,
     };
 
     test('should map all enum values', () {
@@ -31,7 +29,7 @@ void main() {
     }
 
     test('should give every expense category a distinct color', () {
-      expect(expectedColors.values.toSet().length, equals(9));
+      expect(expectedColors.values.toSet().length, equals(7));
     });
   });
 
@@ -59,12 +57,12 @@ void main() {
   });
 
   group('CategoryPiColors.customPalette', () {
-    test('should offer 12 colors', () {
-      expect(CategoryPiColors.customPalette, hasLength(12));
+    test('should offer 8 colors', () {
+      expect(CategoryPiColors.customPalette, hasLength(8));
     });
 
     test('should give every entry a distinct value', () {
-      expect(CategoryPiColors.customPalette.toSet(), hasLength(12));
+      expect(CategoryPiColors.customPalette.toSet(), hasLength(8));
     });
   });
 
