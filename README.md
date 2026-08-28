@@ -1,7 +1,7 @@
 # RichLudo
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-2.2.0-green" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-2.3.0-green" alt="Version"/>
   <img src="https://img.shields.io/badge/flutter-%E2%89%A53.10-blue" alt="Flutter"/>
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey" alt="Platform"/>
   <img src="https://img.shields.io/badge/license-GPL--3.0-orange" alt="License"/>
@@ -98,6 +98,7 @@ lib/
 - ✅ Calculate totals for income, expenses, and savings
 - ✅ Support for recurring transactions
 - ✅ Expense and income categories
+- ✅ Custom categories created by the user, with their own name, icon and color
 - ✅ Local persistence with SQLite
 - ✅ Automatic light/dark theme
 - ✅ Localization in Portuguese

@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../../domain/model/custom_category.dart';
 import '../../../domain/model/transaction_type.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../viewmodel/category_viewmodel.dart';
 import '../../viewmodel/transaction_form_viewmodel.dart';
 import '../utils/category_icon.dart';
 import '../utils/category_mapper.dart';
+import 'category_manager_dialog.dart';
+
+/// Value of the dropdown entry that opens [CategoryManagerDialog]. It is never
+/// stored: `_CategoryDropdown` turns it into a dialog instead of a selection.
+const String _newCategoryOptionValue = '__new_category__';
 
 class TransactionDialog extends StatelessWidget {
   final int selectedMonth;
@@ -22,6 +29,9 @@ class TransactionDialog extends StatelessWidget {
     return Consumer<TransactionFormViewModel>(
       builder: (context, viewModel, child) {
         final uiState = viewModel.uiState;
+        final customCategories = context
+            .watch<CategoryViewModel>()
+            .categoriesFor(uiState.transactionType);
 
         return Dialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 25),
@@ -65,8 +75,8 @@ class TransactionDialog extends StatelessWidget {
                 ),
                 _CategoryAndQuantityInput(
                   uiState: uiState,
-                  onExpenseCategoryChange: viewModel.onExpenseCategoryChange,
-                  onIncomeCategoryChange: viewModel.onIncomeCategoryChange,
+                  customCategories: customCategories,
+                  onCategoryChange: viewModel.onCategoryChange,
                   onQuantityChange: viewModel.onQuantityChange,
                 ),
                 const SizedBox(height: 8),
@@ -160,14 +170,14 @@ class _RadioOption extends StatelessWidget {
 
 class _CategoryAndQuantityInput extends StatelessWidget {
   final FormUiState uiState;
-  final void Function(ExpenseCategory) onExpenseCategoryChange;
-  final void Function(IncomeCategory) onIncomeCategoryChange;
+  final List<CustomCategory> customCategories;
+  final void Function(String) onCategoryChange;
   final void Function(String) onQuantityChange;
 
   const _CategoryAndQuantityInput({
     required this.uiState,
-    required this.onExpenseCategoryChange,
-    required this.onIncomeCategoryChange,
+    required this.customCategories,
+    required this.onCategoryChange,
     required this.onQuantityChange,
   });
 
@@ -181,10 +191,9 @@ class _CategoryAndQuantityInput extends StatelessWidget {
         Expanded(
           child: _CategoryDropdown(
             transactionType: uiState.transactionType,
-            expenseCategory: uiState.expenseCategory,
-            incomeCategory: uiState.incomeCategory,
-            onExpenseCategoryChange: onExpenseCategoryChange,
-            onIncomeCategoryChange: onIncomeCategoryChange,
+            customCategories: customCategories,
+            categorySlug: uiState.categorySlug,
+            onCategoryChange: onCategoryChange,
           ),
         ),
         const SizedBox(width: 8),
@@ -209,106 +218,157 @@ class _CategoryAndQuantityInput extends StatelessWidget {
   }
 }
 
-class _CategoryDropdown extends StatelessWidget {
+/// One entry of the category dropdown: the value stored in
+/// `transactions.category`, the text shown, and the icon shown beside it.
+class _CategoryOption {
+  final String slug;
+  final String label;
+  final IconData icon;
+
+  const _CategoryOption({
+    required this.slug,
+    required this.label,
+    required this.icon,
+  });
+}
+
+List<_CategoryOption> _builtInOptions(
+  TransactionType type,
+  AppLocalizations l10n,
+) {
+  if (type == TransactionType.expense) {
+    return ExpenseCategory.values
+        .map(
+          (category) => _CategoryOption(
+            slug: category.name,
+            label: mapExpenseCategory(category, l10n),
+            icon: category.icon,
+          ),
+        )
+        .toList();
+  }
+
+  return IncomeCategory.values
+      .map(
+        (category) => _CategoryOption(
+          slug: category.name,
+          label: mapIncomeCategory(category, l10n),
+          icon: category.icon,
+        ),
+      )
+      .toList();
+}
+
+List<_CategoryOption> _customOptions(List<CustomCategory> categories) {
+  return categories
+      .map(
+        (category) => _CategoryOption(
+          slug: category.slug,
+          label: category.name,
+          icon: resolveCustomCategoryIcon(category.iconCodePoint),
+        ),
+      )
+      .toList();
+}
+
+class _CategoryDropdown extends StatefulWidget {
   final TransactionType transactionType;
-  final ExpenseCategory? expenseCategory;
-  final IncomeCategory? incomeCategory;
-  final void Function(ExpenseCategory) onExpenseCategoryChange;
-  final void Function(IncomeCategory) onIncomeCategoryChange;
+  final List<CustomCategory> customCategories;
+  final String? categorySlug;
+  final void Function(String) onCategoryChange;
 
   const _CategoryDropdown({
     required this.transactionType,
-    required this.expenseCategory,
-    required this.incomeCategory,
-    required this.onExpenseCategoryChange,
-    required this.onIncomeCategoryChange,
+    required this.customCategories,
+    required this.categorySlug,
+    required this.onCategoryChange,
   });
+
+  @override
+  State<_CategoryDropdown> createState() => _CategoryDropdownState();
+}
+
+class _CategoryDropdownState extends State<_CategoryDropdown> {
+  // Picking the "new category" entry leaves that entry showing inside the
+  // form field, because DropdownButtonFormField keeps its own selection.
+  // Bumping this token changes the field's key, which rebuilds it from
+  // `initialValue` and drops the entry that was never a real choice.
+  int _resetToken = 0;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final options = [
+      ..._builtInOptions(widget.transactionType, l10n),
+      ..._customOptions(widget.customCategories),
+      _CategoryOption(
+        slug: _newCategoryOptionValue,
+        label: l10n.categoryCreateNew,
+        icon: Icons.add,
+      ),
+    ];
+    // A slug that is not among the options would trip the dropdown's own
+    // assertion, so an unknown or deleted one shows as nothing chosen.
+    final selected =
+        widget.categorySlug != _newCategoryOptionValue &&
+            options.any((option) => option.slug == widget.categorySlug)
+        ? widget.categorySlug
+        : null;
 
-    if (transactionType == TransactionType.expense) {
-      return DropdownButtonFormField<ExpenseCategory>(
-        initialValue: expenseCategory,
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: l10n.formCategoryLabel,
-          border: const OutlineInputBorder(),
-        ),
-        selectedItemBuilder: (context) {
-          return ExpenseCategory.values.map((category) {
-            return Row(
-              children: [
-                Icon(category.icon, size: 18),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    mapExpenseCategory(category, l10n),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            );
-          }).toList();
-        },
-        items: ExpenseCategory.values.map((category) {
-          return DropdownMenuItem(
-            value: category,
-            child: Row(
-              children: [
-                Icon(category.icon, size: 18),
-                const SizedBox(width: 6),
-                Text(mapExpenseCategory(category, l10n)),
-              ],
-            ),
+    return DropdownButtonFormField<String>(
+      key: ValueKey('$selected-$_resetToken'),
+      initialValue: selected,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: l10n.formCategoryLabel,
+        border: const OutlineInputBorder(),
+      ),
+      selectedItemBuilder: (context) {
+        return options.map((option) {
+          return Row(
+            children: [
+              Icon(option.icon, size: 18),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(option.label, overflow: TextOverflow.ellipsis),
+              ),
+            ],
           );
-        }).toList(),
-        onChanged: (value) {
-          if (value != null) onExpenseCategoryChange(value);
-        },
-      );
-    } else {
-      return DropdownButtonFormField<IncomeCategory>(
-        initialValue: incomeCategory,
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: l10n.formCategoryLabel,
-          border: const OutlineInputBorder(),
-        ),
-        selectedItemBuilder: (context) {
-          return IncomeCategory.values.map((category) {
-            return Row(
-              children: [
-                Icon(category.icon, size: 18),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    mapIncomeCategory(category, l10n),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ],
-            );
-          }).toList();
-        },
-        items: IncomeCategory.values.map((category) {
-          return DropdownMenuItem(
-            value: category,
-            child: Row(
-              children: [
-                Icon(category.icon, size: 18),
-                const SizedBox(width: 6),
-                Text(mapIncomeCategory(category, l10n)),
-              ],
-            ),
-          );
-        }).toList(),
-        onChanged: (value) {
-          if (value != null) onIncomeCategoryChange(value);
-        },
-      );
-    }
+        }).toList();
+      },
+      items: options.map((option) {
+        return DropdownMenuItem(
+          value: option.slug,
+          child: Row(
+            children: [
+              Icon(option.icon, size: 18),
+              const SizedBox(width: 6),
+              Text(option.label),
+            ],
+          ),
+        );
+      }).toList(),
+      onChanged: (value) async {
+        if (value == null) return;
+
+        if (value != _newCategoryOptionValue) {
+          widget.onCategoryChange(value);
+          return;
+        }
+
+        final createdSlug = await CategoryManagerDialog.show(
+          context,
+          widget.transactionType,
+        );
+
+        if (createdSlug != null) {
+          widget.onCategoryChange(createdSlug);
+        }
+        if (mounted) {
+          setState(() => _resetToken++);
+        }
+      },
+    );
   }
 }
 

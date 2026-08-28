@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rich_ludo/domain/model/custom_category.dart';
+import 'package:rich_ludo/domain/model/transaction_type.dart';
 import 'package:rich_ludo/l10n/app_localizations.dart';
 import 'package:rich_ludo/l10n/app_localizations_en.dart';
 import 'package:rich_ludo/presentation/ui/utils/category_mapper.dart';
@@ -17,11 +19,9 @@ void main() {
       ExpenseCategory.gift: 'Gift',
       ExpenseCategory.recurring: 'Recurring',
       ExpenseCategory.food: 'Food',
-      ExpenseCategory.stuff: 'Stuff',
       ExpenseCategory.medicine: 'Medicine',
       ExpenseCategory.clothes: 'Clothes',
       ExpenseCategory.hygiene: 'Hygiene',
-      ExpenseCategory.care: 'Care',
     };
 
     test('should map all enum values', () {
@@ -72,6 +72,53 @@ void main() {
     test('should return the uncategorized label for an unknown string', () {
       expect(
         getExpenseCategoryLabel('not-a-category', l10n),
+        equals(l10n.categoryUncategorized),
+      );
+    });
+  });
+
+  group('getExpenseCategoryLabel with user-created categories', () {
+    const custom = CustomCategory(
+      id: 1,
+      slug: 'custom_mercado',
+      name: 'Mercado',
+      type: TransactionType.expense,
+      iconCodePoint: 0xe59c,
+      colorValue: 0xFFC62828,
+    );
+
+    test('should return the stored name for a user-created slug', () {
+      expect(
+        getExpenseCategoryLabel(
+          'custom_mercado',
+          l10n,
+          customCategories: const [custom],
+        ),
+        equals('Mercado'),
+      );
+    });
+
+    test(
+      'should still resolve a built-in name when a custom list is given',
+      () {
+        expect(
+          getExpenseCategoryLabel(
+            'food',
+            l10n,
+            customCategories: const [custom],
+          ),
+          equals(mapExpenseCategory(ExpenseCategory.food, l10n)),
+        );
+      },
+    );
+
+    test('should fall back to uncategorized for a deleted user slug', () {
+      expect(
+        getExpenseCategoryLabel(
+          'custom_removida',
+          l10n,
+          customCategories: const [],
+        ),
         equals(l10n.categoryUncategorized),
       );
     });

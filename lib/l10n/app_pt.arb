@@ -15,11 +15,9 @@
   "expenseCategoryGift": "Presente",
   "expenseCategoryRecurring": "Recorrente",
   "expenseCategoryFood": "Comida",
-  "expenseCategoryStuff": "Coisas",
   "expenseCategoryMedicine": "Remédio",
   "expenseCategoryClothes": "Roupas",
   "expenseCategoryHygiene": "Higiene",
-  "expenseCategoryCare": "Cuidados",
   "income": "Renda",
   "saving": "Economia",
   "outgoing": "Despesas",
@@ -54,5 +52,26 @@
   "december": "Dezembro",
   "chartTitle": "Despesas por categoria",
   "categoryUncategorized": "Sem categoria",
-  "chartTotalExpense": "Total de despesas"
+  "chartTotalExpense": "Total de despesas",
+  "categoryCreateNew": "Nova categoria",
+  "categoryManagerTitle": "Categorias",
+  "categoryNameLabel": "Nome",
+  "categoryIconLabel": "Ícone",
+  "categoryColorLabel": "Cor",
+  "categorySave": "Salvar",
+  "categoryMineTitle": "Suas categorias",
+  "categoryEmpty": "Você ainda não criou nenhuma categoria",
+  "categoryDeleteTooltip": "Excluir categoria",
+  "categoryErrorEmptyName": "Informe um nome",
+  "categoryErrorNameTooLong": "Nome muito longo (máximo 30 caracteres)",
+  "categoryErrorDuplicateName": "Já existe uma categoria com esse nome",
+  "categoryErrorSaveFailed": "Não foi possível salvar a categoria",
+  "categoryDeleteInUse": "{count} transações usam esta categoria. Não é possível excluir.",
+  "@categoryDeleteInUse": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

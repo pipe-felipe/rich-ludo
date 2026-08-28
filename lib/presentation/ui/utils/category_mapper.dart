@@ -1,3 +1,4 @@
+import '../../../domain/model/custom_category.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../viewmodel/transaction_form_viewmodel.dart';
 
@@ -11,16 +12,12 @@ String mapExpenseCategory(ExpenseCategory category, AppLocalizations l10n) {
       return l10n.expenseCategoryRecurring;
     case ExpenseCategory.food:
       return l10n.expenseCategoryFood;
-    case ExpenseCategory.stuff:
-      return l10n.expenseCategoryStuff;
     case ExpenseCategory.medicine:
       return l10n.expenseCategoryMedicine;
     case ExpenseCategory.clothes:
       return l10n.expenseCategoryClothes;
     case ExpenseCategory.hygiene:
       return l10n.expenseCategoryHygiene;
-    case ExpenseCategory.care:
-      return l10n.expenseCategoryCare;
   }
 }
 
@@ -39,10 +36,23 @@ String mapIncomeCategory(IncomeCategory category, AppLocalizations l10n) {
 
 /// Resolves the localized expense category name from a [String] category
 /// (used by the `Transaction` model). Delegates to [mapExpenseCategory].
-/// A null or unknown value falls back to the "no category" label.
-String getExpenseCategoryLabel(String? category, AppLocalizations l10n) {
+/// A user-created slug resolves to its stored name, which the user typed and
+/// which is therefore not localized. A null or unknown value falls back to
+/// the "no category" label.
+String getExpenseCategoryLabel(
+  String? category,
+  AppLocalizations l10n, {
+  List<CustomCategory> customCategories = const [],
+}) {
   if (category == null) {
     return l10n.categoryUncategorized;
+  }
+
+  final custom = customCategories
+      .where((entry) => entry.slug == category)
+      .firstOrNull;
+  if (custom != null) {
+    return custom.name;
   }
 
   final parsed = ExpenseCategory.values

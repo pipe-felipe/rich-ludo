@@ -7,11 +7,15 @@
 | Models | `test/domain/model/transaction_test.dart` | Defaults, equality, `copyWith` |
 | Use cases | `test/domain/usecase/` | Repository calls and business branches |
 | Repository | `test/data/repository/transaction_repository_impl_test.dart` | Delegation and `Result` propagation |
-| Migrations | `test/data/database/database_migration_test.dart` | v1 to v2 schema migration with FFI SQLite |
+| Migrations | `test/data/database/database_migration_test.dart` | v1 to v2 schema migration, and v1 and v2 to v3 through `validateAndMigrateIfNeeded` with row preservation |
 | Main ViewModel | `test/presentation/viewmodel/main_screen_viewmodel_test.dart` | Commands, selected-month totals, navigation, cache reuse, recurring visibility, exclusions, and delayed-load race |
 | Active local service | `test/data/services/transaction_local_service_test.dart` | FFI SQLite contract for recurring rows plus requested-month one-time rows |
 | Form ViewModel | `test/presentation/viewmodel/transaction_form_viewmodel_test.dart` | Form state and submission |
 | UI utilities | `test/presentation/ui/utils/` | Category icons and labels |
+| Category model | `test/domain/model/custom_category_test.dart` | Slug building, accents, built-in collision, mapper round trip |
+| Category data | `test/data/services/category_local_service_test.dart`, `test/data/repository/category_repository_impl_test.dart` | FFI SQLite contract of the `categories` table and repository delegation |
+| Category rules | `test/domain/usecase/create_custom_category_usecase_test.dart`, `test/domain/usecase/delete_custom_category_usecase_test.dart` | Name validation, duplicates, and the in-use refusal with its count |
+| Category UI | `test/presentation/viewmodel/category_viewmodel_test.dart`, `test/presentation/ui/widgets/category_manager_dialog_test.dart`, `test/presentation/ui/widgets/transaction_dialog_test.dart` | Reload after create and delete, the dialog's error messages, and the dropdown entries |
 
 ## Important gaps
 

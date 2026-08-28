@@ -10,11 +10,9 @@ enum ExpenseCategory {
   gift,
   recurring,
   food,
-  stuff,
   medicine,
   clothes,
   hygiene,
-  care,
 }
 
 enum IncomeCategory { salary, gift, investment, other }
@@ -22,8 +20,10 @@ enum IncomeCategory { salary, gift, investment, other }
 class FormUiState {
   final String date;
   final TransactionType transactionType;
-  final ExpenseCategory? expenseCategory;
-  final IncomeCategory? incomeCategory;
+
+  /// `.name` of an [ExpenseCategory] or an [IncomeCategory] value, or the
+  /// slug of a category the user created. `null` means nothing is chosen.
+  final String? categorySlug;
   final String quantity;
   final String notes;
   final bool isRecurring;
@@ -32,8 +32,7 @@ class FormUiState {
   const FormUiState({
     this.date = '',
     this.transactionType = TransactionType.expense,
-    this.expenseCategory,
-    this.incomeCategory,
+    this.categorySlug,
     this.quantity = '',
     this.notes = '',
     this.isRecurring = false,
@@ -43,8 +42,7 @@ class FormUiState {
   FormUiState copyWith({
     String? date,
     TransactionType? transactionType,
-    ExpenseCategory? expenseCategory,
-    IncomeCategory? incomeCategory,
+    String? Function()? categorySlug,
     String? quantity,
     String? notes,
     bool? isRecurring,
@@ -53,8 +51,7 @@ class FormUiState {
     return FormUiState(
       date: date ?? this.date,
       transactionType: transactionType ?? this.transactionType,
-      expenseCategory: expenseCategory ?? this.expenseCategory,
-      incomeCategory: incomeCategory ?? this.incomeCategory,
+      categorySlug: categorySlug != null ? categorySlug() : this.categorySlug,
       quantity: quantity ?? this.quantity,
       notes: notes ?? this.notes,
       isRecurring: isRecurring ?? this.isRecurring,
@@ -81,24 +78,22 @@ class TransactionFormViewModel extends ChangeNotifier {
   bool get isSubmitEnabled {
     final hasValidQuantity =
         _uiState.quantity.isNotEmpty && !_uiState.isQuantityError;
-    final hasCategory = _uiState.transactionType == TransactionType.expense
-        ? _uiState.expenseCategory != null
-        : _uiState.incomeCategory != null;
-    return hasValidQuantity && hasCategory;
+    return hasValidQuantity && _uiState.categorySlug != null;
   }
 
+  /// Switching the type clears the chosen category: the two types never offer
+  /// the same options, so keeping the old slug would submit a category the
+  /// user cannot see in the dropdown.
   void onTransactionTypeChange(TransactionType newType) {
-    _uiState = _uiState.copyWith(transactionType: newType);
+    _uiState = _uiState.copyWith(
+      transactionType: newType,
+      categorySlug: () => null,
+    );
     notifyListeners();
   }
 
-  void onExpenseCategoryChange(ExpenseCategory newCategory) {
-    _uiState = _uiState.copyWith(expenseCategory: newCategory);
-    notifyListeners();
-  }
-
-  void onIncomeCategoryChange(IncomeCategory newCategory) {
-    _uiState = _uiState.copyWith(incomeCategory: newCategory);
+  void onCategoryChange(String newCategorySlug) {
+    _uiState = _uiState.copyWith(categorySlug: () => newCategorySlug);
     notifyListeners();
   }
 
@@ -143,9 +138,7 @@ class TransactionFormViewModel extends ChangeNotifier {
 
     final monthStart = DateTime(year, month, 1).millisecondsSinceEpoch;
 
-    final category = _uiState.transactionType == TransactionType.expense
-        ? _uiState.expenseCategory?.name
-        : _uiState.incomeCategory?.name;
+    final category = _uiState.categorySlug;
 
     final transaction = Transaction(
       amountCents: amountCents,

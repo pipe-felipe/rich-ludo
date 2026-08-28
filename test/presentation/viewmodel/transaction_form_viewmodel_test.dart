@@ -33,8 +33,7 @@ void main() {
 
         expect(state.date, equals(''));
         expect(state.transactionType, equals(TransactionType.expense));
-        expect(state.expenseCategory, isNull);
-        expect(state.incomeCategory, isNull);
+        expect(state.categorySlug, isNull);
         expect(state.quantity, equals(''));
         expect(state.notes, equals(''));
         expect(state.isRecurring, isFalse);
@@ -67,19 +66,28 @@ void main() {
       });
     });
 
-    group('onExpenseCategoryChange', () {
-      test('should change expense category', () {
-        viewModel.onExpenseCategoryChange(ExpenseCategory.food);
+    group('onCategoryChange', () {
+      test('should change the category slug', () {
+        viewModel.onCategoryChange('food');
 
-        expect(viewModel.uiState.expenseCategory, equals(ExpenseCategory.food));
+        expect(viewModel.uiState.categorySlug, equals('food'));
+      });
+
+      test('should accept a user-created slug', () {
+        viewModel.onCategoryChange('custom_mercado');
+
+        expect(viewModel.uiState.categorySlug, equals('custom_mercado'));
       });
     });
 
-    group('onIncomeCategoryChange', () {
-      test('should change income category', () {
-        viewModel.onIncomeCategoryChange(IncomeCategory.salary);
+    group('onTransactionTypeChange clearing', () {
+      test('should clear the category slug when the type changes', () {
+        viewModel.onCategoryChange('food');
 
-        expect(viewModel.uiState.incomeCategory, equals(IncomeCategory.salary));
+        viewModel.onTransactionTypeChange(TransactionType.income);
+
+        expect(viewModel.uiState.categorySlug, isNull);
+        expect(viewModel.isSubmitEnabled, isFalse);
       });
     });
 
@@ -146,7 +154,7 @@ void main() {
 
     group('isSubmitEnabled', () {
       test('should be true with valid expense category and quantity', () {
-        viewModel.onExpenseCategoryChange(ExpenseCategory.food);
+        viewModel.onCategoryChange('food');
         viewModel.onQuantityChange('50.00');
 
         expect(viewModel.isSubmitEnabled, isTrue);
@@ -154,7 +162,7 @@ void main() {
 
       test('should be true with valid income category and quantity', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
-        viewModel.onIncomeCategoryChange(IncomeCategory.salary);
+        viewModel.onCategoryChange('salary');
         viewModel.onQuantityChange('1000');
 
         expect(viewModel.isSubmitEnabled, isTrue);
@@ -167,13 +175,13 @@ void main() {
       });
 
       test('should be false without quantity', () {
-        viewModel.onExpenseCategoryChange(ExpenseCategory.food);
+        viewModel.onCategoryChange('food');
 
         expect(viewModel.isSubmitEnabled, isFalse);
       });
 
       test('should be false with invalid quantity', () {
-        viewModel.onExpenseCategoryChange(ExpenseCategory.food);
+        viewModel.onCategoryChange('food');
         viewModel.onQuantityChange('abc');
 
         expect(viewModel.isSubmitEnabled, isFalse);
@@ -186,7 +194,7 @@ void main() {
           () => mockMakeTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.ok(1));
 
-        viewModel.onExpenseCategoryChange(ExpenseCategory.food);
+        viewModel.onCategoryChange('food');
         viewModel.onQuantityChange('50.50');
         viewModel.onNotesChange('Lunch');
         viewModel.onRecurringChange(false);
@@ -196,12 +204,33 @@ void main() {
         verify(() => mockMakeTransactionUseCase(any())).called(1);
       });
 
+      test(
+        'should submit the user-created slug in the category field',
+        () async {
+          when(
+            () => mockMakeTransactionUseCase(any()),
+          ).thenAnswer((_) async => Result.ok(1));
+
+          viewModel.onCategoryChange('custom_mercado');
+          viewModel.onQuantityChange('12.00');
+
+          await viewModel.submitCommand.execute(2, 2026);
+
+          final captured =
+              verify(
+                    () => mockMakeTransactionUseCase(captureAny()),
+                  ).captured.single
+                  as Transaction;
+          expect(captured.category, equals('custom_mercado'));
+        },
+      );
+
       test('should have running state during execution', () async {
         when(
           () => mockMakeTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.ok(1));
 
-        viewModel.onExpenseCategoryChange(ExpenseCategory.food);
+        viewModel.onCategoryChange('food');
         viewModel.onQuantityChange('50.50');
 
         final future = viewModel.submitCommand.execute(2, 2026);
@@ -219,7 +248,7 @@ void main() {
           () => mockMakeTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.ok(1));
 
-        viewModel.onExpenseCategoryChange(ExpenseCategory.food);
+        viewModel.onCategoryChange('food');
         viewModel.onQuantityChange('50.50');
         viewModel.onNotesChange('Lunch');
 
@@ -227,7 +256,7 @@ void main() {
 
         expect(viewModel.uiState.quantity, equals(''));
         expect(viewModel.uiState.notes, equals(''));
-        expect(viewModel.uiState.expenseCategory, isNull);
+        expect(viewModel.uiState.categorySlug, isNull);
       });
 
       test('should have error state when failed', () async {
@@ -235,7 +264,7 @@ void main() {
           () => mockMakeTransactionUseCase(any()),
         ).thenAnswer((_) async => Result.error(Exception('Database error')));
 
-        viewModel.onExpenseCategoryChange(ExpenseCategory.food);
+        viewModel.onCategoryChange('food');
         viewModel.onQuantityChange('50.50');
 
         await viewModel.submitCommand.execute(2, 2026);
@@ -253,7 +282,7 @@ void main() {
     group('resetForm', () {
       test('should reset all fields', () {
         viewModel.onTransactionTypeChange(TransactionType.income);
-        viewModel.onIncomeCategoryChange(IncomeCategory.salary);
+        viewModel.onCategoryChange('salary');
         viewModel.onQuantityChange('1000');
         viewModel.onNotesChange('Salary');
         viewModel.onRecurringChange(true);
@@ -264,8 +293,7 @@ void main() {
         final state = viewModel.uiState;
         expect(state.date, equals(''));
         expect(state.transactionType, equals(TransactionType.expense));
-        expect(state.expenseCategory, isNull);
-        expect(state.incomeCategory, isNull);
+        expect(state.categorySlug, isNull);
         expect(state.quantity, equals(''));
         expect(state.notes, equals(''));
         expect(state.isRecurring, isFalse);

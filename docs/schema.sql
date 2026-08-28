@@ -1,7 +1,7 @@
 -- ============================================
 -- Rich Ludo Database Schema
 -- SQLite Database Documentation
--- Version: 2
+-- Version: 3
 -- Last Updated: 2026-02-17
 -- ============================================
 
@@ -74,6 +74,41 @@ CREATE TABLE recurring_exclusions (
 );
 
 -- ============================================
+-- TABLE: categories
+-- Stores only the categories created by the user.
+-- The 13 built-in categories remain Dart enums
+-- and are never rows of this table.
+--
+-- Example: a category named "Mercado" is stored as
+-- (slug='custom_mercado', name='Mercado', type='expense')
+-- and transactions.category holds 'custom_mercado'.
+-- ============================================
+CREATE TABLE categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    -- Value written to transactions.category, always prefixed 'custom_'
+    slug TEXT NOT NULL,
+
+    -- Display name typed by the user (up to 30 characters)
+    name TEXT NOT NULL,
+
+    -- Category type: 'income' or 'expense'
+    type TEXT NOT NULL,
+
+    -- Code point of an entry of customCategoryIcons
+    iconCodePoint INTEGER NOT NULL,
+
+    -- ARGB value of an entry of CategoryPiColors.customPalette
+    colorValue INTEGER NOT NULL,
+
+    -- Creation timestamp (milliseconds since epoch)
+    createdAt INTEGER NOT NULL DEFAULT 0,
+
+    -- One name per type; the same name may exist for both types
+    UNIQUE (slug, type)
+);
+
+-- ============================================
 -- NOTE ON FOREIGN KEYS IN SQLITE
 -- ============================================
 -- By default, SQLite does NOT enforce Foreign Key
@@ -90,4 +125,5 @@ CREATE TABLE recurring_exclusions (
 -- ============================================
 -- Version 1: Initial schema (transactions)
 -- Version 2: Added endMonth, endYear and the recurring_exclusions table
+-- Version 3: Added the categories table for user-created categories
 -- ============================================

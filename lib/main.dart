@@ -5,15 +5,22 @@ import 'package:provider/provider.dart';
 
 import 'l10n/app_localizations.dart';
 
+import 'data/services/category_service.dart';
+import 'data/services/category_local_service.dart';
 import 'data/services/export_local_service.dart';
 import 'data/services/export_service.dart';
 import 'data/services/transaction_service.dart';
 import 'data/services/transaction_local_service.dart';
+import 'data/repository/category_repository_impl.dart';
 import 'data/repository/transaction_repository_impl.dart';
+import 'domain/repository/category_repository.dart';
 import 'domain/repository/transaction_repository.dart';
+import 'domain/usecase/create_custom_category_usecase.dart';
+import 'domain/usecase/delete_custom_category_usecase.dart';
 import 'domain/usecase/delete_recurring_transaction_usecase.dart';
 import 'domain/usecase/delete_transaction_usecase.dart';
 import 'domain/usecase/export_database_usecase.dart';
+import 'domain/usecase/get_custom_categories_usecase.dart';
 import 'domain/usecase/get_exclusions_usecase.dart';
 import 'domain/usecase/get_transactions_by_month_year_usecase.dart';
 import 'domain/usecase/get_non_recurring_balance_usecase.dart';
@@ -21,6 +28,7 @@ import 'domain/usecase/import_database_usecase.dart';
 import 'domain/usecase/make_transaction_usecase.dart';
 import 'presentation/ui/theme/app_theme.dart';
 import 'presentation/ui/screens/main_screen.dart';
+import 'presentation/viewmodel/category_viewmodel.dart';
 import 'presentation/viewmodel/main_screen_viewmodel.dart';
 import 'presentation/viewmodel/transaction_form_viewmodel.dart';
 
@@ -39,20 +47,27 @@ class RichLudoApp extends StatelessWidget {
       providers: [
         Provider<TransactionService>(create: (_) => TransactionLocalService()),
         Provider<ExportService>(create: (_) => ExportLocalService()),
+        Provider<CategoryService>(create: (_) => CategoryLocalService()),
 
         Provider<TransactionRepository>(
           create: (context) => TransactionRepositoryImpl(
             service: context.read<TransactionService>(),
           ),
         ),
+        Provider<CategoryRepository>(
+          create: (context) =>
+              CategoryRepositoryImpl(service: context.read<CategoryService>()),
+        ),
 
         Provider<GetTransactionsByMonthYearUseCase>(
-          create: (context) =>
-              GetTransactionsByMonthYearUseCase(context.read<TransactionRepository>()),
+          create: (context) => GetTransactionsByMonthYearUseCase(
+            context.read<TransactionRepository>(),
+          ),
         ),
         Provider<GetNonRecurringBalanceUseCase>(
-          create: (context) =>
-              GetNonRecurringBalanceUseCase(context.read<TransactionRepository>()),
+          create: (context) => GetNonRecurringBalanceUseCase(
+            context.read<TransactionRepository>(),
+          ),
         ),
         Provider<MakeTransactionUseCase>(
           create: (context) =>
@@ -79,11 +94,27 @@ class RichLudoApp extends StatelessWidget {
           create: (context) =>
               ImportDatabaseUseCase(context.read<ExportService>()),
         ),
+        Provider<GetCustomCategoriesUseCase>(
+          create: (context) =>
+              GetCustomCategoriesUseCase(context.read<CategoryRepository>()),
+        ),
+        Provider<CreateCustomCategoryUseCase>(
+          create: (context) =>
+              CreateCustomCategoryUseCase(context.read<CategoryRepository>()),
+        ),
+        Provider<DeleteCustomCategoryUseCase>(
+          create: (context) => DeleteCustomCategoryUseCase(
+            context.read<CategoryRepository>(),
+            context.read<TransactionRepository>(),
+          ),
+        ),
 
         ChangeNotifierProvider<MainScreenViewModel>(
           create: (context) => MainScreenViewModel(
-            getTransactionsUseCase: context.read<GetTransactionsByMonthYearUseCase>(),
-            getNonRecurringBalanceUseCase: context.read<GetNonRecurringBalanceUseCase>(),
+            getTransactionsUseCase: context
+                .read<GetTransactionsByMonthYearUseCase>(),
+            getNonRecurringBalanceUseCase: context
+                .read<GetNonRecurringBalanceUseCase>(),
             deleteTransactionUseCase: context.read<DeleteTransactionUseCase>(),
             deleteRecurringTransactionUseCase: context
                 .read<DeleteRecurringTransactionUseCase>(),
@@ -95,6 +126,16 @@ class RichLudoApp extends StatelessWidget {
         ChangeNotifierProvider<TransactionFormViewModel>(
           create: (context) => TransactionFormViewModel(
             makeTransactionUseCase: context.read<MakeTransactionUseCase>(),
+          ),
+        ),
+        ChangeNotifierProvider<CategoryViewModel>(
+          create: (context) => CategoryViewModel(
+            getCustomCategoriesUseCase: context
+                .read<GetCustomCategoriesUseCase>(),
+            createCustomCategoryUseCase: context
+                .read<CreateCustomCategoryUseCase>(),
+            deleteCustomCategoryUseCase: context
+                .read<DeleteCustomCategoryUseCase>(),
           ),
         ),
       ],

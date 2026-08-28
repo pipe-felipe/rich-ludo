@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart' as fl;
 import 'package:flutter/material.dart';
 
 import '../../../../domain/model/category_total.dart';
+import '../../../../domain/model/custom_category.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../utils/category_color.dart';
 import '../../utils/category_mapper.dart';
@@ -16,11 +17,13 @@ int categoryPercentage(int amountCents, int totalCents) {
 class PieChart extends StatefulWidget {
   final List<CategoryTotal> categoryTotals;
   final int totalExpenseCents;
+  final List<CustomCategory> customCategories;
 
   const PieChart({
     super.key,
     required this.categoryTotals,
     required this.totalExpenseCents,
+    this.customCategories = const [],
   });
 
   @override
@@ -68,7 +71,10 @@ class _PieChartState extends State<PieChart> {
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
 
       return fl.PieChartSectionData(
-        color: getExpenseCategoryColor(total.category),
+        color: getExpenseCategoryColor(
+          total.category,
+          customCategories: widget.customCategories,
+        ),
         value: total.amountCents.toDouble(),
         title:
             '${categoryPercentage(total.amountCents, widget.totalExpenseCents)}%',
@@ -87,11 +93,13 @@ class _PieChartState extends State<PieChart> {
 class CategoryLegend extends StatelessWidget {
   final List<CategoryTotal> categoryTotals;
   final int totalExpenseCents;
+  final List<CustomCategory> customCategories;
 
   const CategoryLegend({
     super.key,
     required this.categoryTotals,
     required this.totalExpenseCents,
+    this.customCategories = const [],
   });
 
   @override
@@ -105,8 +113,15 @@ class CategoryLegend extends StatelessWidget {
         final total = categoryTotals[index];
 
         return _Indicator(
-          color: getExpenseCategoryColor(total.category),
-          label: getExpenseCategoryLabel(total.category, l10n),
+          color: getExpenseCategoryColor(
+            total.category,
+            customCategories: customCategories,
+          ),
+          label: getExpenseCategoryLabel(
+            total.category,
+            l10n,
+            customCategories: customCategories,
+          ),
           value: 'R\$ ${formatMoney(total.amountCents)}',
           percentage: categoryPercentage(total.amountCents, totalExpenseCents),
         );
