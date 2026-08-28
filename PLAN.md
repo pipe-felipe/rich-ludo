@@ -273,7 +273,7 @@ path of its file. Searching for it must land on the block.
 |---|---|---|---|
 | 1 | Add the MonthYear domain model | `PLAN/01-month-year.md` | DONE |
 | 2 | Rename the recurring delete mode and dialog to a neutral scope | `PLAN/02-recurring-scope-rename.md` | DONE |
-| 3 | Move the delete use case onto MonthYear | `PLAN/03-delete-usecase-month-year.md` | TODO |
+| 3 | Move the delete use case onto MonthYear | `PLAN/03-delete-usecase-month-year.md` | DONE |
 | 4 | Add the edit localization keys | `PLAN/04-l10n-edit-keys.md` | TODO |
 | 5 | Let the scope dialog disable one option | `PLAN/05-scope-dialog-disabled.md` | TODO |
 | 6 | Add UpdateTransactionUseCase | `PLAN/06-update-transaction-usecase.md` | TODO |
