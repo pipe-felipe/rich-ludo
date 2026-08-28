@@ -16,6 +16,9 @@ import 'package:rich_ludo/utils/result.dart';
 
 import 'package:rich_ludo/domain/usecase/get_transactions_by_month_year_usecase.dart';
 import 'package:rich_ludo/domain/usecase/get_non_recurring_balance_usecase.dart';
+import 'package:rich_ludo/domain/usecase/update_recurring_transaction_usecase.dart';
+import 'package:rich_ludo/domain/usecase/update_transaction_usecase.dart';
+import 'package:rich_ludo/domain/model/recurring_scope.dart';
 
 class MockGetTransactionsUseCase extends Mock
     implements GetTransactionsByMonthYearUseCase {}
@@ -29,6 +32,14 @@ class MockDeleteTransactionUseCase extends Mock
 class MockDeleteRecurringTransactionUseCase extends Mock
     implements DeleteRecurringTransactionUseCase {}
 
+class MockUpdateTransactionUseCase extends Mock
+    implements UpdateTransactionUseCase {}
+
+class MockUpdateRecurringTransactionUseCase extends Mock
+    implements UpdateRecurringTransactionUseCase {}
+
+class FakeTransaction extends Fake implements Transaction {}
+
 class MockGetExclusionsUseCase extends Mock implements GetExclusionsUseCase {}
 
 class MockExportDatabaseUseCase extends Mock implements ExportDatabaseUseCase {}
@@ -41,9 +52,17 @@ void main() {
   late MockDeleteTransactionUseCase mockDeleteTransactionUseCase;
   late MockDeleteRecurringTransactionUseCase
   mockDeleteRecurringTransactionUseCase;
+  late MockUpdateTransactionUseCase mockUpdateTransactionUseCase;
+  late MockUpdateRecurringTransactionUseCase
+  mockUpdateRecurringTransactionUseCase;
   late MockGetExclusionsUseCase mockGetExclusionsUseCase;
   late MockExportDatabaseUseCase mockExportDatabaseUseCase;
   late MockImportDatabaseUseCase mockImportDatabaseUseCase;
+
+  setUpAll(() {
+    registerFallbackValue(FakeTransaction());
+    registerFallbackValue(RecurringScope.thisMonth);
+  });
 
   setUp(() {
     mockGetTransactionsUseCase = MockGetTransactionsUseCase();
@@ -51,6 +70,9 @@ void main() {
     mockDeleteTransactionUseCase = MockDeleteTransactionUseCase();
     mockDeleteRecurringTransactionUseCase =
         MockDeleteRecurringTransactionUseCase();
+    mockUpdateTransactionUseCase = MockUpdateTransactionUseCase();
+    mockUpdateRecurringTransactionUseCase =
+        MockUpdateRecurringTransactionUseCase();
     mockGetExclusionsUseCase = MockGetExclusionsUseCase();
     mockExportDatabaseUseCase = MockExportDatabaseUseCase();
     mockImportDatabaseUseCase = MockImportDatabaseUseCase();
@@ -93,6 +115,8 @@ void main() {
       getNonRecurringBalanceUseCase: mockGetNonRecurringBalanceUseCase,
       deleteTransactionUseCase: mockDeleteTransactionUseCase,
       deleteRecurringTransactionUseCase: mockDeleteRecurringTransactionUseCase,
+      updateTransactionUseCase: mockUpdateTransactionUseCase,
+      updateRecurringTransactionUseCase: mockUpdateRecurringTransactionUseCase,
       getExclusionsUseCase: mockGetExclusionsUseCase,
       exportDatabaseUseCase: mockExportDatabaseUseCase,
       importDatabaseUseCase: mockImportDatabaseUseCase,
@@ -179,6 +203,9 @@ void main() {
           deleteTransactionUseCase: mockDeleteTransactionUseCase,
           deleteRecurringTransactionUseCase:
               mockDeleteRecurringTransactionUseCase,
+          updateTransactionUseCase: mockUpdateTransactionUseCase,
+          updateRecurringTransactionUseCase:
+              mockUpdateRecurringTransactionUseCase,
           getExclusionsUseCase: mockGetExclusionsUseCase,
           exportDatabaseUseCase: mockExportDatabaseUseCase,
           importDatabaseUseCase: mockImportDatabaseUseCase,
@@ -510,6 +537,101 @@ void main() {
 
           expect(viewModel.deleteTransaction.running, isFalse);
           expect(viewModel.deleteTransaction.completed, isTrue);
+
+          viewModel.dispose();
+        },
+      );
+    });
+
+    group('Update', () {
+      test('updateItem should call the update use case and reload', () async {
+        when(
+          () => mockUpdateTransactionUseCase(any()),
+        ).thenAnswer((_) async => Result.ok(1));
+
+        final viewModel = createViewModel();
+        await waitForLoad(viewModel);
+
+        final tx = Transaction(
+          id: 1,
+          amountCents: 100,
+          type: TransactionType.expense,
+          targetMonth: 8,
+          targetYear: 2026,
+        );
+
+        await viewModel.updateItem(tx);
+
+        verify(() => mockUpdateTransactionUseCase(any())).called(1);
+        expect(viewModel.updateTransaction.completed, isTrue);
+
+        viewModel.dispose();
+      });
+
+      test(
+        'updateItem should report the error when the use case fails',
+        () async {
+          when(
+            () => mockUpdateTransactionUseCase(any()),
+          ).thenAnswer((_) async => Result.error(Exception('Database error')));
+
+          final viewModel = createViewModel();
+          await waitForLoad(viewModel);
+
+          final tx = Transaction(
+            id: 1,
+            amountCents: 100,
+            type: TransactionType.expense,
+            targetMonth: 8,
+            targetYear: 2026,
+          );
+
+          await viewModel.updateItem(tx);
+
+          expect(viewModel.updateTransaction.error, isTrue);
+
+          viewModel.dispose();
+        },
+      );
+
+      test(
+        'updateRecurringItem should pass the selected month and the scope',
+        () async {
+          when(
+            () => mockUpdateRecurringTransactionUseCase(
+              original: any(named: 'original'),
+              edited: any(named: 'edited'),
+              scope: any(named: 'scope'),
+              currentMonth: any(named: 'currentMonth'),
+              currentYear: any(named: 'currentYear'),
+            ),
+          ).thenAnswer((_) async => Result.ok(1));
+
+          final viewModel = createViewModel();
+          await waitForLoad(viewModel);
+
+          final tx = Transaction(
+            id: 1,
+            amountCents: 100,
+            type: TransactionType.expense,
+            targetMonth: 8,
+            targetYear: 2026,
+          );
+
+          await viewModel.updateRecurringItem(tx, tx, RecurringScope.thisMonth);
+
+          final captured = verify(
+            () => mockUpdateRecurringTransactionUseCase(
+              original: captureAny(named: 'original'),
+              edited: captureAny(named: 'edited'),
+              scope: captureAny(named: 'scope'),
+              currentMonth: captureAny(named: 'currentMonth'),
+              currentYear: captureAny(named: 'currentYear'),
+            ),
+          ).captured;
+          expect(captured[3], equals(viewModel.currentMonth));
+          expect(captured[4], equals(viewModel.currentYear));
+          expect(captured[2], equals(RecurringScope.thisMonth));
 
           viewModel.dispose();
         },

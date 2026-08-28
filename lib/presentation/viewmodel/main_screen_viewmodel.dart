@@ -11,6 +11,8 @@ import '../../domain/usecase/get_exclusions_usecase.dart';
 import '../../domain/usecase/get_transactions_by_month_year_usecase.dart';
 import '../../domain/usecase/get_non_recurring_balance_usecase.dart';
 import '../../domain/usecase/import_database_usecase.dart';
+import '../../domain/usecase/update_recurring_transaction_usecase.dart';
+import '../../domain/usecase/update_transaction_usecase.dart';
 import '../../utils/command.dart';
 import '../../utils/result.dart';
 import '../ui/utils/money_formatter.dart';
@@ -20,6 +22,8 @@ class MainScreenViewModel extends ChangeNotifier {
   final GetNonRecurringBalanceUseCase _getNonRecurringBalanceUseCase;
   final DeleteTransactionUseCase _deleteTransactionUseCase;
   final DeleteRecurringTransactionUseCase _deleteRecurringTransactionUseCase;
+  final UpdateTransactionUseCase _updateTransactionUseCase;
+  final UpdateRecurringTransactionUseCase _updateRecurringTransactionUseCase;
   final GetExclusionsUseCase _getExclusionsUseCase;
   final ExportDatabaseUseCase _exportDatabaseUseCase;
   final ImportDatabaseUseCase _importDatabaseUseCase;
@@ -42,6 +46,8 @@ class MainScreenViewModel extends ChangeNotifier {
 
   late final Command1<int, int> deleteTransaction;
 
+  late final Command1<int, Transaction> updateTransaction;
+
   late final Command0<String> exportDatabase;
 
   late final Command0<void> importDatabase;
@@ -52,6 +58,9 @@ class MainScreenViewModel extends ChangeNotifier {
     required DeleteTransactionUseCase deleteTransactionUseCase,
     required DeleteRecurringTransactionUseCase
     deleteRecurringTransactionUseCase,
+    required UpdateTransactionUseCase updateTransactionUseCase,
+    required UpdateRecurringTransactionUseCase
+    updateRecurringTransactionUseCase,
     required GetExclusionsUseCase getExclusionsUseCase,
     required ExportDatabaseUseCase exportDatabaseUseCase,
     required ImportDatabaseUseCase importDatabaseUseCase,
@@ -59,12 +68,15 @@ class MainScreenViewModel extends ChangeNotifier {
        _getNonRecurringBalanceUseCase = getNonRecurringBalanceUseCase,
        _deleteTransactionUseCase = deleteTransactionUseCase,
        _deleteRecurringTransactionUseCase = deleteRecurringTransactionUseCase,
+       _updateTransactionUseCase = updateTransactionUseCase,
+       _updateRecurringTransactionUseCase = updateRecurringTransactionUseCase,
        _getExclusionsUseCase = getExclusionsUseCase,
        _exportDatabaseUseCase = exportDatabaseUseCase,
        _importDatabaseUseCase = importDatabaseUseCase {
     load = Command0<List<Transaction>>(_loadTransactions);
     load.addListener(_onLoadChanged);
     deleteTransaction = Command1<int, int>(_deleteItem);
+    updateTransaction = Command1<int, Transaction>(_updateItem);
     exportDatabase = Command0<String>(_exportDatabaseUseCase.call);
     importDatabase = Command0<void>(_importDatabaseUseCase.call);
 
@@ -183,6 +195,19 @@ class MainScreenViewModel extends ChangeNotifier {
         break;
       case Error<int>():
         debugPrint('Error deleting item: ${result.error}');
+    }
+
+    return result;
+  }
+
+  Future<Result<int>> _updateItem(Transaction transaction) async {
+    final result = await _updateTransactionUseCase(transaction);
+
+    switch (result) {
+      case Ok<int>():
+        break;
+      case Error<int>():
+        debugPrint('Error updating item: ${result.error}');
     }
 
     return result;
@@ -366,6 +391,34 @@ class MainScreenViewModel extends ChangeNotifier {
         invalidateAndReload();
       case Error<int>():
         debugPrint('Error deleting recurring: ${result.error}');
+    }
+  }
+
+  Future<void> updateItem(Transaction edited) async {
+    await updateTransaction.execute(edited);
+    if (updateTransaction.completed) {
+      invalidateAndReload();
+    }
+  }
+
+  Future<void> updateRecurringItem(
+    Transaction original,
+    Transaction edited,
+    RecurringScope scope,
+  ) async {
+    final result = await _updateRecurringTransactionUseCase(
+      original: original,
+      edited: edited,
+      scope: scope,
+      currentMonth: _currentMonth,
+      currentYear: _currentYear,
+    );
+
+    switch (result) {
+      case Ok<int>():
+        invalidateAndReload();
+      case Error<int>():
+        debugPrint('Error updating recurring: ${result.error}');
     }
   }
 
