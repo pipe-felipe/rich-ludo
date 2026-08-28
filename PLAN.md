@@ -275,7 +275,7 @@ path of its file. Searching for it must land on the block.
 | 2 | Rename the recurring delete mode and dialog to a neutral scope | `PLAN/02-recurring-scope-rename.md` | DONE |
 | 3 | Move the delete use case onto MonthYear | `PLAN/03-delete-usecase-month-year.md` | DONE |
 | 4 | Add the edit localization keys | `PLAN/04-l10n-edit-keys.md` | DONE |
-| 5 | Let the scope dialog disable one option | `PLAN/05-scope-dialog-disabled.md` | TODO |
+| 5 | Let the scope dialog disable one option | `PLAN/05-scope-dialog-disabled.md` | DONE |
 | 6 | Add UpdateTransactionUseCase | `PLAN/06-update-transaction-usecase.md` | TODO |
 | 7 | Add UpdateRecurringTransactionUseCase | `PLAN/07-update-recurring-usecase.md` | TODO |
 | 8 | Give the form ViewModel an edit mode | `PLAN/08-form-viewmodel-edit.md` | TODO |
