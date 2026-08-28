@@ -271,7 +271,7 @@ path of its file. Searching for it must land on the block.
 
 | # | Block | Where | Status |
 |---|---|---|---|
-| 1 | Add the MonthYear domain model | `PLAN/01-month-year.md` | TODO |
+| 1 | Add the MonthYear domain model | `PLAN/01-month-year.md` | DONE |
 | 2 | Rename the recurring delete mode and dialog to a neutral scope | `PLAN/02-recurring-scope-rename.md` | TODO |
 | 3 | Move the delete use case onto MonthYear | `PLAN/03-delete-usecase-month-year.md` | TODO |
 | 4 | Add the edit localization keys | `PLAN/04-l10n-edit-keys.md` | TODO |
