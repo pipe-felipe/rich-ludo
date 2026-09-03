@@ -212,7 +212,7 @@ path of its file. Searching for it must land on the block.
 | # | Block | Where | Status |
 |---|---|---|---|
 | 1 | Make the card tappable and rewrite its widget tests | §13, heading `BLOCK 1` | DONE |
-| 2 | Point the edit e2e helper at the card and update the test map | §13, heading `BLOCK 2` | TODO |
+| 2 | Point the edit e2e helper at the card and update the test map | §13, heading `BLOCK 2` | DONE |
 | 3 | Verify the whole task and remove the plan | §13, heading `BLOCK 3` | TODO |
 
 Statuses: `TODO` → `DONE`, or `BLOCKED` (see §11 R12).

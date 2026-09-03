@@ -5,8 +5,9 @@ import 'package:rich_ludo/data/services/transaction_local_service.dart';
 import 'package:rich_ludo/domain/model/transaction.dart';
 import 'package:rich_ludo/domain/model/transaction_type.dart';
 import 'package:rich_ludo/main.dart' as app;
+import 'package:rich_ludo/presentation/ui/widgets/transaction_card.dart';
 
-/// E2E coverage for editing an existing transaction: the pencil button opens
+/// E2E coverage for editing an existing transaction: tapping the transaction card opens
 /// the dialog pre-filled with the stored values, a one-off edit writes the
 /// new amount and notes, a recurring edit asks for its scope through the
 /// four-option dialog, and turning the Repete switch off leaves the
@@ -57,7 +58,7 @@ void main() {
   }
 
   Future<void> openEditDialog(WidgetTester tester) async {
-    await tester.tap(find.byIcon(Icons.edit));
+    await tester.tap(find.byType(TransactionCard));
     await tester.pumpAndSettle();
   }
 
