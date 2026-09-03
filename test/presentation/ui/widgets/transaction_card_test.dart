@@ -39,16 +39,16 @@ void main() {
   }
 
   group('TransactionCard', () {
-    testWidgets('should show one edit button and one delete button', (
-      tester,
-    ) async {
+    testWidgets('should show the delete button only', (tester) async {
       await pumpCard(tester, cardTransaction(), onEdit: () {}, onDelete: () {});
 
-      expect(find.byIcon(Icons.edit), findsOneWidget);
+      expect(find.byIcon(Icons.edit), findsNothing);
       expect(find.byIcon(Icons.delete), findsOneWidget);
     });
 
-    testWidgets('should call onEdit when the pencil is tapped', (tester) async {
+    testWidgets('should call onEdit when the card body is tapped', (
+      tester,
+    ) async {
       var editCount = 0;
       var deleteCount = 0;
       await pumpCard(
@@ -58,7 +58,7 @@ void main() {
         onDelete: () => deleteCount++,
       );
 
-      await tester.tap(find.byIcon(Icons.edit));
+      await tester.tap(find.byType(TransactionCard));
       await tester.pump();
 
       expect(editCount, equals(1));
