@@ -17,7 +17,7 @@
 | Category rules | `test/domain/usecase/create_custom_category_usecase_test.dart`, `test/domain/usecase/delete_custom_category_usecase_test.dart` | Name validation, duplicates, and the in-use refusal with its count |
 | Category UI | `test/presentation/viewmodel/category_viewmodel_test.dart`, `test/presentation/ui/widgets/category_manager_dialog_test.dart`, `test/presentation/ui/widgets/transaction_dialog_test.dart` | Reload after create and delete, the dialog's error messages, and the dropdown entries |
 | Edit rules | `test/domain/usecase/update_transaction_usecase_test.dart`, `test/domain/usecase/update_recurring_transaction_usecase_test.dart`, `test/domain/model/month_year_test.dart` | Delegation, the four recurring spans with their collapse cases, and month arithmetic |
-| Edit UI | `test/presentation/ui/widgets/transaction_card_test.dart`, `test/presentation/ui/widgets/recurring_scope_dialog_test.dart`, `integration_test/edit_transaction_test.dart` | The tappable card, the disabled scope option, and the four end-to-end edit paths |
+| Edit UI | `test/presentation/ui/widgets/transaction_card_test.dart`, `test/presentation/ui/widgets/recurring_scope_dialog_test.dart`, `integration_test/edit_transaction_test.dart` | The tappable card, the disabled scope option, and the five end-to-end edit paths |
 
 ## Important gaps
 

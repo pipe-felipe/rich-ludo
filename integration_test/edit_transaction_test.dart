@@ -83,6 +83,22 @@ void main() {
 
   group('Edit transaction', () {
     testWidgets(
+      'tapping the card body opens the edit dialog without the pencil button',
+      (tester) async {
+        await seedOneOff();
+        await startApp(tester);
+
+        expect(find.byIcon(Icons.edit), findsNothing);
+        expect(find.byIcon(Icons.delete), findsOneWidget);
+
+        await openEditDialog(tester);
+
+        expect(find.widgetWithText(TextField, '50.00'), findsOneWidget);
+        expect(find.widgetWithText(TextField, 'Almoço'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
       'editing a one-off transaction writes the new amount and notes',
       (tester) async {
         await seedOneOff();
