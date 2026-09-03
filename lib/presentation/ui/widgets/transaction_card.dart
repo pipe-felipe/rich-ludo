@@ -43,9 +43,8 @@ class TransactionCard extends StatelessWidget {
           onTap: onEdit,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.fromLTRB(14, 14, 6, 14),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _CategoryIcon(
                   category: item.category,
@@ -58,9 +57,11 @@ class TransactionCard extends StatelessWidget {
                   description: item.description,
                   humanDate: item.humanDate,
                 ),
-                Flexible(
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 140),
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
                     child: _AmountText(
                       amountCents: item.amountCents,
                       isIncome: _isIncome,
