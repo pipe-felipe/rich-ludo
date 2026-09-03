@@ -36,46 +36,46 @@ class TransactionCard extends StatelessWidget {
     return Card(
       color: backgroundColor,
       margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _CategoryIcon(
-              category: item.category,
-              customCategories: customCategories,
-              isIncome: _isIncome,
-              iconColor: iconColor,
-            ),
-            const SizedBox(width: 12),
-            _TransactionDetails(
-              description: item.description,
-              humanDate: item.humanDate,
-            ),
-            Flexible(
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: _AmountText(
-                  amountCents: item.amountCents,
+      child: Semantics(
+        label: AppLocalizations.of(context)!.transactionEditTooltip,
+        button: true,
+        child: InkWell(
+          onTap: onEdit,
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 6, 14),
+            child: Row(
+              children: [
+                _CategoryIcon(
+                  category: item.category,
+                  customCategories: customCategories,
                   isIncome: _isIncome,
+                  iconColor: iconColor,
                 ),
-              ),
+                const SizedBox(width: 12),
+                _TransactionDetails(
+                  description: item.description,
+                  humanDate: item.humanDate,
+                ),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 140),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: _AmountText(
+                      amountCents: item.amountCents,
+                      isIncome: _isIncome,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: onDelete,
+                  visualDensity: VisualDensity.compact,
+                  icon: Icon(Icons.delete, color: AppTheme.thrashCan(context)),
+                ),
+              ],
             ),
-            IconButton(
-              onPressed: onEdit,
-              visualDensity: VisualDensity.compact,
-              tooltip: AppLocalizations.of(context)!.transactionEditTooltip,
-              icon: Icon(
-                Icons.edit,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            IconButton(
-              onPressed: onDelete,
-              visualDensity: VisualDensity.compact,
-              icon: Icon(Icons.delete, color: AppTheme.thrashCan(context)),
-            ),
-          ],
+          ),
         ),
       ),
     );

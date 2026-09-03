@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Project license switched from GPL-3.0 to MIT
+
+## [3.1.0] - 2026-09-03
+
+### Added
+- Open transaction editing by tapping anywhere on the transaction card, which is now a semantic button labelled with `transactionEditTooltip`
+- E2E test verifying that tapping the card body opens the edit dialog with no pencil button
+- E2E test suite for deleting one-off and recurring transactions
+
+### Changed
+- The transaction card no longer shows the pencil edit button, keeping only the delete action
+- `RecurringScopeDialog` redesigned with compact list options instead of pill-shaped buttons, a centered title, tighter insets and a divider separating the destructive all-months option
+
 ## [3.0.0] - 2026-08-27
 
 ### Added

@@ -1,10 +1,10 @@
 # RichLudo
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-3.0.0-green" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-3.1.0-green" alt="Version"/>
   <img src="https://img.shields.io/badge/flutter-%E2%89%A53.10-blue" alt="Flutter"/>
   <img src="https://img.shields.io/badge/platform-Android%20%7C%20iOS-lightgrey" alt="Platform"/>
-  <img src="https://img.shields.io/badge/license-GPL--3.0-orange" alt="License"/>
+  <img src="https://img.shields.io/badge/license-MIT-orange" alt="License"/>
 </p>
 
 Personal finance control app, converted from the RichPipi project (Kotlin Multiplatform) to Flutter.
@@ -193,4 +193,4 @@ flutter build ios
 
 ## License
 
-This project is licensed under the **GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.

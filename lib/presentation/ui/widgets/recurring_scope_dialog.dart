@@ -29,29 +29,29 @@ class RecurringScopeDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 25),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
               title,
+              textAlign: TextAlign.center,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
-            _DialogPillOption(
+            const SizedBox(height: 12),
+            _DialogOption(
               icon: Icons.today,
               label: l10n.recurringDeleteThisMonth,
               onTap: () => Navigator.of(context).pop(RecurringScope.thisMonth),
               isEnabled: !disabledScopes.contains(RecurringScope.thisMonth),
             ),
-            const SizedBox(height: 10),
-            _DialogPillOption(
+            _DialogOption(
               icon: Icons.arrow_back,
               label: l10n.recurringDeleteBackwards,
               onTap: () => Navigator.of(
@@ -61,8 +61,7 @@ class RecurringScopeDialog extends StatelessWidget {
                 RecurringScope.thisAndPreviousMonths,
               ),
             ),
-            const SizedBox(height: 10),
-            _DialogPillOption(
+            _DialogOption(
               icon: Icons.arrow_forward,
               label: l10n.recurringDeleteForwards,
               onTap: () =>
@@ -71,15 +70,14 @@ class RecurringScopeDialog extends StatelessWidget {
                 RecurringScope.thisAndFutureMonths,
               ),
             ),
-            const SizedBox(height: 10),
-            _DialogPillOption(
+            const Divider(height: 16),
+            _DialogOption(
               icon: Icons.delete_forever,
               label: l10n.recurringDeleteAll,
               onTap: () => Navigator.of(context).pop(RecurringScope.allMonths),
               isDestructive: true,
               isEnabled: !disabledScopes.contains(RecurringScope.allMonths),
             ),
-            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -96,14 +94,14 @@ class RecurringScopeDialog extends StatelessWidget {
   }
 }
 
-class _DialogPillOption extends StatelessWidget {
+class _DialogOption extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
   final bool isDestructive;
   final bool isEnabled;
 
-  const _DialogPillOption({
+  const _DialogOption({
     required this.icon,
     required this.label,
     required this.onTap,
@@ -114,45 +112,33 @@ class _DialogPillOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    final pillColor = isDestructive
-        ? colorScheme.errorContainer
-        : colorScheme.primaryContainer;
-    final iconBgColor = isDestructive ? colorScheme.error : colorScheme.primary;
-    final iconFgColor = isDestructive
-        ? colorScheme.onError
-        : colorScheme.onPrimary;
-    final textColor = isDestructive
-        ? colorScheme.onErrorContainer
-        : colorScheme.onPrimaryContainer;
+    final accentColor = isDestructive ? colorScheme.error : colorScheme.primary;
 
     return Opacity(
       opacity: isEnabled ? 1.0 : 0.4,
       child: Material(
-        color: pillColor,
-        borderRadius: BorderRadius.circular(40),
+        color: Colors.transparent,
         child: InkWell(
           onTap: isEnabled ? onTap : null,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(10),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
             child: Row(
               children: [
                 Container(
-                  width: 38,
-                  height: 38,
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: iconBgColor,
-                    shape: BoxShape.circle,
+                    color: accentColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: iconFgColor, size: 20),
+                  child: Icon(icon, size: 22, color: accentColor),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     label,
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: textColor,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: isDestructive ? colorScheme.error : null,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
